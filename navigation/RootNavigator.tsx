@@ -1,0 +1,34 @@
+import React from "react";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import OnboardingScreen from "@/screens/OnboardingScreen";
+import LicenseVerificationScreen from "@/screens/LicenseVerificationScreen";
+import MainTabNavigator from "@/navigation/MainTabNavigator";
+import { useUser } from "@/context/UserContext";
+
+export type RootStackParamList = {
+  Onboarding: undefined;
+  LicenseVerification: undefined;
+  Main: undefined;
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+export default function RootNavigator() {
+  const { hasCompletedOnboarding } = useUser();
+
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {!hasCompletedOnboarding ? (
+        <>
+          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+          <Stack.Screen
+            name="LicenseVerification"
+            component={LicenseVerificationScreen}
+          />
+        </>
+      ) : (
+        <Stack.Screen name="Main" component={MainTabNavigator} />
+      )}
+    </Stack.Navigator>
+  );
+}

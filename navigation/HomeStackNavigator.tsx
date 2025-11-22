@@ -1,14 +1,20 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import HomeScreen from "@/screens/HomeScreen";
-import DetailScreen from "@/screens/DetailScreen";
+import PatientHomeScreen from "@/screens/PatientHomeScreen";
+import PharmacistHomeScreen from "@/screens/PharmacistHomeScreen";
+import UploadPrescriptionScreen from "@/screens/UploadPrescriptionScreen";
+import PriceListScreen from "@/screens/PriceListScreen";
+import BookAppointmentScreen from "@/screens/BookAppointmentScreen";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { useTheme } from "@/hooks/useTheme";
 import { getCommonScreenOptions } from "@/navigation/screenOptions";
 
 export type HomeStackParamList = {
-  Home: undefined;
-  Detail: undefined;
+  PatientHome: undefined;
+  PharmacistHome: undefined;
+  UploadPrescription: undefined;
+  PriceList: undefined;
+  BookAppointment: { pharmacistId: string };
 };
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
@@ -23,16 +29,33 @@ export default function HomeStackNavigator() {
       }}
     >
       <Stack.Screen
-        name="Home"
-        component={HomeScreen}
+        name="PatientHome"
+        component={PatientHomeScreen}
         options={{
-          headerTitle: () => <HeaderTitle title="My App" />,
+          headerTitle: () => <HeaderTitle title="CapsuleCheck" />,
         }}
       />
       <Stack.Screen
-        name="Detail"
-        component={DetailScreen}
-        options={{ headerTitle: "Detail" }}
+        name="PharmacistHome"
+        component={PharmacistHomeScreen}
+        options={{
+          headerTitle: () => <HeaderTitle title="CapsuleCheck" />,
+        }}
+      />
+      <Stack.Screen
+        name="UploadPrescription"
+        component={UploadPrescriptionScreen}
+        options={{ headerTitle: "Upload Prescription" }}
+      />
+      <Stack.Screen
+        name="PriceList"
+        component={PriceListScreen}
+        options={{ headerTitle: "Price List" }}
+      />
+      <Stack.Screen
+        name="BookAppointment"
+        component={BookAppointmentScreen}
+        options={{ headerTitle: "Book Appointment" }}
       />
     </Stack.Navigator>
   );

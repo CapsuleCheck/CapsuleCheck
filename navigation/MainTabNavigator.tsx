@@ -4,11 +4,15 @@ import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { Platform, StyleSheet } from "react-native";
 import HomeStackNavigator from "@/navigation/HomeStackNavigator";
+import MyRxStackNavigator from "@/navigation/MyRxStackNavigator";
+import PharmaciesStackNavigator from "@/navigation/PharmaciesStackNavigator";
 import ProfileStackNavigator from "@/navigation/ProfileStackNavigator";
 import { useTheme } from "@/hooks/useTheme";
 
 export type MainTabParamList = {
   HomeTab: undefined;
+  MyRxTab: undefined;
+  PharmaciesTab: undefined;
   ProfileTab: undefined;
 };
 
@@ -50,6 +54,26 @@ export default function MainTabNavigator() {
           title: "Home",
           tabBarIcon: ({ color, size }) => (
             <Feather name="home" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="MyRxTab"
+        component={MyRxStackNavigator}
+        options={{
+          title: "My Rx",
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="package" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="PharmaciesTab"
+        component={PharmaciesStackNavigator}
+        options={{
+          title: "Pharmacies",
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="map-pin" size={size} color={color} />
           ),
         }}
       />
