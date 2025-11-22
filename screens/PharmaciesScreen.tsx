@@ -5,9 +5,9 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ScreenFlatList } from "@/components/ScreenFlatList";
 import { PrescriberCard } from "@/components/PrescriberCard";
 import { Spacing } from "@/constants/theme";
-import { HomeStackParamList } from "@/navigation/HomeStackNavigator";
+import { PharmaciesStackParamList } from "@/navigation/PharmaciesStackNavigator";
 
-type NavigationProp = NativeStackNavigationProp<HomeStackParamList>;
+type NavigationProp = NativeStackNavigationProp<PharmaciesStackParamList>;
 
 const MOCK_PRESCRIBERS = [
   {

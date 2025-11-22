@@ -1,11 +1,13 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import PharmaciesScreen from "@/screens/PharmaciesScreen";
+import BookAppointmentScreen from "@/screens/BookAppointmentScreen";
 import { useTheme } from "@/hooks/useTheme";
 import { getCommonScreenOptions } from "@/navigation/screenOptions";
 
 export type PharmaciesStackParamList = {
   Pharmacies: undefined;
+  BookAppointment: { prescriberId: string };
 };
 
 const Stack = createNativeStackNavigator<PharmaciesStackParamList>();
@@ -23,6 +25,11 @@ export default function PharmaciesStackNavigator() {
         name="Pharmacies"
         component={PharmaciesScreen}
         options={{ headerTitle: "Prescribers" }}
+      />
+      <Stack.Screen
+        name="BookAppointment"
+        component={BookAppointmentScreen}
+        options={{ headerTitle: "Book Appointment" }}
       />
     </Stack.Navigator>
   );
