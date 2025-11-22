@@ -1,7 +1,7 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import PatientHomeScreen from "@/screens/PatientHomeScreen";
-import PharmacistHomeScreen from "@/screens/PharmacistHomeScreen";
+import PrescriberHomeScreen from "@/screens/PrescriberHomeScreen";
 import UploadPrescriptionScreen from "@/screens/UploadPrescriptionScreen";
 import PriceListScreen from "@/screens/PriceListScreen";
 import BookAppointmentScreen from "@/screens/BookAppointmentScreen";
@@ -14,7 +14,7 @@ export type HomeStackParamList = {
   PharmacistHome: undefined;
   UploadPrescription: undefined;
   PriceList: undefined;
-  BookAppointment: { pharmacistId: string };
+  BookAppointment: { prescriberId: string };
 };
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
@@ -37,7 +37,7 @@ export default function HomeStackNavigator() {
       />
       <Stack.Screen
         name="PharmacistHome"
-        component={PharmacistHomeScreen}
+        component={PrescriberHomeScreen}
         options={{
           headerTitle: () => <HeaderTitle title="CapsuleCheck" />,
         }}

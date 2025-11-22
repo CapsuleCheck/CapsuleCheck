@@ -23,7 +23,7 @@ export default function LicenseVerificationScreen() {
   const [loading, setLoading] = useState(false);
 
   const handleSelectFile = () => {
-    setSelectedFile("pharmacist_license.pdf");
+    setSelectedFile("prescriber_license.pdf");
   };
 
   const handleSubmit = () => {

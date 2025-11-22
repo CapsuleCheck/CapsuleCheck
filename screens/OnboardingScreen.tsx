@@ -61,7 +61,7 @@ export default function OnboardingScreen() {
             <View style={[styles.iconCircle, { backgroundColor: theme.primary + "20" }]}>
               <Feather name="user" size={32} color={theme.primary} />
             </View>
-            <ThemedText style={styles.optionTitle}>For Patients</ThemedText>
+            <ThemedText style={styles.optionTitle}>Patients</ThemedText>
             <ThemedText style={[styles.optionDescription, { color: theme.textSecondary }]}>
               Save on medications by finding affordable alternatives at local pharmacies.
             </ThemedText>
@@ -86,7 +86,7 @@ export default function OnboardingScreen() {
             <View style={[styles.iconCircle, { backgroundColor: theme.warning + "20" }]}>
               <Feather name="briefcase" size={32} color={theme.warning} />
             </View>
-            <ThemedText style={styles.optionTitle}>For Pharmacists</ThemedText>
+            <ThemedText style={styles.optionTitle}>Prescribers</ThemedText>
             <ThemedText style={[styles.optionDescription, { color: theme.textSecondary }]}>
               Expand your reach and help patients access affordable care.
             </ThemedText>

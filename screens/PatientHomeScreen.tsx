@@ -64,14 +64,14 @@ export default function PatientHomeScreen() {
 
       <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
         <View style={styles.cardHeader}>
-          <ThemedText style={styles.cardTitle}>Consult a Pharmacist</ThemedText>
+          <ThemedText style={styles.cardTitle}>Consult a Prescriber</ThemedText>
           <ThemedText style={[styles.cardSubtitle, { color: theme.textSecondary }]}>
-            Book an appointment with an independent pharmacist.
+            Book an appointment with an independent prescriber.
           </ThemedText>
         </View>
         <PrimaryButton
           title="Book Appointment"
-          onPress={() => navigation.navigate("BookAppointment", { pharmacistId: "1" })}
+          onPress={() => navigation.navigate("BookAppointment", { prescriberId: "1" })}
           variant="secondary"
           style={styles.cardButton}
         />

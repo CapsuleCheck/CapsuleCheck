@@ -36,7 +36,7 @@ export default function ProfileScreen() {
         </ThemedText>
         <View style={[styles.badge, { backgroundColor: theme.primary + "20" }]}>
           <ThemedText style={[styles.badgeText, { color: theme.primary }]}>
-            {userRole === "patient" ? "Patient" : "Pharmacist"}
+            {userRole === "patient" ? "Patient" : "Prescriber"}
           </ThemedText>
         </View>
       </View>

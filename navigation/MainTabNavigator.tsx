@@ -71,7 +71,7 @@ export default function MainTabNavigator() {
         name="PharmaciesTab"
         component={PharmaciesStackNavigator}
         options={{
-          title: "Pharmacies",
+          title: "Prescribers",
           tabBarIcon: ({ color, size }) => (
             <Feather name="map-pin" size={size} color={color} />
           ),

@@ -5,7 +5,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { BorderRadius, Spacing } from "@/constants/theme";
 
-interface PharmacistCardProps {
+interface PrescriberCardProps {
   name: string;
   rating: number;
   reviews: number;
@@ -15,14 +15,14 @@ interface PharmacistCardProps {
   onPress: () => void;
 }
 
-export function PharmacistCard({
+export function PrescriberCard({
   name,
   rating,
   reviews,
   time,
   type,
   onPress,
-}: PharmacistCardProps) {
+}: PrescriberCardProps) {
   const { theme } = useTheme();
 
   return (

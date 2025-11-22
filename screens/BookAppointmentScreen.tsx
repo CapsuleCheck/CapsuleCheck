@@ -37,7 +37,7 @@ export default function BookAppointmentScreen() {
           <View style={styles.pharmacistDetails}>
             <ThemedText style={styles.pharmacistName}>Dr. Evelyn Reed</ThemedText>
             <ThemedText style={[styles.pharmacistRole, { color: theme.textSecondary }]}>
-              Independent Pharmacist
+              Independent Prescriber
             </ThemedText>
             <View style={styles.ratingRow}>
               <Feather name="star" size={14} color="#F59E0B" />

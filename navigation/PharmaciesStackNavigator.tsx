@@ -22,7 +22,7 @@ export default function PharmaciesStackNavigator() {
       <Stack.Screen
         name="Pharmacies"
         component={PharmaciesScreen}
-        options={{ headerTitle: "Pharmacists" }}
+        options={{ headerTitle: "Prescribers" }}
       />
     </Stack.Navigator>
   );

@@ -23,7 +23,7 @@ const UPCOMING_BOOKINGS = [
   },
 ];
 
-export default function PharmacistHomeScreen() {
+export default function PrescriberHomeScreen() {
   const { theme } = useTheme();
   const screenInsets = useScreenInsets();
   const [isOnline, setIsOnline] = useState(true);

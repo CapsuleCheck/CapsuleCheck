@@ -3,13 +3,13 @@ import { View, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ScreenFlatList } from "@/components/ScreenFlatList";
-import { PharmacistCard } from "@/components/PharmacistCard";
+import { PrescriberCard } from "@/components/PrescriberCard";
 import { Spacing } from "@/constants/theme";
 import { HomeStackParamList } from "@/navigation/HomeStackNavigator";
 
 type NavigationProp = NativeStackNavigationProp<HomeStackParamList>;
 
-const MOCK_PHARMACISTS = [
+const MOCK_PRESCRIBERS = [
   {
     id: "1",
     name: "Dr. Evelyn Reed",
@@ -41,15 +41,15 @@ export default function PharmaciesScreen() {
 
   return (
     <ScreenFlatList
-      data={MOCK_PHARMACISTS}
+      data={MOCK_PRESCRIBERS}
       renderItem={({ item }) => (
-        <PharmacistCard
+        <PrescriberCard
           name={item.name}
           rating={item.rating}
           reviews={item.reviews}
           time={item.time}
           type={item.type}
-          onPress={() => navigation.navigate("BookAppointment", { pharmacistId: item.id })}
+          onPress={() => navigation.navigate("BookAppointment", { prescriberId: item.id })}
         />
       )}
       keyExtractor={(item) => item.id}
