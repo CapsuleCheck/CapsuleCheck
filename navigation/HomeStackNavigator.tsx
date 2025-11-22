@@ -7,11 +7,12 @@ import PriceListScreen from "@/screens/PriceListScreen";
 import BookAppointmentScreen from "@/screens/BookAppointmentScreen";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { useTheme } from "@/hooks/useTheme";
+import { useUser } from "@/context/UserContext";
 import { getCommonScreenOptions } from "@/navigation/screenOptions";
 
 export type HomeStackParamList = {
   PatientHome: undefined;
-  PharmacistHome: undefined;
+  PrescriberHome: undefined;
   UploadPrescription: undefined;
   PriceList: undefined;
   BookAppointment: { prescriberId: string };
@@ -21,9 +22,13 @@ const Stack = createNativeStackNavigator<HomeStackParamList>();
 
 export default function HomeStackNavigator() {
   const { theme, isDark } = useTheme();
+  const { userRole } = useUser();
+
+  const initialRoute = userRole === "prescriber" ? "PrescriberHome" : "PatientHome";
 
   return (
     <Stack.Navigator
+      initialRouteName={initialRoute}
       screenOptions={{
         ...getCommonScreenOptions({ theme, isDark }),
       }}
@@ -36,7 +41,7 @@ export default function HomeStackNavigator() {
         }}
       />
       <Stack.Screen
-        name="PharmacistHome"
+        name="PrescriberHome"
         component={PrescriberHomeScreen}
         options={{
           headerTitle: () => <HeaderTitle title="CapsuleCheck" />,

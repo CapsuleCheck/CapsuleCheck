@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Pressable } from "react-native";
+import { View, StyleSheet, Pressable, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ScreenScrollView } from "@/components/ScreenScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { useUser } from "@/context/UserContext";
@@ -30,12 +29,18 @@ export default function LicenseVerificationScreen() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      completeOnboarding("pharmacist");
+      completeOnboarding("prescriber");
     }, 1500);
   };
 
   return (
-    <ScreenScrollView contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}>
+    <ScrollView 
+      style={[styles.container, { backgroundColor: theme.backgroundRoot }]}
+      contentContainerStyle={{ 
+        paddingHorizontal: Spacing.xl,
+        paddingBottom: insets.bottom + Spacing.xl 
+      }}
+    >
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <Pressable onPress={() => navigation.goBack()}>
           <Feather name="arrow-left" size={24} color={theme.text} />
@@ -119,11 +124,14 @@ export default function LicenseVerificationScreen() {
           </ThemedText>
         </Pressable>
       </View>
-    </ScreenScrollView>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",

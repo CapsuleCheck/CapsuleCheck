@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
-type UserRole = "patient" | "pharmacist" | null;
+type UserRole = "patient" | "prescriber" | null;
 
 interface UserContextType {
   userRole: UserRole;
