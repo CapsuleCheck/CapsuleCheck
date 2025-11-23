@@ -49,10 +49,10 @@ export default function ComparePricesScreen() {
       sources = sources.filter(s => s.distance !== undefined && s.distance <= NEARBY_DISTANCE_THRESHOLD);
     }
     
-    if (filterType === "generic" && priceData.medication.genericName) {
-      sources = sources.filter(s => s.pharmacyName.includes("Generic") || s.pharmacyName.includes("Value"));
+    if (filterType === "generic") {
+      sources = sources.filter(s => s.isGenericOffer === true);
     } else if (filterType === "brand") {
-      sources = sources.filter(s => !s.pharmacyName.includes("Generic") && !s.pharmacyName.includes("Value"));
+      sources = sources.filter(s => s.isGenericOffer === false || s.isGenericOffer === undefined);
     }
     
     switch (sortBy) {
@@ -69,9 +69,21 @@ export default function ComparePricesScreen() {
     }
   }, [priceData, sortBy, filterType, inStockOnly, nearbyOnly]);
 
-  const lowestPriceSource = useMemo(() => {
-    return filteredAndSortedSources.find((s) => s.price === priceData?.lowestPrice);
-  }, [filteredAndSortedSources, priceData]);
+  const filteredLowestPrice = useMemo(() => {
+    if (filteredAndSortedSources.length === 0) return null;
+    return Math.min(...filteredAndSortedSources.map(s => s.price));
+  }, [filteredAndSortedSources]);
+
+  const filteredLowestPriceSource = useMemo(() => {
+    if (!filteredLowestPrice) return null;
+    return filteredAndSortedSources.find((s) => s.price === filteredLowestPrice);
+  }, [filteredAndSortedSources, filteredLowestPrice]);
+
+  const filteredAveragePrice = useMemo(() => {
+    if (filteredAndSortedSources.length === 0) return null;
+    const total = filteredAndSortedSources.reduce((sum, s) => sum + s.price, 0);
+    return total / filteredAndSortedSources.length;
+  }, [filteredAndSortedSources]);
 
   if (!priceData) {
     return (
@@ -222,25 +234,31 @@ export default function ComparePricesScreen() {
       <View style={[styles.summaryCard, { backgroundColor: theme.card }]}>
         <View style={styles.summaryRow}>
           <View>
-            <ThemedText style={[styles.summaryLabel, { color: theme.textSecondary }]}>Lowest Price</ThemedText>
-            <ThemedText style={styles.summaryValue}>
-              ${priceData.lowestPrice.toFixed(2)}
+            <ThemedText style={[styles.summaryLabel, { color: theme.textSecondary }]}>
+              {filteredLowestPrice !== null ? "Lowest (Filtered)" : "Lowest Price"}
             </ThemedText>
-            {lowestPriceSource && (
+            <ThemedText style={styles.summaryValue}>
+              ${(filteredLowestPrice !== null ? filteredLowestPrice : priceData.lowestPrice).toFixed(2)}
+            </ThemedText>
+            {filteredLowestPriceSource && (
               <ThemedText style={[styles.summaryPharmacy, { color: theme.textSecondary }]}>
-                at {lowestPriceSource.pharmacyName}
+                at {filteredLowestPriceSource.pharmacyName}
               </ThemedText>
             )}
           </View>
           <View style={[styles.summaryDivider, { backgroundColor: theme.border }]} />
           <View>
-            <ThemedText style={[styles.summaryLabel, { color: theme.textSecondary }]}>Average Price</ThemedText>
+            <ThemedText style={[styles.summaryLabel, { color: theme.textSecondary }]}>
+              {filteredAveragePrice !== null ? "Average (Filtered)" : "Average Price"}
+            </ThemedText>
             <ThemedText style={styles.summaryValue}>
-              ${priceData.averagePrice.toFixed(2)}
+              ${(filteredAveragePrice !== null ? filteredAveragePrice : priceData.averagePrice).toFixed(2)}
             </ThemedText>
-            <ThemedText style={[styles.summarySavings, { color: theme.success }]}>
-              Save ${(priceData.averagePrice - priceData.lowestPrice).toFixed(2)}
-            </ThemedText>
+            {filteredLowestPrice !== null && filteredAveragePrice !== null && (
+              <ThemedText style={[styles.summarySavings, { color: theme.success }]}>
+                Save ${(filteredAveragePrice - filteredLowestPrice).toFixed(2)}
+              </ThemedText>
+            )}
           </View>
         </View>
       </View>
@@ -296,7 +314,7 @@ export default function ComparePricesScreen() {
           </View>
         ) : (
           filteredAndSortedSources.map((source) =>
-            renderPriceCard(source, source.id === lowestPriceSource?.id)
+            renderPriceCard(source, source.id === filteredLowestPriceSource?.id)
           )
         )}
       </View>

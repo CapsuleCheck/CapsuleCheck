@@ -50,6 +50,7 @@ export interface PriceSource {
   distance?: number;
   inStock: boolean;
   pharmacyId?: string;
+  isGenericOffer?: boolean;
 }
 
 export interface MedicationPrice {
