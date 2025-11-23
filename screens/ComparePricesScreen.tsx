@@ -17,7 +17,8 @@ type ComparePricesScreenNavigationProp = NativeStackNavigationProp<
   "ComparePrices"
 >;
 
-type SortOption = "price" | "distance" | "name";
+type SortOption = "price-low" | "price-high" | "distance" | "name";
+type FilterType = "all" | "generic" | "brand";
 
 export default function ComparePricesScreen() {
   const route = useRoute<ComparePricesScreenRouteProp>();
@@ -26,19 +27,39 @@ export default function ComparePricesScreen() {
   const { medicationId } = route.params;
   const medicationPrices = useMedicationPrices();
   
-  const [sortBy, setSortBy] = useState<SortOption>("price");
+  const [sortBy, setSortBy] = useState<SortOption>("price-low");
   const [selectedPharmacy, setSelectedPharmacy] = useState<string | null>(null);
+  const [filterType, setFilterType] = useState<FilterType>("all");
+  const [inStockOnly, setInStockOnly] = useState(false);
+  const [nearbyOnly, setNearbyOnly] = useState(false);
 
   const priceData = medicationPrices.getByMedicationId(medicationId);
+  const NEARBY_DISTANCE_THRESHOLD = 5;
 
-  const sortedSources = useMemo(() => {
+  const filteredAndSortedSources = useMemo(() => {
     if (!priceData) return [];
     
-    const sources = [...priceData.sources];
+    let sources = [...priceData.sources];
+    
+    if (inStockOnly) {
+      sources = sources.filter(s => s.inStock);
+    }
+    
+    if (nearbyOnly) {
+      sources = sources.filter(s => s.distance !== undefined && s.distance <= NEARBY_DISTANCE_THRESHOLD);
+    }
+    
+    if (filterType === "generic" && priceData.medication.genericName) {
+      sources = sources.filter(s => s.pharmacyName.includes("Generic") || s.pharmacyName.includes("Value"));
+    } else if (filterType === "brand") {
+      sources = sources.filter(s => !s.pharmacyName.includes("Generic") && !s.pharmacyName.includes("Value"));
+    }
     
     switch (sortBy) {
-      case "price":
+      case "price-low":
         return sources.sort((a, b) => a.price - b.price);
+      case "price-high":
+        return sources.sort((a, b) => b.price - a.price);
       case "distance":
         return sources.sort((a, b) => (a.distance || 999) - (b.distance || 999));
       case "name":
@@ -46,11 +67,11 @@ export default function ComparePricesScreen() {
       default:
         return sources;
     }
-  }, [priceData, sortBy]);
+  }, [priceData, sortBy, filterType, inStockOnly, nearbyOnly]);
 
   const lowestPriceSource = useMemo(() => {
-    return sortedSources.find((s) => s.price === priceData?.lowestPrice);
-  }, [sortedSources, priceData]);
+    return filteredAndSortedSources.find((s) => s.price === priceData?.lowestPrice);
+  }, [filteredAndSortedSources, priceData]);
 
   if (!priceData) {
     return (
@@ -83,6 +104,36 @@ export default function ComparePricesScreen() {
         style={[
           styles.sortButtonText,
           sortBy === option && { color: theme.buttonText },
+        ]}
+      >
+        {label}
+      </ThemedText>
+    </Pressable>
+  );
+
+  const renderFilterChip = (
+    active: boolean,
+    label: string,
+    icon: keyof typeof Feather.glyphMap,
+    onPress: () => void
+  ) => (
+    <Pressable
+      style={[
+        styles.filterChip,
+        { backgroundColor: theme.backgroundSecondary, borderColor: theme.border },
+        active && { backgroundColor: theme.primary, borderColor: theme.primary },
+      ]}
+      onPress={onPress}
+    >
+      <Feather 
+        name={icon} 
+        size={14} 
+        color={active ? theme.buttonText : theme.text} 
+      />
+      <ThemedText
+        style={[
+          styles.filterChipText,
+          active && { color: theme.buttonText },
         ]}
       >
         {label}
@@ -194,10 +245,27 @@ export default function ComparePricesScreen() {
         </View>
       </View>
 
+      <View style={styles.filterSection}>
+        <ThemedText style={styles.sectionLabel}>Filters:</ThemedText>
+        <View style={styles.filterChips}>
+          {renderFilterChip(filterType === "all", "All", "grid", () => setFilterType("all"))}
+          {priceData.medication.genericName && renderFilterChip(
+            filterType === "generic",
+            "Generic",
+            "package",
+            () => setFilterType("generic")
+          )}
+          {renderFilterChip(filterType === "brand", "Brand", "award", () => setFilterType("brand"))}
+          {renderFilterChip(inStockOnly, "In Stock", "check-circle", () => setInStockOnly(!inStockOnly))}
+          {renderFilterChip(nearbyOnly, "Nearby", "navigation", () => setNearbyOnly(!nearbyOnly))}
+        </View>
+      </View>
+
       <View style={styles.sortContainer}>
         <ThemedText style={styles.sortLabel}>Sort by:</ThemedText>
         <View style={styles.sortButtons}>
-          {renderSortButton("price", "Price", "dollar-sign")}
+          {renderSortButton("price-low", "Price: Low", "arrow-down")}
+          {renderSortButton("price-high", "Price: High", "arrow-up")}
           {renderSortButton("distance", "Distance", "map-pin")}
           {renderSortButton("name", "Name", "type")}
         </View>
@@ -205,10 +273,31 @@ export default function ComparePricesScreen() {
 
       <View style={styles.priceList}>
         <ThemedText style={styles.listTitle}>
-          {sortedSources.length} Pharmacies Found
+          {filteredAndSortedSources.length} {filteredAndSortedSources.length === 1 ? "Pharmacy" : "Pharmacies"} Found
         </ThemedText>
-        {sortedSources.map((source) =>
-          renderPriceCard(source, source.id === lowestPriceSource?.id)
+        {filteredAndSortedSources.length === 0 ? (
+          <View style={styles.emptyFilterContainer}>
+            <Feather name="filter" size={48} color={theme.textSecondary} />
+            <ThemedText style={[styles.emptyFilterText, { color: theme.textSecondary }]}>
+              No pharmacies match your current filters
+            </ThemedText>
+            <Pressable
+              style={[styles.clearFiltersButton, { backgroundColor: theme.primary }]}
+              onPress={() => {
+                setFilterType("all");
+                setInStockOnly(false);
+                setNearbyOnly(false);
+              }}
+            >
+              <ThemedText style={[styles.clearFiltersText, { color: theme.buttonText }]}>
+                Clear Filters
+              </ThemedText>
+            </Pressable>
+          </View>
+        ) : (
+          filteredAndSortedSources.map((source) =>
+            renderPriceCard(source, source.id === lowestPriceSource?.id)
+          )
         )}
       </View>
 
@@ -402,5 +491,53 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: Typography.sizes.md,
     textAlign: "center",
+  },
+  filterSection: {
+    paddingHorizontal: Spacing.lg,
+    marginBottom: Spacing.lg,
+  },
+  sectionLabel: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: "600",
+    marginBottom: Spacing.sm,
+  },
+  filterChips: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: Spacing.sm,
+  },
+  filterChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  filterChipText: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: "600",
+  },
+  emptyFilterContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: Spacing.xxxl,
+    gap: Spacing.md,
+  },
+  emptyFilterText: {
+    fontSize: Typography.sizes.md,
+    textAlign: "center",
+    marginBottom: Spacing.sm,
+  },
+  clearFiltersButton: {
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.md,
+    borderRadius: BorderRadius.xl,
+    marginTop: Spacing.sm,
+  },
+  clearFiltersText: {
+    fontSize: Typography.sizes.md,
+    fontWeight: "600",
   },
 });
