@@ -64,10 +64,10 @@ export default function MainTabNavigator() {
         component={MyRxStackNavigator}
         options={{
           title: "My Rx",
-          tabBarIcon: ({ size }) => (
+          tabBarIcon: ({ color, size }) => (
             <Image
               source={capsuleIcon}
-              style={{ width: size, height: size }}
+              style={{ width: size, height: size, tintColor: color }}
               resizeMode="contain"
             />
           ),
