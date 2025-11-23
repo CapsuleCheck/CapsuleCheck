@@ -1,28 +1,46 @@
 import { View, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Pressable } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ThemedText } from "@/components/ThemedText";
 import { ScreenScrollView } from "@/components/ScreenScrollView";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { useTheme } from "@/hooks/useTheme";
 import { useUser } from "@/context/UserContext";
+import { ProfileStackParamList } from "@/navigation/ProfileStackNavigator";
 import { BorderRadius, Spacing } from "@/constants/theme";
 
+type ProfileScreenNavigationProp = NativeStackNavigationProp<ProfileStackParamList, "Profile">;
+
+type MenuItem = {
+  icon: keyof typeof Feather.glyphMap;
+  label: string;
+  screen: keyof ProfileStackParamList;
+};
+
 export default function ProfileScreen() {
+  const navigation = useNavigation<ProfileScreenNavigationProp>();
   const { theme } = useTheme();
   const { setUserRole, userRole } = useUser();
 
-  const menuItems = [
-    { icon: "user", label: "Personal Information" },
-    { icon: "bell", label: "Notifications" },
-    { icon: "lock", label: "Privacy & Security" },
-    { icon: "credit-card", label: "Payment Methods" },
-    { icon: "help-circle", label: "Help & Support" },
-    { icon: "info", label: "About CapsuleCheck" },
+  const menuItems: MenuItem[] = [
+    { icon: "user", label: "Personal Information", screen: "PersonalInformation" },
+    { icon: "bell", label: "Notifications", screen: "Notifications" },
+    { icon: "lock", label: "Privacy & Security", screen: "PrivacySecurity" },
+    { icon: "credit-card", label: "Payment Methods", screen: "PaymentMethods" },
+    { icon: "help-circle", label: "Help & Support", screen: "HelpSupport" },
+    { icon: "info", label: "About CapsuleCheck", screen: "About" },
   ];
 
   const handleLogout = () => {
     setUserRole(null);
+  };
+
+  const handleMenuPress = (screen: keyof ProfileStackParamList) => {
+    if (screen !== "Profile") {
+      navigation.navigate(screen);
+    }
   };
 
   return (
@@ -53,8 +71,9 @@ export default function ProfileScreen() {
                 opacity: pressed ? 0.7 : 1,
               },
             ]}
+            onPress={() => handleMenuPress(item.screen)}
           >
-            <Feather name={item.icon as any} size={20} color={theme.text} />
+            <Feather name={item.icon} size={20} color={theme.text} />
             <ThemedText style={styles.menuText}>{item.label}</ThemedText>
             <Feather name="chevron-right" size={20} color={theme.textSecondary} />
           </Pressable>
