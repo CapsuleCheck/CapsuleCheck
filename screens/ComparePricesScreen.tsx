@@ -289,7 +289,23 @@ export default function ComparePricesScreen() {
       </View>
 
       <View style={styles.filterSection}>
-        <ThemedText style={styles.sectionLabel}>Filters:</ThemedText>
+        <View style={styles.filterHeader}>
+          <ThemedText style={styles.sectionLabel}>Filters:</ThemedText>
+          {hasActiveFilters && (
+            <Pressable
+              style={styles.clearAllButton}
+              onPress={() => {
+                setFilterType("all");
+                setInStockOnly(false);
+                setNearbyOnly(false);
+              }}
+            >
+              <ThemedText style={[styles.clearAllText, { color: theme.primary }]}>
+                Clear All
+              </ThemedText>
+            </Pressable>
+          )}
+        </View>
         <View style={styles.filterChips}>
           {renderFilterChip(filterType === "all", "All", "grid", () => setFilterType("all"))}
           {priceData.medication.genericName && renderFilterChip(
@@ -542,10 +558,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     marginBottom: Spacing.lg,
   },
+  filterHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: Spacing.sm,
+  },
   sectionLabel: {
     fontSize: Typography.sizes.sm,
     fontWeight: "600",
-    marginBottom: Spacing.sm,
+  },
+  clearAllButton: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+  },
+  clearAllText: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: "600",
   },
   filterChips: {
     flexDirection: "row",
