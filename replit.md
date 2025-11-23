@@ -68,7 +68,7 @@ Preferred communication style: Simple, everyday language.
 - AI-powered prescription analysis (intended integration)
 - Search and browse prescribers
 - Book appointments with prescribers
-- Compare medication prices across sources
+- Compare medication prices across sources with advanced filtering and sorting
 
 **Pharmacist/Prescriber Role Features**
 - Dashboard showing upcoming bookings and availability status
@@ -92,8 +92,8 @@ Preferred communication style: Simple, everyday language.
 - No back navigation from main app to onboarding
 
 **Stack Navigators**
-- HomeStack: Patient/Pharmacist dashboards, prescription upload, price comparison, booking
-- MyRxStack: Prescription management and history
+- HomeStack: Patient/Pharmacist dashboards, prescription upload, price list, price comparison with filtering, booking
+- MyRxStack: Prescription management, history, and prescription-specific price comparison
 - PharmaciesStack: Prescriber search and appointment booking
 - ProfileStack: User settings and account management
 
@@ -197,6 +197,47 @@ Preferred communication style: Simple, everyday language.
 - **About CapsuleCheck**: App information, version details, legal links, and social media connections
 
 All editable profile data persists across the app session via AppDataContext reducer pattern.
+
+### Price Comparison System (Complete UI/UX with Filtering)
+- **Compare Prices Screen**: Comprehensive price comparison with advanced filtering and sorting
+  - Accessible from both Home (Price List) and My Rx (Prescription Detail) flows
+  - Displays medication name, dosage, and supply information
+  - Summary card shows lowest and average prices (dynamically filtered)
+  
+- **Filter System**:
+  - **Generic/Brand Filter**: Shows only generic or brand-name offers (based on `isGenericOffer` flag)
+  - **In Stock Only**: Filters to pharmacies with medication currently in stock
+  - **Nearby Only**: Shows pharmacies within 5-mile radius
+  - Filters work cumulatively and can be combined
+  - Clear visual indication of active filters with highlighted chips
+  - Empty state with "Clear Filters" button when no results match
+  
+- **Sorting Options**:
+  - Price: Low to High (default)
+  - Price: High to Low
+  - Distance (nearest first)
+  - Name (alphabetical)
+  
+- **Dynamic Summary Card**:
+  - Shows "Lowest Price" and "Average Price" when no filters active
+  - Updates to "Lowest (Filtered)" and "Average (Filtered)" when filters applied
+  - Displays empty state message when filters produce zero results
+  - Savings calculation based on current filtered or unfiltered prices
+  
+- **Pharmacy Cards**:
+  - Display pharmacy name, price, distance, and stock status
+  - "Lowest Price" badge on cheapest option in current filtered view
+  - Selection indicator when pharmacy is chosen
+  - Automatic selection clearing when filtered list no longer contains selected pharmacy
+  
+- **Data Model**:
+  - `isGenericOffer` boolean field on PriceSource for reliable generic/brand filtering
+  - Explicit distance values for nearby filtering (5-mile threshold)
+  - In-stock status for availability filtering
+  
+- **Navigation**:
+  - Home → Price List → Click medication → Compare Prices (with filters)
+  - My Rx → Prescription Detail → Compare Prices (with filters)
 
 ### Future Integrations (Indicated by Design)
 - **SSO Providers**: Apple Sign-In and Google Sign-In for authentication

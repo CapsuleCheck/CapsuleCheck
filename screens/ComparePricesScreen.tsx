@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { View, StyleSheet, Pressable } from "react-native";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -89,6 +89,12 @@ export default function ComparePricesScreen() {
     return total / filteredAndSortedSources.length;
   }, [filteredAndSortedSources]);
 
+  useEffect(() => {
+    if (selectedPharmacy && !filteredAndSortedSources.some(s => s.id === selectedPharmacy)) {
+      setSelectedPharmacy(null);
+    }
+  }, [filteredAndSortedSources, selectedPharmacy]);
+
   if (!priceData) {
     return (
       <ScreenScrollView>
@@ -158,10 +164,6 @@ export default function ComparePricesScreen() {
   );
 
   const renderPriceCard = (source: PriceSource, isFilteredLowest: boolean) => {
-    const isLowest = filteredLowestPrice !== null 
-      ? source.price === filteredLowestPrice 
-      : source.price === priceData?.lowestPrice;
-
     return (
       <Pressable
         key={source.id}
@@ -174,7 +176,7 @@ export default function ComparePricesScreen() {
             selectedPharmacy === source.id && { borderColor: theme.primary },
           ]}
         >
-          {isLowest && (
+          {isFilteredLowest && (
             <View style={[styles.lowestBadge, { backgroundColor: theme.primary }]}>
               <Feather name="award" size={14} color={theme.buttonText} />
               <ThemedText style={[styles.lowestBadgeText, { color: theme.buttonText }]}>Lowest Price</ThemedText>
@@ -242,39 +244,48 @@ export default function ComparePricesScreen() {
       </View>
 
       <View style={[styles.summaryCard, { backgroundColor: theme.card }]}>
-        <View style={styles.summaryRow}>
-          <View>
-            <ThemedText style={[styles.summaryLabel, { color: theme.textSecondary }]}>
-              {hasActiveFilters ? "Lowest (Filtered)" : "Lowest Price"}
+        {filteredAndSortedSources.length === 0 ? (
+          <View style={styles.emptySummaryContainer}>
+            <Feather name="info" size={24} color={theme.textSecondary} />
+            <ThemedText style={[styles.emptySummaryText, { color: theme.textSecondary }]}>
+              No matching pharmacies found. Clear filters to see all prices.
             </ThemedText>
-            <ThemedText style={styles.summaryValue}>
-              ${(filteredLowestPrice !== null ? filteredLowestPrice : priceData.lowestPrice).toFixed(2)}
-            </ThemedText>
-            {filteredLowestPriceSource ? (
-              <ThemedText style={[styles.summaryPharmacy, { color: theme.textSecondary }]}>
-                at {filteredLowestPriceSource.pharmacyName}
-              </ThemedText>
-            ) : null}
           </View>
-          <View style={[styles.summaryDivider, { backgroundColor: theme.border }]} />
-          <View>
-            <ThemedText style={[styles.summaryLabel, { color: theme.textSecondary }]}>
-              {hasActiveFilters ? "Average (Filtered)" : "Average Price"}
-            </ThemedText>
-            <ThemedText style={styles.summaryValue}>
-              ${(filteredAveragePrice !== null ? filteredAveragePrice : priceData.averagePrice).toFixed(2)}
-            </ThemedText>
-            {filteredLowestPrice !== null && filteredAveragePrice !== null ? (
-              <ThemedText style={[styles.summarySavings, { color: theme.success }]}>
-                Save ${(filteredAveragePrice - filteredLowestPrice).toFixed(2)}
+        ) : (
+          <View style={styles.summaryRow}>
+            <View>
+              <ThemedText style={[styles.summaryLabel, { color: theme.textSecondary }]}>
+                {hasActiveFilters && filteredLowestPrice !== null ? "Lowest (Filtered)" : "Lowest Price"}
               </ThemedText>
-            ) : (
-              <ThemedText style={[styles.summarySavings, { color: theme.success }]}>
-                Save ${(priceData.averagePrice - priceData.lowestPrice).toFixed(2)}
+              <ThemedText style={styles.summaryValue}>
+                ${(filteredLowestPrice !== null ? filteredLowestPrice : priceData.lowestPrice).toFixed(2)}
               </ThemedText>
-            )}
+              {filteredLowestPriceSource ? (
+                <ThemedText style={[styles.summaryPharmacy, { color: theme.textSecondary }]}>
+                  at {filteredLowestPriceSource.pharmacyName}
+                </ThemedText>
+              ) : null}
+            </View>
+            <View style={[styles.summaryDivider, { backgroundColor: theme.border }]} />
+            <View>
+              <ThemedText style={[styles.summaryLabel, { color: theme.textSecondary }]}>
+                {hasActiveFilters && filteredAveragePrice !== null ? "Average (Filtered)" : "Average Price"}
+              </ThemedText>
+              <ThemedText style={styles.summaryValue}>
+                ${(filteredAveragePrice !== null ? filteredAveragePrice : priceData.averagePrice).toFixed(2)}
+              </ThemedText>
+              {filteredLowestPrice !== null && filteredAveragePrice !== null ? (
+                <ThemedText style={[styles.summarySavings, { color: theme.success }]}>
+                  Save ${(filteredAveragePrice - filteredLowestPrice).toFixed(2)}
+                </ThemedText>
+              ) : (
+                <ThemedText style={[styles.summarySavings, { color: theme.success }]}>
+                  Save ${(priceData.averagePrice - priceData.lowestPrice).toFixed(2)}
+                </ThemedText>
+              )}
+            </View>
           </View>
-        </View>
+        )}
       </View>
 
       <View style={styles.filterSection}>
@@ -327,9 +338,12 @@ export default function ComparePricesScreen() {
             </Pressable>
           </View>
         ) : (
-          filteredAndSortedSources.map((source) =>
-            renderPriceCard(source, source.id === filteredLowestPriceSource?.id)
-          )
+          <React.Fragment>
+            {filteredAndSortedSources.map((source) => {
+              const isLowestInFiltered = filteredLowestPriceSource !== null && source.id === filteredLowestPriceSource.id;
+              return renderPriceCard(source, isLowestInFiltered);
+            })}
+          </React.Fragment>
         )}
       </View>
 
@@ -571,5 +585,16 @@ const styles = StyleSheet.create({
   clearFiltersText: {
     fontSize: Typography.sizes.md,
     fontWeight: "600",
+  },
+  emptySummaryContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.md,
+    paddingVertical: Spacing.lg,
+  },
+  emptySummaryText: {
+    flex: 1,
+    fontSize: Typography.sizes.sm,
+    lineHeight: 20,
   },
 });

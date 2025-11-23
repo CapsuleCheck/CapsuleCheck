@@ -5,6 +5,7 @@ import PrescriberHomeScreen from "@/screens/PrescriberHomeScreen";
 import UploadPrescriptionScreen from "@/screens/UploadPrescriptionScreen";
 import PriceListScreen from "@/screens/PriceListScreen";
 import BookAppointmentScreen from "@/screens/BookAppointmentScreen";
+import ComparePricesScreen from "@/screens/ComparePricesScreen";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { useTheme } from "@/hooks/useTheme";
 import { useUser } from "@/context/UserContext";
@@ -16,6 +17,7 @@ export type HomeStackParamList = {
   UploadPrescription: undefined;
   PriceList: undefined;
   BookAppointment: { prescriberId: string };
+  ComparePrices: { medicationId: string };
 };
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
@@ -61,6 +63,11 @@ export default function HomeStackNavigator() {
         name="BookAppointment"
         component={BookAppointmentScreen}
         options={{ headerTitle: "Book Appointment" }}
+      />
+      <Stack.Screen
+        name="ComparePrices"
+        component={ComparePricesScreen}
+        options={{ headerTitle: "Compare Prices" }}
       />
     </Stack.Navigator>
   );
