@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Pressable } from "react-native";
+import { View, StyleSheet, Pressable, Alert } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import * as ImagePicker from "expo-image-picker";
+import * as DocumentPicker from "expo-document-picker";
 import { ScreenScrollView } from "@/components/ScreenScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
@@ -18,20 +20,53 @@ export default function UploadPrescriptionScreen() {
   const navigation = useNavigation<NavigationProp>();
   const [loading, setLoading] = useState(false);
 
-  const handleTakePhoto = () => {
-    setLoading(true);
-    setTimeout(() => {
+  const handleTakePhoto = async () => {
+    try {
+      const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+      
+      if (permissionResult.granted === false) {
+        Alert.alert(
+          "Camera Permission Required",
+          "Please allow camera access to take photos of your prescription."
+        );
+        return;
+      }
+
+      setLoading(true);
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        quality: 0.8,
+      });
+
       setLoading(false);
-      navigation.navigate("PriceList");
-    }, 1500);
+
+      if (!result.canceled && result.assets[0]) {
+        navigation.navigate("PriceList");
+      }
+    } catch (error) {
+      setLoading(false);
+      Alert.alert("Error", "Failed to take photo. Please try again.");
+    }
   };
 
-  const handleUploadDocument = () => {
-    setLoading(true);
-    setTimeout(() => {
+  const handleUploadDocument = async () => {
+    try {
+      setLoading(true);
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ["image/*", "application/pdf"],
+        copyToCacheDirectory: true,
+      });
+
       setLoading(false);
-      navigation.navigate("PriceList");
-    }, 1500);
+
+      if (!result.canceled && result.assets[0]) {
+        navigation.navigate("PriceList");
+      }
+    } catch (error) {
+      setLoading(false);
+      Alert.alert("Error", "Failed to select document. Please try again.");
+    }
   };
 
   return (

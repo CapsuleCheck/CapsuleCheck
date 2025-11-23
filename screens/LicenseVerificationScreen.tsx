@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Pressable, ScrollView } from "react-native";
+import { View, StyleSheet, Pressable, ScrollView, Alert } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import * as DocumentPicker from "expo-document-picker";
 import { ThemedText } from "@/components/ThemedText";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { useUser } from "@/context/UserContext";
@@ -21,11 +22,24 @@ export default function LicenseVerificationScreen() {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleSelectFile = () => {
-    setSelectedFile("prescriber_license.pdf");
+  const handleSelectFile = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ["image/*", "application/pdf"],
+        copyToCacheDirectory: true,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        setSelectedFile(result.assets[0].name);
+      }
+    } catch (error) {
+      Alert.alert("Error", "Failed to select file. Please try again.");
+    }
   };
 
   const handleSubmit = () => {
+    if (!selectedFile) return;
+    
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
