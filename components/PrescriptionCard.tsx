@@ -1,11 +1,10 @@
 import React from "react";
-import { View, StyleSheet, Pressable, Image } from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { ThemedText } from "@/components/ThemedText";
+import { CapsuleIcon } from "@/components/CapsuleIcon";
 import { useTheme } from "@/hooks/useTheme";
 import { BorderRadius, Spacing } from "@/constants/theme";
-
-const capsuleIcon = require("@/assets/images/capsule-icon.png");
 
 interface PrescriptionCardProps {
   name: string;
@@ -41,11 +40,7 @@ export function PrescriptionCard({
             { backgroundColor: theme.primary + "20" },
           ]}
         >
-          <Image
-            source={capsuleIcon}
-            style={{ width: 20, height: 20, tintColor: theme.primary }}
-            resizeMode="contain"
-          />
+          <CapsuleIcon size={20} color={theme.primary} />
         </View>
       </View>
       <View style={styles.content}>

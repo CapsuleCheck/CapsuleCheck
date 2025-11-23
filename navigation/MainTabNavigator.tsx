@@ -2,14 +2,13 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
-import { Platform, StyleSheet, Image } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import HomeStackNavigator from "@/navigation/HomeStackNavigator";
 import MyRxStackNavigator from "@/navigation/MyRxStackNavigator";
 import PharmaciesStackNavigator from "@/navigation/PharmaciesStackNavigator";
 import ProfileStackNavigator from "@/navigation/ProfileStackNavigator";
 import { useTheme } from "@/hooks/useTheme";
-
-const capsuleIcon = require("@/assets/images/capsule-icon.png");
+import { CapsuleIcon } from "@/components/CapsuleIcon";
 
 export type MainTabParamList = {
   HomeTab: undefined;
@@ -65,11 +64,7 @@ export default function MainTabNavigator() {
         options={{
           title: "My Rx",
           tabBarIcon: ({ color, size }) => (
-            <Image
-              source={capsuleIcon}
-              style={{ width: size, height: size, tintColor: color }}
-              resizeMode="contain"
-            />
+            <CapsuleIcon size={size} color={color} />
           ),
         }}
       />
