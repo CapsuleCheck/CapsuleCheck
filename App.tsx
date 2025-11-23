@@ -8,6 +8,7 @@ import { StatusBar } from "expo-status-bar";
 
 import RootNavigator from "@/navigation/RootNavigator";
 import { UserProvider } from "@/context/UserContext";
+import { AppDataProvider } from "@/context/AppDataContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export default function App() {
@@ -16,11 +17,13 @@ export default function App() {
     <SafeAreaProvider>
         <GestureHandlerRootView style={styles.root}>
           <KeyboardProvider>
-            <UserProvider>
-              <NavigationContainer>
-                <RootNavigator />
-              </NavigationContainer>
-            </UserProvider>
+            <AppDataProvider>
+              <UserProvider>
+                <NavigationContainer>
+                  <RootNavigator />
+                </NavigationContainer>
+              </UserProvider>
+            </AppDataProvider>
             <StatusBar style="auto" />
           </KeyboardProvider>
         </GestureHandlerRootView>

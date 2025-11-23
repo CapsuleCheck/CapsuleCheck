@@ -1,63 +1,75 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ScreenFlatList } from "@/components/ScreenFlatList";
 import { ThemedText } from "@/components/ThemedText";
 import { PrescriptionCard } from "@/components/PrescriptionCard";
 import { useTheme } from "@/hooks/useTheme";
+import { usePrescriptions } from "@/hooks/useAppDataHooks";
 import { Spacing } from "@/constants/theme";
+import { MyRxStackParamList } from "@/navigation/MyRxStackNavigator";
+import { Prescription } from "@/types/data";
 
-const MOCK_PRESCRIPTIONS = [
-  {
-    id: "1",
-    name: "Atorvastatin 20mg",
-    status: "Refill due in 3 days",
-    statusType: "warning",
-  },
-  {
-    id: "2",
-    name: "Lisinopril 10mg",
-    status: "Status: Active",
-    statusType: "success",
-  },
-  {
-    id: "3",
-    name: "Metformin 500mg",
-    status: "Refill due in 10 days",
-    statusType: "success",
-  },
-  {
-    id: "4",
-    name: "Amlodipine 5mg",
-    status: "Status: Active",
-    statusType: "success",
-  },
-];
+type NavigationProp = NativeStackNavigationProp<MyRxStackParamList>;
 
 export default function MyRxScreen() {
   const { theme } = useTheme();
+  const navigation = useNavigation<NavigationProp>();
+  const prescriptions = usePrescriptions();
 
-  const getStatusColor = (type: string) => {
-    switch (type) {
-      case "warning":
-        return theme.warning;
-      case "success":
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "active":
         return theme.success;
-      case "error":
+      case "pending_refill":
+        return theme.warning;
+      case "refill_requested":
+        return theme.primary;
+      case "expired":
         return theme.error;
       default:
         return theme.textSecondary;
     }
   };
 
+  const getStatusText = (prescription: Prescription) => {
+    if (prescription.status === "active" && prescription.nextRefillDate) {
+      const daysUntilRefill = Math.ceil(
+        (new Date(prescription.nextRefillDate).getTime() - new Date().getTime()) /
+          (1000 * 60 * 60 * 24)
+      );
+      if (daysUntilRefill <= 3) {
+        return `Refill due in ${daysUntilRefill} ${daysUntilRefill === 1 ? "day" : "days"}`;
+      }
+      return "Status: Active";
+    }
+    
+    switch (prescription.status) {
+      case "pending_refill":
+        return "Refill Due Soon";
+      case "refill_requested":
+        return "Refill Requested";
+      case "expired":
+        return "Expired";
+      default:
+        return "Status: Active";
+    }
+  };
+
+  const handlePrescriptionPress = (prescriptionId: string) => {
+    navigation.navigate("PrescriptionDetail", { prescriptionId });
+  };
+
   return (
     <ScreenFlatList
-      data={MOCK_PRESCRIPTIONS}
+      data={prescriptions.all}
       renderItem={({ item }) => (
         <PrescriptionCard
-          name={item.name}
-          status={item.status}
-          statusColor={getStatusColor(item.statusType)}
-          onPress={() => {}}
+          name={item.medication.name}
+          status={getStatusText(item)}
+          statusColor={getStatusColor(item.status)}
+          onPress={() => handlePrescriptionPress(item.id)}
         />
       )}
       keyExtractor={(item) => item.id}
