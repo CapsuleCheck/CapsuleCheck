@@ -119,6 +119,7 @@ export default function HelpSupportScreen() {
                 { borderBottomColor: theme.border },
                 index === contactOptions.length - 1 && { borderBottomWidth: 0 },
               ]}
+              onPress={() => {}}
             >
               <View
                 style={[
@@ -144,6 +145,7 @@ export default function HelpSupportScreen() {
           
           <Pressable
             style={[styles.resourceItem, { borderBottomColor: theme.border }]}
+            onPress={() => {}}
           >
             <Feather name="book-open" size={20} color={theme.text} />
             <ThemedText style={styles.resourceText}>User Guide</ThemedText>
@@ -152,13 +154,14 @@ export default function HelpSupportScreen() {
 
           <Pressable
             style={[styles.resourceItem, { borderBottomColor: theme.border }]}
+            onPress={() => {}}
           >
             <Feather name="video" size={20} color={theme.text} />
             <ThemedText style={styles.resourceText}>Tutorial Videos</ThemedText>
             <Feather name="external-link" size={16} color={theme.textSecondary} />
           </Pressable>
 
-          <Pressable style={styles.resourceItem}>
+          <Pressable style={styles.resourceItem} onPress={() => {}}>
             <Feather name="file-text" size={20} color={theme.text} />
             <ThemedText style={styles.resourceText}>Documentation</ThemedText>
             <Feather name="external-link" size={16} color={theme.textSecondary} />

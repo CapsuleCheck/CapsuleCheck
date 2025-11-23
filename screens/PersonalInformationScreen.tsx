@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, StyleSheet, TextInput, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -7,7 +7,7 @@ import { ScreenKeyboardAwareScrollView } from "@/components/ScreenKeyboardAwareS
 import { ThemedText } from "@/components/ThemedText";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { useTheme } from "@/hooks/useTheme";
-import { useUser } from "@/context/UserContext";
+import { useAppData } from "@/context/AppDataContext";
 import { ProfileStackParamList } from "@/navigation/ProfileStackNavigator";
 import { BorderRadius, Spacing, Typography } from "@/constants/theme";
 
@@ -19,23 +19,50 @@ type PersonalInformationScreenNavigationProp = NativeStackNavigationProp<
 export default function PersonalInformationScreen() {
   const navigation = useNavigation<PersonalInformationScreenNavigationProp>();
   const { theme } = useTheme();
-  const { userRole } = useUser();
+  const { state, updateUserProfile } = useAppData();
+  const profile = state.userProfile;
 
   const [formData, setFormData] = useState({
-    firstName: userRole === "patient" ? "Mefe" : "Dr. Evelyn",
-    lastName: userRole === "patient" ? "Johnson" : "Reed",
-    email: userRole === "patient" ? "mefe.johnson@email.com" : "dr.reed@medpractice.com",
-    phone: "+1 (555) 123-4567",
-    dateOfBirth: "01/15/1990",
-    address: "123 Main Street, Apt 4B",
-    city: "San Francisco",
-    state: "CA",
-    zipCode: "94102",
+    name: "",
+    email: "",
+    phone: "",
+    dateOfBirth: "",
+    street: "",
+    city: "",
+    state: "",
+    zipCode: "",
   });
 
   const [isEditing, setIsEditing] = useState(false);
 
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        name: profile.name,
+        email: profile.email,
+        phone: profile.phone,
+        dateOfBirth: profile.dateOfBirth,
+        street: profile.address.street,
+        city: profile.address.city,
+        state: profile.address.state,
+        zipCode: profile.address.zip,
+      });
+    }
+  }, [profile]);
+
   const handleSave = () => {
+    updateUserProfile({
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      dateOfBirth: formData.dateOfBirth,
+      address: {
+        street: formData.street,
+        city: formData.city,
+        state: formData.state,
+        zip: formData.zipCode,
+      },
+    });
     setIsEditing(false);
   };
 
@@ -69,6 +96,16 @@ export default function PersonalInformationScreen() {
     </View>
   );
 
+  if (!profile) {
+    return (
+      <ScreenKeyboardAwareScrollView>
+        <View style={styles.content}>
+          <ThemedText>Loading profile...</ThemedText>
+        </View>
+      </ScreenKeyboardAwareScrollView>
+    );
+  }
+
   return (
     <ScreenKeyboardAwareScrollView>
       <View style={styles.content}>
@@ -82,8 +119,7 @@ export default function PersonalInformationScreen() {
             )}
           </View>
 
-          {renderInput("First Name", formData.firstName, "firstName", "user")}
-          {renderInput("Last Name", formData.lastName, "lastName", "user")}
+          {renderInput("Full Name", formData.name, "name", "user")}
           {renderInput("Email", formData.email, "email", "mail")}
           {renderInput("Phone", formData.phone, "phone", "phone")}
           {renderInput("Date of Birth", formData.dateOfBirth, "dateOfBirth", "calendar")}
@@ -92,7 +128,7 @@ export default function PersonalInformationScreen() {
         <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
           <ThemedText style={styles.cardTitle}>Address</ThemedText>
           
-          {renderInput("Street Address", formData.address, "address", "map-pin")}
+          {renderInput("Street Address", formData.street, "street", "map-pin")}
           {renderInput("City", formData.city, "city", "map")}
           
           <View style={styles.row}>

@@ -49,12 +49,13 @@ export default function PrivacySecurityScreen() {
           
           <Pressable
             style={[styles.menuItem, { borderBottomColor: theme.border }]}
+            onPress={() => {}}
           >
             <Feather name="key" size={20} color={theme.text} />
             <View style={styles.menuTextContainer}>
               <ThemedText style={styles.menuTitle}>Change Password</ThemedText>
               <ThemedText style={[styles.menuSubtitle, { color: theme.textSecondary }]}>
-                Update your account password
+                Update your account password (Requires backend authentication)
               </ThemedText>
             </View>
             <Feather name="chevron-right" size={20} color={theme.textSecondary} />
@@ -93,23 +94,24 @@ export default function PrivacySecurityScreen() {
           
           <Pressable
             style={[styles.menuItem, { borderBottomColor: theme.border }]}
+            onPress={() => {}}
           >
             <Feather name="eye-off" size={20} color={theme.text} />
             <View style={styles.menuTextContainer}>
               <ThemedText style={styles.menuTitle}>Privacy Settings</ThemedText>
               <ThemedText style={[styles.menuSubtitle, { color: theme.textSecondary }]}>
-                Control who can see your information
+                Control who can see your information (Requires backend)
               </ThemedText>
             </View>
             <Feather name="chevron-right" size={20} color={theme.textSecondary} />
           </Pressable>
 
-          <Pressable style={styles.menuItem}>
+          <Pressable style={styles.menuItem} onPress={() => {}}>
             <Feather name="download" size={20} color={theme.text} />
             <View style={styles.menuTextContainer}>
               <ThemedText style={styles.menuTitle}>Download My Data</ThemedText>
               <ThemedText style={[styles.menuSubtitle, { color: theme.textSecondary }]}>
-                Request a copy of your personal data
+                Request a copy of your personal data (Requires backend)
               </ThemedText>
             </View>
             <Feather name="chevron-right" size={20} color={theme.textSecondary} />

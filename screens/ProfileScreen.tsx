@@ -8,6 +8,7 @@ import { ScreenScrollView } from "@/components/ScreenScrollView";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { useTheme } from "@/hooks/useTheme";
 import { useUser } from "@/context/UserContext";
+import { useAppData } from "@/context/AppDataContext";
 import { ProfileStackParamList } from "@/navigation/ProfileStackNavigator";
 import { BorderRadius, Spacing } from "@/constants/theme";
 
@@ -23,6 +24,8 @@ export default function ProfileScreen() {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
   const { theme } = useTheme();
   const { setUserRole, userRole } = useUser();
+  const { state } = useAppData();
+  const userProfile = state.userProfile;
 
   const menuItems: MenuItem[] = [
     { icon: "user", label: "Personal Information", screen: "PersonalInformation" },
@@ -50,7 +53,7 @@ export default function ProfileScreen() {
           <Feather name="user" size={40} color={theme.primary} />
         </View>
         <ThemedText style={styles.name}>
-          {userRole === "patient" ? "Mefe Johnson" : "Dr. Evelyn Reed"}
+          {userProfile?.name || (userRole === "patient" ? "Patient" : "Prescriber")}
         </ThemedText>
         <View style={[styles.badge, { backgroundColor: theme.primary + "20" }]}>
           <ThemedText style={[styles.badgeText, { color: theme.primary }]}>

@@ -80,6 +80,7 @@ export default function AboutScreen() {
                 { borderBottomColor: theme.border },
                 index === legalLinks.length - 1 && { borderBottomWidth: 0 },
               ]}
+              onPress={() => {}}
             >
               <Feather name={item.icon} size={20} color={theme.text} />
               <ThemedText style={styles.linkText}>{item.title}</ThemedText>
@@ -98,6 +99,7 @@ export default function AboutScreen() {
                 { borderBottomColor: theme.border },
                 index === teamLinks.length - 1 && { borderBottomWidth: 0 },
               ]}
+              onPress={() => {}}
             >
               <Feather name={item.icon} size={20} color={theme.text} />
               <View style={styles.linkContent}>

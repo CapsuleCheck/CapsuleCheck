@@ -188,12 +188,23 @@ Preferred communication style: Simple, everyday language.
 - **expo-haptics**: Haptic feedback for iOS
 - **expo-linking**: Deep linking support
 
+### Profile Section (Complete UI/UX)
+- **Personal Information**: Edit form for user profile data (name, email, phone, address) with persistence via AppDataContext
+- **Notifications**: Toggle switches for notification preferences (refills, appointments, price alerts, promotions, email, push) with state persistence
+- **Privacy & Security**: Security settings toggles (biometric auth, 2FA, data sharing) and placeholders for password change/data export (requires backend)
+- **Payment Methods**: Card management with add/remove/set default functionality, persisted via AppDataContext
+- **Help & Support**: FAQs, contact options, and resource links (external links would require expo-web-browser in production)
+- **About CapsuleCheck**: App information, version details, legal links, and social media connections
+
+All editable profile data persists across the app session via AppDataContext reducer pattern.
+
 ### Future Integrations (Indicated by Design)
 - **SSO Providers**: Apple Sign-In and Google Sign-In for authentication
 - **Document Picker/Camera**: For prescription and license uploads
 - **AI Service**: For prescription analysis (service not yet integrated)
-- **Payment Processing**: For medication purchases (indicated in ProfileScreen)
-- **Backend API**: No current backend integration; mock data used throughout
+- **Payment Processing**: Full Stripe/payment provider integration for production card management
+- **Backend API**: Password management, data export, external contact forms, legal document hosting
+- **External Links**: expo-web-browser for opening social media, support resources, and legal documents
 
 ### Development Tools
 - **TypeScript**: Type safety and better developer experience

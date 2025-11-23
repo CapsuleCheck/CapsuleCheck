@@ -1,68 +1,47 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, StyleSheet, Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { ScreenScrollView } from "@/components/ScreenScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { useTheme } from "@/hooks/useTheme";
+import { useAppData } from "@/context/AppDataContext";
 import { BorderRadius, Spacing, Typography } from "@/constants/theme";
-
-type PaymentMethod = {
-  id: string;
-  type: "card" | "bank";
-  last4: string;
-  brand?: string;
-  expiryMonth?: number;
-  expiryYear?: number;
-  isDefault: boolean;
-};
 
 export default function PaymentMethodsScreen() {
   const { theme } = useTheme();
+  const { state, updatePaymentMethod, deletePaymentMethod, addPaymentMethod } = useAppData();
+  const paymentMethods = state.paymentMethods;
 
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
-    {
-      id: "1",
-      type: "card",
-      last4: "4242",
-      brand: "Visa",
-      expiryMonth: 12,
-      expiryYear: 2025,
-      isDefault: true,
-    },
-    {
-      id: "2",
-      type: "card",
-      last4: "5555",
-      brand: "Mastercard",
-      expiryMonth: 8,
-      expiryYear: 2026,
-      isDefault: false,
-    },
-  ]);
-
-  const getCardIcon = (brand?: string): keyof typeof Feather.glyphMap => {
-    switch (brand?.toLowerCase()) {
-      case "visa":
-      case "mastercard":
-      case "amex":
-        return "credit-card";
-      default:
-        return "credit-card";
-    }
+  const getCardIcon = (): keyof typeof Feather.glyphMap => {
+    return "credit-card";
   };
 
   const setDefaultPaymentMethod = (id: string) => {
-    setPaymentMethods((prev) =>
-      prev.map((method) => ({
-        ...method,
-        isDefault: method.id === id,
-      }))
-    );
+    const currentDefault = paymentMethods.find(m => m.isDefault);
+    if (currentDefault && currentDefault.id !== id) {
+      updatePaymentMethod(currentDefault.id, { isDefault: false });
+    }
+    updatePaymentMethod(id, { isDefault: true });
   };
 
-  const removePaymentMethod = (id: string) => {
-    setPaymentMethods((prev) => prev.filter((method) => method.id !== id));
+  const handleRemovePaymentMethod = (id: string) => {
+    deletePaymentMethod(id);
+  };
+
+  const handleAddPaymentMethod = () => {
+    const newId = `pm-${Date.now()}`;
+    const mockCardNumbers = ["4242", "5555", "3782", "6011"];
+    const randomLast4 = mockCardNumbers[Math.floor(Math.random() * mockCardNumbers.length)];
+    
+    addPaymentMethod({
+      id: newId,
+      type: "credit_card",
+      lastFour: randomLast4,
+      expiryDate: `${(Math.floor(Math.random() * 12) + 1).toString().padStart(2, '0')}/${new Date().getFullYear() % 100 + Math.floor(Math.random() * 5) + 1}`,
+      cardholderName: state.userProfile?.name || "Cardholder",
+      isDefault: paymentMethods.length === 0,
+    });
   };
 
   return (
@@ -91,18 +70,18 @@ export default function PaymentMethodsScreen() {
                     ]}
                   >
                     <Feather
-                      name={getCardIcon(method.brand)}
+                      name={getCardIcon()}
                       size={24}
                       color={theme.primary}
                     />
                   </View>
                   <View style={styles.cardDetails}>
                     <ThemedText style={styles.cardBrand}>
-                      {method.brand} •••• {method.last4}
+                      {method.type === "credit_card" ? "Credit Card" : method.type === "debit_card" ? "Debit Card" : "Bank Account"} •••• {method.lastFour}
                     </ThemedText>
-                    {method.expiryMonth && method.expiryYear && (
+                    {method.expiryDate && (
                       <ThemedText style={[styles.cardExpiry, { color: theme.textSecondary }]}>
-                        Expires {method.expiryMonth}/{method.expiryYear}
+                        Expires {method.expiryDate}
                       </ThemedText>
                     )}
                   </View>
@@ -137,7 +116,7 @@ export default function PaymentMethodsScreen() {
                     styles.actionButton,
                     { opacity: pressed ? 0.7 : 1 },
                   ]}
-                  onPress={() => removePaymentMethod(method.id)}
+                  onPress={() => handleRemovePaymentMethod(method.id)}
                 >
                   <Feather name="trash-2" size={16} color={theme.error} />
                   <ThemedText style={[styles.actionText, { color: theme.error }]}>
@@ -151,14 +130,14 @@ export default function PaymentMethodsScreen() {
 
         <PrimaryButton
           title="Add Payment Method"
-          onPress={() => {}}
+          onPress={handleAddPaymentMethod}
         />
 
         <View style={[styles.infoCard, { backgroundColor: theme.backgroundSecondary }]}>
           <Feather name="shield" size={16} color={theme.textSecondary} />
           <ThemedText style={[styles.infoText, { color: theme.textSecondary }]}>
             Your payment information is encrypted and secure. We never store your full card
-            details.
+            details. (Note: In production, this would integrate with a payment provider like Stripe)
           </ThemedText>
         </View>
       </View>
