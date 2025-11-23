@@ -25,6 +25,7 @@ import {
   SEED_PAYMENT_METHODS,
   SEED_AI_ANALYSES,
 } from "@/data/seedData";
+import { generateMockAnalysis } from "@/utils/aiAnalysis";
 
 interface AppDataState {
   prescriptions: Prescription[];
@@ -85,6 +86,7 @@ interface AppDataContextType {
   createRefillRequest: (request: RefillRequest) => void;
   updateRefillRequest: (id: string, updates: Partial<RefillRequest>) => void;
   addReview: (review: Review) => void;
+  createPrescriptionAnalysis: (prescriptionId: string) => Promise<string>;
   resetData: () => void;
 }
 
@@ -310,6 +312,30 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       dispatch({ type: "UPDATE_REFILL_REQUEST", payload: { id, updates } }),
     addReview: (review) =>
       dispatch({ type: "ADD_REVIEW", payload: review }),
+    createPrescriptionAnalysis: async (prescriptionId: string) => {
+      const prescription = state.prescriptions.find((p) => p.id === prescriptionId);
+      if (!prescription) {
+        throw new Error("Prescription not found");
+      }
+
+      if (prescription.analysisId) {
+        return prescription.analysisId;
+      }
+
+      const analysis = await generateMockAnalysis(
+        prescription,
+        state.medications,
+        state.medicationPrices
+      );
+
+      dispatch({ type: "CREATE_AI_ANALYSIS", payload: analysis });
+      dispatch({
+        type: "UPDATE_PRESCRIPTION",
+        payload: { id: prescriptionId, updates: { analysisId: analysis.id } },
+      });
+
+      return analysis.id;
+    },
     resetData: () =>
       dispatch({ type: "RESET_DATA" }),
   };

@@ -4,6 +4,7 @@ import MyRxScreen from "@/screens/MyRxScreen";
 import PrescriptionDetailScreen from "@/screens/PrescriptionDetailScreen";
 import RefillRequestScreen from "@/screens/RefillRequestScreen";
 import AnalysisResultsScreen from "@/screens/AnalysisResultsScreen";
+import ComparePricesScreen from "@/screens/ComparePricesScreen";
 import { useTheme } from "@/hooks/useTheme";
 import { getCommonScreenOptions } from "@/navigation/screenOptions";
 
@@ -12,6 +13,7 @@ export type MyRxStackParamList = {
   PrescriptionDetail: { prescriptionId: string };
   RefillRequest: { prescriptionId: string };
   AnalysisResults: { analysisId: string };
+  ComparePrices: { medicationId: string };
 };
 
 const Stack = createNativeStackNavigator<MyRxStackParamList>();
@@ -44,6 +46,11 @@ export default function MyRxStackNavigator() {
         name="AnalysisResults"
         component={AnalysisResultsScreen}
         options={{ headerTitle: "AI Analysis" }}
+      />
+      <Stack.Screen
+        name="ComparePrices"
+        component={ComparePricesScreen}
+        options={{ headerTitle: "Compare Prices" }}
       />
     </Stack.Navigator>
   );

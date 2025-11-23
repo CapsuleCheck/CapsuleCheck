@@ -1,5 +1,5 @@
-import React from "react";
-import { View, StyleSheet, Alert } from "react-native";
+import React, { useState } from "react";
+import { View, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -11,7 +11,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { useScreenInsets } from "@/hooks/useScreenInsets";
 import { usePrescriptions, useAIAnalyses } from "@/hooks/useAppDataHooks";
 import { useAppData } from "@/context/AppDataContext";
-import { BorderRadius, Spacing } from "@/constants/theme";
+import { BorderRadius, Spacing, Colors } from "@/constants/theme";
 import { MyRxStackParamList } from "@/navigation/MyRxStackNavigator";
 
 type PrescriptionDetailRouteProp = RouteProp<MyRxStackParamList, "PrescriptionDetail">;
@@ -24,9 +24,11 @@ export default function PrescriptionDetailScreen() {
   const navigation = useNavigation<NavigationProp>();
   const { prescriptionId } = route.params;
   
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  
   const prescriptions = usePrescriptions();
   const analyses = useAIAnalyses();
-  const { updatePrescription } = useAppData();
+  const { createPrescriptionAnalysis } = useAppData();
   
   const prescription = prescriptions.getById(prescriptionId);
   const analysis = prescription?.analysisId 
@@ -58,6 +60,22 @@ export default function PrescriptionDetailScreen() {
   const handleViewAnalysis = () => {
     if (analysis) {
       navigation.navigate("AnalysisResults", { analysisId: analysis.id });
+    }
+  };
+
+  const handleComparePrices = () => {
+    navigation.navigate("ComparePrices", { medicationId: prescription.medicationId });
+  };
+
+  const handleAnalyzePrescription = async () => {
+    setIsAnalyzing(true);
+    try {
+      const analysisId = await createPrescriptionAnalysis(prescriptionId);
+      navigation.navigate("AnalysisResults", { analysisId });
+    } catch (error) {
+      console.error("Failed to analyze prescription:", error);
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
@@ -190,6 +208,41 @@ export default function PrescriptionDetailScreen() {
           </View>
         )}
 
+        <View style={[styles.aiSection, { backgroundColor: theme.card, borderColor: theme.primary }]}>
+          <View style={styles.aiHeader}>
+            <Feather name="zap" size={20} color={theme.primary} />
+            <ThemedText style={[styles.aiTitle, { color: theme.primary }]}>
+              AI-Powered Analysis
+            </ThemedText>
+          </View>
+          
+          {analysis ? (
+            <>
+              <ThemedText style={[styles.aiDescription, { color: theme.text }]}>
+                AI analysis complete. View cost-saving recommendations and safety insights.
+              </ThemedText>
+              <PrimaryButton
+                title="View Analysis Results"
+                onPress={handleViewAnalysis}
+                style={styles.aiButton}
+              />
+            </>
+          ) : (
+            <>
+              <ThemedText style={[styles.aiDescription, { color: theme.text }]}>
+                Get personalized recommendations, cost-saving alternatives, and safety insights powered by AI.
+              </ThemedText>
+              <PrimaryButton
+                title={isAnalyzing ? "Analyzing..." : "Analyze Prescription"}
+                onPress={handleAnalyzePrescription}
+                disabled={isAnalyzing}
+                loading={isAnalyzing}
+                style={styles.aiButton}
+              />
+            </>
+          )}
+        </View>
+
         <View style={styles.actions}>
           <PrimaryButton
             title="Request Refill"
@@ -200,7 +253,7 @@ export default function PrescriptionDetailScreen() {
           
           <PrimaryButton
             title="Compare Prices"
-            onPress={() => {}}
+            onPress={handleComparePrices}
             variant="outline"
             style={styles.actionButton}
           />
@@ -294,6 +347,30 @@ const styles = StyleSheet.create({
   listText: {
     fontSize: 14,
     flex: 1,
+  },
+  aiSection: {
+    padding: Spacing.lg,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 2,
+    marginBottom: Spacing.lg,
+  },
+  aiHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
+  },
+  aiTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  aiDescription: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: Spacing.md,
+  },
+  aiButton: {
+    marginTop: Spacing.sm,
   },
   actions: {
     gap: Spacing.md,

@@ -8,6 +8,8 @@ export const Colors = {
     primary: "#14B8A6",
     primaryDark: "#0D9488",
     secondary: "#3B82F6",
+    accent: "#14B8A6",
+    accentLight: "#E0F7F4",
     text: "#1F2937",
     textSecondary: "#6B7280",
     buttonText: "#FFFFFF",
@@ -18,16 +20,20 @@ export const Colors = {
     warning: "#F59E0B",
     error: "#EF4444",
     border: "#E5E7EB",
+    background: "#FFFFFF",
     backgroundRoot: "#FFFFFF",
     backgroundDefault: "#F9FAFB",
     backgroundSecondary: "#F3F4F6",
     backgroundTertiary: "#E5E7EB",
     card: "#FFFFFF",
+    cardSecondary: "#F3F4F6",
   },
   dark: {
     primary: "#14B8A6",
     primaryDark: "#0D9488",
     secondary: "#3B82F6",
+    accent: "#14B8A6",
+    accentLight: "#E0F7F4",
     text: "#1F2937",
     textSecondary: "#6B7280",
     buttonText: "#FFFFFF",
@@ -38,15 +44,18 @@ export const Colors = {
     warning: "#F59E0B",
     error: "#EF4444",
     border: "#E5E7EB",
+    background: "#FFFFFF",
     backgroundRoot: "#FFFFFF",
     backgroundDefault: "#F9FAFB",
     backgroundSecondary: "#F3F4F6",
     backgroundTertiary: "#E5E7EB",
     card: "#FFFFFF",
+    cardSecondary: "#F3F4F6",
   },
 };
 
 export const Spacing = {
+  xxs: 2,
   xs: 4,
   sm: 8,
   md: 12,
@@ -56,6 +65,7 @@ export const Spacing = {
   "3xl": 40,
   "4xl": 48,
   "5xl": 56,
+  xxxl: 64,
   inputHeight: 48,
   buttonHeight: 52,
 };
@@ -99,6 +109,14 @@ export const Typography = {
   button: {
     fontSize: 16,
     fontWeight: "600" as const,
+  },
+  sizes: {
+    xs: 10,
+    sm: 12,
+    md: 14,
+    lg: 16,
+    xl: 20,
+    xxl: 24,
   },
 };
 
