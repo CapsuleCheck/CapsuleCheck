@@ -198,25 +198,35 @@ Preferred communication style: Simple, everyday language.
 
 All editable profile data persists across the app session via AppDataContext reducer pattern.
 
-### Price Comparison System (Complete UI/UX with Filtering)
-- **Compare Prices Screen**: Comprehensive price comparison with advanced filtering and sorting
+### Price Comparison System (Complete UI/UX with Filtering & Animations)
+- **Compare Prices Screen**: Comprehensive price comparison with advanced filtering, sorting, and responsive animations
   - Accessible from both Home (Price List) and My Rx (Prescription Detail) flows
   - Displays medication name, dosage, and supply information
   - Summary card shows lowest and average prices (dynamically filtered)
   
-- **Filter System**:
+- **Filter System with Animations**:
   - **Generic/Brand Filter**: Shows only generic or brand-name offers (based on `isGenericOffer` flag)
   - **In Stock Only**: Filters to pharmacies with medication currently in stock
   - **Nearby Only**: Shows pharmacies within 5-mile radius
+  - **Patient Rating Filter**: Filter by minimum patient ratings (All Ratings, 4+ Stars, 3+ Stars)
   - Filters work cumulatively and can be combined
   - Clear visual indication of active filters with highlighted chips
+  - **Responsive Animations**: Spring-based scale animations on filter chips using react-native-reanimated
   - Empty state with "Clear Filters" button when no results match
   
-- **Sorting Options**:
+- **Sorting Options with Animations**:
   - Price: Low to High (default)
   - Price: High to Low
   - Distance (nearest first)
   - Name (alphabetical)
+  - **Responsive Animations**: Spring-based scale animations on sort buttons for tactile feedback
+  
+- **Patient Rating System**:
+  - Patient ratings displayed on all pharmacy cards with star icons and numeric value
+  - Rating range: 3.5 to 4.8 stars in current data
+  - Visual star display with full stars and half-star logic
+  - Filter pharmacies by minimum rating threshold (3+, 4+, or all ratings)
+  - Ratings integrate seamlessly with other filters (can combine rating + generic + in stock, etc.)
   
 - **Dynamic Summary Card**:
   - Shows "Lowest Price" and "Average Price" when no filters active
@@ -225,19 +235,27 @@ All editable profile data persists across the app session via AppDataContext red
   - Savings calculation based on current filtered or unfiltered prices
   
 - **Pharmacy Cards**:
-  - Display pharmacy name, price, distance, and stock status
+  - Display pharmacy name, price, distance, stock status, and patient rating
+  - Patient ratings shown with visual star icons and numeric value (e.g., "4.5")
   - "Lowest Price" badge on cheapest option in current filtered view
   - Selection indicator when pharmacy is chosen
   - Automatic selection clearing when filtered list no longer contains selected pharmacy
   
+- **Animation Implementation**:
+  - Uses react-native-reanimated for performant animations
+  - Spring configuration: damping 15, stiffness 300 for responsive feel
+  - Scale animation: 1.0 → 0.95 on press, returns to 1.0 on release
+  - Applied to both filter chips and sort buttons for consistent tactile feedback
+  
 - **Data Model**:
   - `isGenericOffer` boolean field on PriceSource for reliable generic/brand filtering
+  - `patientRating` optional number field (1-5 scale) for pharmacy quality ratings
   - Explicit distance values for nearby filtering (5-mile threshold)
   - In-stock status for availability filtering
   
 - **Navigation**:
-  - Home → Price List → Click medication → Compare Prices (with filters)
-  - My Rx → Prescription Detail → Compare Prices (with filters)
+  - Home → Price List → Click medication → Compare Prices (with filters and animations)
+  - My Rx → Prescription Detail → Compare Prices (with filters and animations)
 
 ### Future Integrations (Indicated by Design)
 - **SSO Providers**: Apple Sign-In and Google Sign-In for authentication
