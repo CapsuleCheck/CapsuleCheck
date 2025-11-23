@@ -3,6 +3,12 @@ import { View, StyleSheet, Pressable } from "react-native";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 import { ScreenScrollView } from "@/components/ScreenScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
@@ -32,13 +38,14 @@ export default function ComparePricesScreen() {
   const [filterType, setFilterType] = useState<FilterType>("all");
   const [inStockOnly, setInStockOnly] = useState(false);
   const [nearbyOnly, setNearbyOnly] = useState(false);
+  const [minRating, setMinRating] = useState<number | null>(null);
 
   const priceData = medicationPrices.getByMedicationId(medicationId);
   const NEARBY_DISTANCE_THRESHOLD = 5;
 
   const hasActiveFilters = useMemo(() => {
-    return inStockOnly || nearbyOnly || filterType !== "all";
-  }, [inStockOnly, nearbyOnly, filterType]);
+    return inStockOnly || nearbyOnly || filterType !== "all" || minRating !== null;
+  }, [inStockOnly, nearbyOnly, filterType, minRating]);
 
   const filteredAndSortedSources = useMemo(() => {
     if (!priceData) return [];
@@ -59,6 +66,10 @@ export default function ComparePricesScreen() {
       sources = sources.filter(s => s.isGenericOffer === false || s.isGenericOffer === undefined);
     }
     
+    if (minRating !== null) {
+      sources = sources.filter(s => s.patientRating !== undefined && s.patientRating >= minRating);
+    }
+    
     switch (sortBy) {
       case "price-low":
         return sources.sort((a, b) => a.price - b.price);
@@ -71,7 +82,7 @@ export default function ComparePricesScreen() {
       default:
         return sources;
     }
-  }, [priceData, sortBy, filterType, inStockOnly, nearbyOnly]);
+  }, [priceData, sortBy, filterType, inStockOnly, nearbyOnly, minRating]);
 
   const filteredLowestPrice = useMemo(() => {
     if (filteredAndSortedSources.length === 0) return null;
@@ -108,60 +119,92 @@ export default function ComparePricesScreen() {
     );
   }
 
-  const renderSortButton = (option: SortOption, label: string, icon: keyof typeof Feather.glyphMap) => (
-    <Pressable
-      style={[
-        styles.sortButton,
-        { backgroundColor: theme.backgroundSecondary },
-        sortBy === option && { backgroundColor: theme.primary },
-      ]}
-      onPress={() => setSortBy(option)}
-    >
-      <Feather 
-        name={icon} 
-        size={16} 
-        color={sortBy === option ? theme.buttonText : theme.text} 
-      />
-      <ThemedText
-        style={[
-          styles.sortButtonText,
-          sortBy === option && { color: theme.buttonText },
-        ]}
-      >
-        {label}
-      </ThemedText>
-    </Pressable>
-  );
+  const AnimatedSortButton = ({ option, label, icon }: { option: SortOption; label: string; icon: keyof typeof Feather.glyphMap }) => {
+    const scale = useSharedValue(1);
+    const isActive = sortBy === option;
 
-  const renderFilterChip = (
-    active: boolean,
-    label: string,
-    icon: keyof typeof Feather.glyphMap,
-    onPress: () => void
-  ) => (
-    <Pressable
-      style={[
-        styles.filterChip,
-        { backgroundColor: theme.backgroundSecondary, borderColor: theme.border },
-        active && { backgroundColor: theme.primary, borderColor: theme.primary },
-      ]}
-      onPress={onPress}
-    >
-      <Feather 
-        name={icon} 
-        size={14} 
-        color={active ? theme.buttonText : theme.text} 
-      />
-      <ThemedText
-        style={[
-          styles.filterChipText,
-          active && { color: theme.buttonText },
-        ]}
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+    }));
+
+    const handlePressIn = () => {
+      scale.value = withSpring(0.95, { damping: 15, stiffness: 300 });
+    };
+
+    const handlePressOut = () => {
+      scale.value = withSpring(1, { damping: 15, stiffness: 300 });
+    };
+
+    return (
+      <Pressable
+        onPress={() => setSortBy(option)}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
       >
-        {label}
-      </ThemedText>
-    </Pressable>
-  );
+        <Animated.View
+          style={[
+            styles.sortButton,
+            { backgroundColor: theme.backgroundSecondary },
+            isActive && { backgroundColor: theme.primary },
+            animatedStyle,
+          ]}
+        >
+          <Feather name={icon} size={16} color={isActive ? theme.buttonText : theme.text} />
+          <ThemedText style={[styles.sortButtonText, isActive && { color: theme.buttonText }]}>
+            {label}
+          </ThemedText>
+        </Animated.View>
+      </Pressable>
+    );
+  };
+
+  const AnimatedFilterChip = ({ active, label, icon, onPress }: { active: boolean; label: string; icon: keyof typeof Feather.glyphMap; onPress: () => void }) => {
+    const scale = useSharedValue(1);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+    }));
+
+    const handlePressIn = () => {
+      scale.value = withSpring(0.95, { damping: 15, stiffness: 300 });
+    };
+
+    const handlePressOut = () => {
+      scale.value = withSpring(1, { damping: 15, stiffness: 300 });
+    };
+
+    return (
+      <Pressable onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut}>
+        <Animated.View
+          style={[
+            styles.filterChip,
+            { backgroundColor: theme.backgroundSecondary, borderColor: theme.border },
+            active && { backgroundColor: theme.primary, borderColor: theme.primary },
+            animatedStyle,
+          ]}
+        >
+          <Feather name={icon} size={14} color={active ? theme.buttonText : theme.text} />
+          <ThemedText style={[styles.filterChipText, active && { color: theme.buttonText }]}>
+            {label}
+          </ThemedText>
+        </Animated.View>
+      </Pressable>
+    );
+  };
+
+  const renderStars = (rating: number) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(<Feather key={`full-${i}`} name="star" size={12} color={theme.warning} style={{ marginRight: 2 }} />);
+    }
+    if (hasHalfStar) {
+      stars.push(<Feather key="half" name="star" size={12} color={theme.textSecondary} style={{ marginRight: 2 }} />);
+    }
+    return stars;
+  };
 
   const renderPriceCard = (source: PriceSource, isFilteredLowest: boolean) => {
     return (
@@ -197,6 +240,17 @@ export default function ComparePricesScreen() {
           </View>
 
           <View style={styles.priceCardDetails}>
+            {source.patientRating !== undefined && (
+              <View style={styles.detailRow}>
+                <View style={styles.ratingContainer}>
+                  {renderStars(source.patientRating)}
+                  <ThemedText style={styles.ratingText}>
+                    {source.patientRating.toFixed(1)}
+                  </ThemedText>
+                </View>
+              </View>
+            )}
+            
             {source.distance !== undefined && (
               <View style={styles.detailRow}>
                 <Feather name="navigation" size={16} color={theme.textSecondary} />
@@ -298,6 +352,7 @@ export default function ComparePricesScreen() {
                 setFilterType("all");
                 setInStockOnly(false);
                 setNearbyOnly(false);
+                setMinRating(null);
               }}
             >
               <ThemedText style={[styles.clearAllText, { color: theme.primary }]}>
@@ -307,26 +362,37 @@ export default function ComparePricesScreen() {
           )}
         </View>
         <View style={styles.filterChips}>
-          {renderFilterChip(filterType === "all", "All", "grid", () => setFilterType("all"))}
-          {priceData.medication.genericName && renderFilterChip(
-            filterType === "generic",
-            "Generic",
-            "package",
-            () => setFilterType("generic")
+          <AnimatedFilterChip active={filterType === "all"} label="All" icon="grid" onPress={() => setFilterType("all")} />
+          {priceData.medication.genericName && (
+            <AnimatedFilterChip
+              active={filterType === "generic"}
+              label="Generic"
+              icon="package"
+              onPress={() => setFilterType("generic")}
+            />
           )}
-          {renderFilterChip(filterType === "brand", "Brand", "award", () => setFilterType("brand"))}
-          {renderFilterChip(inStockOnly, "In Stock", "check-circle", () => setInStockOnly(!inStockOnly))}
-          {renderFilterChip(nearbyOnly, "Nearby", "navigation", () => setNearbyOnly(!nearbyOnly))}
+          <AnimatedFilterChip active={filterType === "brand"} label="Brand" icon="award" onPress={() => setFilterType("brand")} />
+          <AnimatedFilterChip active={inStockOnly} label="In Stock" icon="check-circle" onPress={() => setInStockOnly(!inStockOnly)} />
+          <AnimatedFilterChip active={nearbyOnly} label="Nearby" icon="navigation" onPress={() => setNearbyOnly(!nearbyOnly)} />
+        </View>
+      </View>
+
+      <View style={styles.filterSection}>
+        <ThemedText style={styles.sectionLabel}>Patient Ratings:</ThemedText>
+        <View style={styles.filterChips}>
+          <AnimatedFilterChip active={minRating === null} label="All Ratings" icon="star" onPress={() => setMinRating(null)} />
+          <AnimatedFilterChip active={minRating === 4} label="4+ Stars" icon="star" onPress={() => setMinRating(4)} />
+          <AnimatedFilterChip active={minRating === 3} label="3+ Stars" icon="star" onPress={() => setMinRating(3)} />
         </View>
       </View>
 
       <View style={styles.sortContainer}>
         <ThemedText style={styles.sortLabel}>Sort by:</ThemedText>
         <View style={styles.sortButtons}>
-          {renderSortButton("price-low", "Price: Low", "arrow-down")}
-          {renderSortButton("price-high", "Price: High", "arrow-up")}
-          {renderSortButton("distance", "Distance", "map-pin")}
-          {renderSortButton("name", "Name", "type")}
+          <AnimatedSortButton option="price-low" label="Price: Low" icon="arrow-down" />
+          <AnimatedSortButton option="price-high" label="Price: High" icon="arrow-up" />
+          <AnimatedSortButton option="distance" label="Distance" icon="map-pin" />
+          <AnimatedSortButton option="name" label="Name" icon="type" />
         </View>
       </View>
 
@@ -346,6 +412,7 @@ export default function ComparePricesScreen() {
                 setFilterType("all");
                 setInStockOnly(false);
                 setNearbyOnly(false);
+                setMinRating(null);
               }}
             >
               <ThemedText style={[styles.clearFiltersText, { color: theme.buttonText }]}>
@@ -356,7 +423,7 @@ export default function ComparePricesScreen() {
         ) : (
           <React.Fragment>
             {filteredAndSortedSources.map((source) => {
-              const isLowestInFiltered = filteredLowestPriceSource !== null && source.id === filteredLowestPriceSource.id;
+              const isLowestInFiltered = filteredLowestPriceSource ? source.id === filteredLowestPriceSource.id : false;
               return renderPriceCard(source, isLowestInFiltered);
             })}
           </React.Fragment>
@@ -521,6 +588,16 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: Typography.sizes.sm,
+  },
+  ratingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+  },
+  ratingText: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: "600",
+    marginLeft: Spacing.xs,
   },
   selectedIndicator: {
     flexDirection: "row",

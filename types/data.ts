@@ -51,6 +51,7 @@ export interface PriceSource {
   inStock: boolean;
   pharmacyId?: string;
   isGenericOffer?: boolean;
+  patientRating?: number;
 }
 
 export interface MedicationPrice {
