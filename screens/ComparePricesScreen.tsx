@@ -36,6 +36,10 @@ export default function ComparePricesScreen() {
   const priceData = medicationPrices.getByMedicationId(medicationId);
   const NEARBY_DISTANCE_THRESHOLD = 5;
 
+  const hasActiveFilters = useMemo(() => {
+    return inStockOnly || nearbyOnly || filterType !== "all";
+  }, [inStockOnly, nearbyOnly, filterType]);
+
   const filteredAndSortedSources = useMemo(() => {
     if (!priceData) return [];
     
@@ -153,74 +157,80 @@ export default function ComparePricesScreen() {
     </Pressable>
   );
 
-  const renderPriceCard = (source: PriceSource, isLowest: boolean) => (
-    <Pressable
-      key={source.id}
-      onPress={() => setSelectedPharmacy(source.id)}
-    >
-      <View
-        style={[
-          styles.priceCard,
-          { backgroundColor: theme.card },
-          selectedPharmacy === source.id && { borderColor: theme.primary },
-        ]}
-      >
-        {isLowest && (
-          <View style={[styles.lowestBadge, { backgroundColor: theme.primary }]}>
-            <Feather name="award" size={14} color={theme.buttonText} />
-            <ThemedText style={[styles.lowestBadgeText, { color: theme.buttonText }]}>Lowest Price</ThemedText>
-          </View>
-        )}
-        
-        <View style={styles.priceCardHeader}>
-          <View style={styles.pharmacyInfo}>
-            <Feather name="map-pin" size={20} color={theme.text} />
-            <ThemedText style={styles.pharmacyName}>{source.pharmacyName}</ThemedText>
-          </View>
-          <View style={styles.priceContainer}>
-            <ThemedText style={styles.priceSymbol}>$</ThemedText>
-            <ThemedText style={styles.price}>
-              {source.price.toFixed(2)}
-            </ThemedText>
-          </View>
-        </View>
+  const renderPriceCard = (source: PriceSource, isFilteredLowest: boolean) => {
+    const isLowest = filteredLowestPrice !== null 
+      ? source.price === filteredLowestPrice 
+      : source.price === priceData?.lowestPrice;
 
-        <View style={styles.priceCardDetails}>
-          {source.distance !== undefined && (
-            <View style={styles.detailRow}>
-              <Feather name="navigation" size={16} color={theme.textSecondary} />
-              <ThemedText style={styles.detailText}>
-                {source.distance.toFixed(1)} mi away
-              </ThemedText>
+    return (
+      <Pressable
+        key={source.id}
+        onPress={() => setSelectedPharmacy(source.id)}
+      >
+        <View
+          style={[
+            styles.priceCard,
+            { backgroundColor: theme.card },
+            selectedPharmacy === source.id && { borderColor: theme.primary },
+          ]}
+        >
+          {isLowest && (
+            <View style={[styles.lowestBadge, { backgroundColor: theme.primary }]}>
+              <Feather name="award" size={14} color={theme.buttonText} />
+              <ThemedText style={[styles.lowestBadgeText, { color: theme.buttonText }]}>Lowest Price</ThemedText>
             </View>
           )}
           
-          <View style={styles.detailRow}>
-            <Feather 
-              name={source.inStock ? "check-circle" : "x-circle"} 
-              size={16} 
-              color={source.inStock ? theme.success : theme.error} 
-            />
-            <ThemedText 
-              style={[
-                styles.detailText,
-                { color: source.inStock ? theme.success : theme.error },
-              ]}
-            >
-              {source.inStock ? "In Stock" : "Out of Stock"}
-            </ThemedText>
+          <View style={styles.priceCardHeader}>
+            <View style={styles.pharmacyInfo}>
+              <Feather name="map-pin" size={20} color={theme.text} />
+              <ThemedText style={styles.pharmacyName}>{source.pharmacyName}</ThemedText>
+            </View>
+            <View style={styles.priceContainer}>
+              <ThemedText style={styles.priceSymbol}>$</ThemedText>
+              <ThemedText style={styles.price}>
+                {source.price.toFixed(2)}
+              </ThemedText>
+            </View>
           </View>
-        </View>
 
-        {selectedPharmacy === source.id && (
-          <View style={[styles.selectedIndicator, { borderTopColor: theme.border }]}>
-            <Feather name="check-circle" size={20} color={theme.primary} />
-            <ThemedText style={[styles.selectedText, { color: theme.primary }]}>Selected</ThemedText>
+          <View style={styles.priceCardDetails}>
+            {source.distance !== undefined && (
+              <View style={styles.detailRow}>
+                <Feather name="navigation" size={16} color={theme.textSecondary} />
+                <ThemedText style={styles.detailText}>
+                  {source.distance.toFixed(1)} mi away
+                </ThemedText>
+              </View>
+            )}
+            
+            <View style={styles.detailRow}>
+              <Feather 
+                name={source.inStock ? "check-circle" : "x-circle"} 
+                size={16} 
+                color={source.inStock ? theme.success : theme.error} 
+              />
+              <ThemedText 
+                style={[
+                  styles.detailText,
+                  { color: source.inStock ? theme.success : theme.error },
+                ]}
+              >
+                {source.inStock ? "In Stock" : "Out of Stock"}
+              </ThemedText>
+            </View>
           </View>
-        )}
-      </View>
-    </Pressable>
-  );
+
+          {selectedPharmacy === source.id && (
+            <View style={[styles.selectedIndicator, { borderTopColor: theme.border }]}>
+              <Feather name="check-circle" size={20} color={theme.primary} />
+              <ThemedText style={[styles.selectedText, { color: theme.primary }]}>Selected</ThemedText>
+            </View>
+          )}
+        </View>
+      </Pressable>
+    );
+  };
 
   return (
     <ScreenScrollView>
@@ -235,28 +245,32 @@ export default function ComparePricesScreen() {
         <View style={styles.summaryRow}>
           <View>
             <ThemedText style={[styles.summaryLabel, { color: theme.textSecondary }]}>
-              {filteredLowestPrice !== null ? "Lowest (Filtered)" : "Lowest Price"}
+              {hasActiveFilters ? "Lowest (Filtered)" : "Lowest Price"}
             </ThemedText>
             <ThemedText style={styles.summaryValue}>
               ${(filteredLowestPrice !== null ? filteredLowestPrice : priceData.lowestPrice).toFixed(2)}
             </ThemedText>
-            {filteredLowestPriceSource && (
+            {filteredLowestPriceSource ? (
               <ThemedText style={[styles.summaryPharmacy, { color: theme.textSecondary }]}>
                 at {filteredLowestPriceSource.pharmacyName}
               </ThemedText>
-            )}
+            ) : null}
           </View>
           <View style={[styles.summaryDivider, { backgroundColor: theme.border }]} />
           <View>
             <ThemedText style={[styles.summaryLabel, { color: theme.textSecondary }]}>
-              {filteredAveragePrice !== null ? "Average (Filtered)" : "Average Price"}
+              {hasActiveFilters ? "Average (Filtered)" : "Average Price"}
             </ThemedText>
             <ThemedText style={styles.summaryValue}>
               ${(filteredAveragePrice !== null ? filteredAveragePrice : priceData.averagePrice).toFixed(2)}
             </ThemedText>
-            {filteredLowestPrice !== null && filteredAveragePrice !== null && (
+            {filteredLowestPrice !== null && filteredAveragePrice !== null ? (
               <ThemedText style={[styles.summarySavings, { color: theme.success }]}>
                 Save ${(filteredAveragePrice - filteredLowestPrice).toFixed(2)}
+              </ThemedText>
+            ) : (
+              <ThemedText style={[styles.summarySavings, { color: theme.success }]}>
+                Save ${(priceData.averagePrice - priceData.lowestPrice).toFixed(2)}
               </ThemedText>
             )}
           </View>
