@@ -132,6 +132,12 @@ export default function LicenseVerificationScreen() {
           style={styles.submitButton}
         />
 
+        <Pressable onPress={() => completeOnboarding("prescriber")} testID="skip-verification">
+          <ThemedText style={[styles.skipText, { color: theme.primary }]}>
+            Skip for Now
+          </ThemedText>
+        </Pressable>
+
         <Pressable>
           <ThemedText style={[styles.needHelp, { color: theme.textSecondary }]}>
             Need help?
@@ -241,6 +247,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   submitButton: {
+    marginBottom: Spacing.lg,
+  },
+  skipText: {
+    fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center",
     marginBottom: Spacing.lg,
   },
   needHelp: {
