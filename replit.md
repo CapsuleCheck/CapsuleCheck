@@ -83,8 +83,10 @@ Preferred communication style: Simple, everyday language.
 
 **Role Selection Flow**
 - Initial onboarding screen presents role choice
-- Patients can proceed directly to main app
-- Pharmacists must complete license verification step
+- Patients proceed to PatientOnboardingScreen to enter personal details (name, age, gender, phone)
+- Patient onboarding includes Skip for Now option
+- Pharmacists proceed to LicenseVerificationScreen for license upload
+- Both flows complete onboarding and redirect to main app with role-specific tabs
 - UserContext tracks role and onboarding completion
 
 ### Navigation Architecture
