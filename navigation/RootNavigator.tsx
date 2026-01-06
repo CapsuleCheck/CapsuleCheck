@@ -1,12 +1,14 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import OnboardingScreen from "@/screens/OnboardingScreen";
+import PatientOnboardingScreen from "@/screens/PatientOnboardingScreen";
 import LicenseVerificationScreen from "@/screens/LicenseVerificationScreen";
 import MainTabNavigator from "@/navigation/MainTabNavigator";
 import { useUser } from "@/context/UserContext";
 
 export type RootStackParamList = {
   Onboarding: undefined;
+  PatientOnboarding: undefined;
   LicenseVerification: undefined;
   Main: undefined;
 };
@@ -21,6 +23,7 @@ export default function RootNavigator() {
       {!hasCompletedOnboarding ? (
         <>
           <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+          <Stack.Screen name="PatientOnboarding" component={PatientOnboardingScreen} />
           <Stack.Screen
             name="LicenseVerification"
             component={LicenseVerificationScreen}

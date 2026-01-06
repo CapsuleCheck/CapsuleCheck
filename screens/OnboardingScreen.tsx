@@ -21,7 +21,7 @@ export default function OnboardingScreen() {
   const { completeOnboarding } = useUser();
 
   const handlePatientSelect = () => {
-    completeOnboarding("patient");
+    navigation.navigate("PatientOnboarding");
   };
 
   const handlePharmacistSelect = () => {
