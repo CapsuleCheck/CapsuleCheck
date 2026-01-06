@@ -71,11 +71,15 @@ Preferred communication style: Simple, everyday language.
 - Compare medication prices across sources with advanced filtering and sorting
 
 **Pharmacist/Prescriber Role Features**
-- Dashboard showing upcoming bookings and availability status
-- Availability toggle (online/offline status)
-- Patient booking management
-- License verification process with document upload
-- Role requires license verification before full access
+- Dashboard with doctor avatar, greeting, and notification bell with badge
+- Availability toggle card ("Available for Consultations" with online/offline switch)
+- Stats cards showing "Today's Bookings" and "Pending Requests" counts
+- Upcoming bookings section with patient photos, time ranges, appointment types, and "View Details" buttons
+- Action buttons: "Manage Availability" (filled) and "Update Medication Pricing" (outlined) with icons
+- Dedicated Bookings screen for appointment management with filter chips and status badges
+- Dedicated Pricing screen for medication price management with search, stock status toggles, and price editing
+- License verification process with document upload (Skip for Now option available)
+- Role-specific tab navigation: Dashboard, Bookings, Pricing, Profile
 
 **Role Selection Flow**
 - Initial onboarding screen presents role choice
@@ -96,6 +100,8 @@ Preferred communication style: Simple, everyday language.
 - MyRxStack: Prescription management, history, and prescription-specific price comparison
 - PharmaciesStack: Prescriber search and appointment booking
 - ProfileStack: User settings and account management
+- BookingsStack (Prescriber only): Appointment management and booking details
+- PricingStack (Prescriber only): Medication pricing management
 
 **Screen Options Configuration**
 - Centralized screen options in `screenOptions.ts`
