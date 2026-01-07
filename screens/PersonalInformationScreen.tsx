@@ -30,6 +30,7 @@ export default function PersonalInformationScreen() {
     street: "",
     city: "",
     state: "",
+    country: "",
     zipCode: "",
   });
 
@@ -45,6 +46,7 @@ export default function PersonalInformationScreen() {
         street: profile.address.street,
         city: profile.address.city,
         state: profile.address.state,
+        country: profile.address.country,
         zipCode: profile.address.zip,
       });
     }
@@ -60,6 +62,7 @@ export default function PersonalInformationScreen() {
         street: formData.street,
         city: formData.city,
         state: formData.state,
+        country: formData.country,
         zip: formData.zipCode,
       },
     });
@@ -70,7 +73,7 @@ export default function PersonalInformationScreen() {
     label: string,
     value: string,
     field: keyof typeof formData,
-    icon: keyof typeof Feather.glyphMap
+    icon: keyof typeof Feather.glyphMap,
   ) => (
     <View style={styles.inputGroup}>
       <View style={styles.inputLabel}>
@@ -109,7 +112,12 @@ export default function PersonalInformationScreen() {
   return (
     <ScreenKeyboardAwareScrollView>
       <View style={styles.content}>
-        <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <View style={styles.cardHeader}>
             <ThemedText style={styles.cardTitle}>Basic Information</ThemedText>
             {!isEditing && (
@@ -122,19 +130,28 @@ export default function PersonalInformationScreen() {
           {renderInput("Full Name", formData.name, "name", "user")}
           {renderInput("Email", formData.email, "email", "mail")}
           {renderInput("Phone", formData.phone, "phone", "phone")}
-          {renderInput("Date of Birth", formData.dateOfBirth, "dateOfBirth", "calendar")}
+          {renderInput(
+            "Date of Birth",
+            formData.dateOfBirth,
+            "dateOfBirth",
+            "calendar",
+          )}
         </View>
 
-        <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <ThemedText style={styles.cardTitle}>Address</ThemedText>
-          
+
           {renderInput("Street Address", formData.street, "street", "map-pin")}
           {renderInput("City", formData.city, "city", "map")}
-          
+          {renderInput("State", formData.state, "state", "map")}
+          {renderInput("Country", formData.country, "country", "map")}
+
           <View style={styles.row}>
-            <View style={styles.halfWidth}>
-              {renderInput("State", formData.state, "state", "map")}
-            </View>
             <View style={styles.halfWidth}>
               {renderInput("ZIP Code", formData.zipCode, "zipCode", "map")}
             </View>

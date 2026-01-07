@@ -14,7 +14,10 @@ import { useAppData } from "@/context/AppDataContext";
 import { BorderRadius, Spacing, Colors } from "@/constants/theme";
 import { MyRxStackParamList } from "@/navigation/MyRxStackNavigator";
 
-type PrescriptionDetailRouteProp = RouteProp<MyRxStackParamList, "PrescriptionDetail">;
+type PrescriptionDetailRouteProp = RouteProp<
+  MyRxStackParamList,
+  "PrescriptionDetail"
+>;
 type NavigationProp = NativeStackNavigationProp<MyRxStackParamList>;
 
 export default function PrescriptionDetailScreen() {
@@ -23,21 +26,23 @@ export default function PrescriptionDetailScreen() {
   const route = useRoute<PrescriptionDetailRouteProp>();
   const navigation = useNavigation<NavigationProp>();
   const { prescriptionId } = route.params;
-  
+
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  
+
   const prescriptions = usePrescriptions();
   const analyses = useAIAnalyses();
   const { createPrescriptionAnalysis } = useAppData();
-  
+
   const prescription = prescriptions.getById(prescriptionId);
-  const analysis = prescription?.analysisId 
-    ? analyses.getById(prescription.analysisId) 
+  const analysis = prescription?.analysisId
+    ? analyses.getById(prescription.analysisId)
     : null;
 
   if (!prescription) {
     return (
-      <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
+      <View
+        style={[styles.container, { backgroundColor: theme.backgroundRoot }]}
+      >
         <ThemedText style={[styles.errorText, { color: theme.textSecondary }]}>
           Prescription not found
         </ThemedText>
@@ -50,7 +55,7 @@ export default function PrescriptionDetailScreen() {
       Alert.alert(
         "No Refills Remaining",
         "You have no refills remaining on this prescription. Please contact your prescriber.",
-        [{ text: "OK" }]
+        [{ text: "OK" }],
       );
       return;
     }
@@ -64,7 +69,9 @@ export default function PrescriptionDetailScreen() {
   };
 
   const handleComparePrices = () => {
-    navigation.navigate("ComparePrices", { medicationId: prescription.medicationId });
+    navigation.navigate("ComparePrices", {
+      medicationId: prescription.medicationId,
+    });
   };
 
   const handleAnalyzePrescription = async () => {
@@ -110,37 +117,74 @@ export default function PrescriptionDetailScreen() {
   };
 
   return (
-    <ScreenScrollView contentContainerStyle={{ paddingBottom: screenInsets.paddingBottom }}>
+    <ScreenScrollView
+      contentContainerStyle={{ paddingBottom: screenInsets.paddingBottom }}
+    >
       <View style={styles.content}>
-        <View style={[styles.header, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <View style={[styles.iconContainer, { backgroundColor: theme.primary + "20" }]}>
+        <View
+          style={[
+            styles.header,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
+          <View
+            style={[
+              styles.iconContainer,
+              { backgroundColor: theme.primary + "20" },
+            ]}
+          >
             <CapsuleIcon size={32} color={theme.primary} />
           </View>
           <View style={styles.headerInfo}>
-            <ThemedText style={styles.medicationName}>{prescription.medication.name}</ThemedText>
+            <ThemedText style={styles.medicationName}>
+              {prescription.medication.name}
+            </ThemedText>
             <ThemedText style={[styles.dosage, { color: theme.textSecondary }]}>
               {prescription.dosage} • {prescription.frequency}
             </ThemedText>
-            <View style={[styles.statusBadge, { backgroundColor: getStatusColor(prescription.status) + "20" }]}>
-              <ThemedText style={[styles.statusText, { color: getStatusColor(prescription.status) }]}>
+            <View
+              style={[
+                styles.statusBadge,
+                { backgroundColor: getStatusColor(prescription.status) + "20" },
+              ]}
+            >
+              <ThemedText
+                style={[
+                  styles.statusText,
+                  { color: getStatusColor(prescription.status) },
+                ]}
+              >
                 {getStatusText(prescription.status)}
               </ThemedText>
             </View>
           </View>
         </View>
 
-        <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <ThemedText style={styles.sectionTitle}>Prescription Details</ThemedText>
-          
+        <View
+          style={[
+            styles.section,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
+          <ThemedText style={styles.sectionTitle}>
+            Prescription Details
+          </ThemedText>
+
           <View style={styles.detailRow}>
-            <ThemedText style={[styles.detailLabel, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.detailLabel, { color: theme.textSecondary }]}
+            >
               Prescribed by
             </ThemedText>
-            <ThemedText style={styles.detailValue}>{prescription.prescriberName}</ThemedText>
+            <ThemedText style={styles.detailValue}>
+              {prescription.prescriberName}
+            </ThemedText>
           </View>
 
           <View style={styles.detailRow}>
-            <ThemedText style={[styles.detailLabel, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.detailLabel, { color: theme.textSecondary }]}
+            >
               Date Issued
             </ThemedText>
             <ThemedText style={styles.detailValue}>
@@ -149,7 +193,9 @@ export default function PrescriptionDetailScreen() {
           </View>
 
           <View style={styles.detailRow}>
-            <ThemedText style={[styles.detailLabel, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.detailLabel, { color: theme.textSecondary }]}
+            >
               Expiration Date
             </ThemedText>
             <ThemedText style={styles.detailValue}>
@@ -158,14 +204,20 @@ export default function PrescriptionDetailScreen() {
           </View>
 
           <View style={styles.detailRow}>
-            <ThemedText style={[styles.detailLabel, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.detailLabel, { color: theme.textSecondary }]}
+            >
               Quantity
             </ThemedText>
-            <ThemedText style={styles.detailValue}>{prescription.quantity} tablets</ThemedText>
+            <ThemedText style={styles.detailValue}>
+              {prescription.quantity} tablets
+            </ThemedText>
           </View>
 
           <View style={styles.detailRow}>
-            <ThemedText style={[styles.detailLabel, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.detailLabel, { color: theme.textSecondary }]}
+            >
               Refills Remaining
             </ThemedText>
             <ThemedText style={styles.detailValue}>
@@ -175,10 +227,14 @@ export default function PrescriptionDetailScreen() {
 
           {prescription.nextRefillDate && (
             <View style={styles.detailRow}>
-              <ThemedText style={[styles.detailLabel, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.detailLabel, { color: theme.textSecondary }]}
+              >
                 Next Refill Date
               </ThemedText>
-              <ThemedText style={[styles.detailValue, { color: theme.warning }]}>
+              <ThemedText
+                style={[styles.detailValue, { color: theme.warning }]}
+              >
                 {new Date(prescription.nextRefillDate).toLocaleDateString()}
               </ThemedText>
             </View>
@@ -186,40 +242,67 @@ export default function PrescriptionDetailScreen() {
         </View>
 
         {prescription.instructions && (
-          <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
+          <View
+            style={[
+              styles.section,
+              { backgroundColor: theme.card, borderColor: theme.border },
+            ]}
+          >
             <ThemedText style={styles.sectionTitle}>Instructions</ThemedText>
-            <ThemedText style={[styles.instructions, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.instructions, { color: theme.textSecondary }]}
+            >
               {prescription.instructions}
             </ThemedText>
           </View>
         )}
 
-        {prescription.medication.sideEffects && prescription.medication.sideEffects.length > 0 && (
-          <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
-            <ThemedText style={styles.sectionTitle}>Common Side Effects</ThemedText>
-            {prescription.medication.sideEffects.map((effect, index) => (
-              <View key={index} style={styles.listItem}>
-                <Feather name="alert-circle" size={16} color={theme.textSecondary} />
-                <ThemedText style={[styles.listText, { color: theme.textSecondary }]}>
-                  {effect}
-                </ThemedText>
-              </View>
-            ))}
-          </View>
-        )}
+        {prescription.medication.sideEffects &&
+          prescription.medication.sideEffects.length > 0 && (
+            <View
+              style={[
+                styles.section,
+                { backgroundColor: theme.card, borderColor: theme.border },
+              ]}
+            >
+              <ThemedText style={styles.sectionTitle}>
+                Common Side Effects
+              </ThemedText>
+              {prescription.medication.sideEffects.map((effect, index) => (
+                <View key={index} style={styles.listItem}>
+                  <Feather
+                    name="alert-circle"
+                    size={16}
+                    color={theme.textSecondary}
+                  />
+                  <ThemedText
+                    style={[styles.listText, { color: theme.textSecondary }]}
+                  >
+                    {effect}
+                  </ThemedText>
+                </View>
+              ))}
+            </View>
+          )}
 
-        <View style={[styles.aiSection, { backgroundColor: theme.card, borderColor: theme.primary }]}>
+        <View
+          style={[
+            styles.aiSection,
+            { backgroundColor: theme.card, borderColor: theme.primary },
+          ]}
+        >
           <View style={styles.aiHeader}>
             <Feather name="zap" size={20} color={theme.primary} />
             <ThemedText style={[styles.aiTitle, { color: theme.primary }]}>
               AI-Powered Analysis
             </ThemedText>
           </View>
-          
+
           {analysis ? (
             <>
               <ThemedText style={[styles.aiDescription, { color: theme.text }]}>
-                AI analysis complete. View cost-saving recommendations and safety insights.
+                AI analysis complete. View cost-saving recommendations and
+                safety insights.
               </ThemedText>
               <PrimaryButton
                 title="View Analysis Results"
@@ -230,7 +313,8 @@ export default function PrescriptionDetailScreen() {
           ) : (
             <>
               <ThemedText style={[styles.aiDescription, { color: theme.text }]}>
-                Get personalized recommendations, cost-saving alternatives, and safety insights powered by AI.
+                Get personalized recommendations, cost-saving alternatives, and
+                safety insights powered by AI.
               </ThemedText>
               <PrimaryButton
                 title={isAnalyzing ? "Analyzing..." : "Analyze Prescription"}
@@ -247,10 +331,13 @@ export default function PrescriptionDetailScreen() {
           <PrimaryButton
             title="Request Refill"
             onPress={handleRequestRefill}
-            disabled={prescription.refillsRemaining === 0 || prescription.status === "expired"}
+            disabled={
+              prescription.refillsRemaining === 0 ||
+              prescription.status === "expired"
+            }
             style={styles.actionButton}
           />
-          
+
           <PrimaryButton
             title="Compare Prices"
             onPress={handleComparePrices}

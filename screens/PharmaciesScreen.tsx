@@ -49,7 +49,9 @@ export default function PharmaciesScreen() {
           reviews={item.reviews}
           time={item.time}
           type={item.type}
-          onPress={() => navigation.navigate("BookAppointment", { prescriberId: item.id })}
+          onPress={() =>
+            navigation.navigate("BookAppointment", { prescriberId: item.id })
+          }
         />
       )}
       keyExtractor={(item) => item.id}
@@ -59,4 +61,3 @@ export default function PharmaciesScreen() {
 }
 
 const styles = StyleSheet.create({});
-

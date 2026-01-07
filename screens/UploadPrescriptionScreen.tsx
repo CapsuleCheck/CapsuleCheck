@@ -22,12 +22,13 @@ export default function UploadPrescriptionScreen() {
 
   const handleTakePhoto = async () => {
     try {
-      const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-      
+      const permissionResult =
+        await ImagePicker.requestCameraPermissionsAsync();
+
       if (permissionResult.granted === false) {
         Alert.alert(
           "Camera Permission Required",
-          "Please allow camera access to take photos of your prescription."
+          "Please allow camera access to take photos of your prescription.",
         );
         return;
       }
@@ -70,10 +71,15 @@ export default function UploadPrescriptionScreen() {
   };
 
   return (
-    <ScreenScrollView contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}>
+    <ScreenScrollView
+      contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}
+    >
       <View style={styles.content}>
-        <ThemedText style={[styles.description, { color: theme.textSecondary }]}>
-          Securely upload your prescription. We'll find you affordable alternatives. It's that simple.
+        <ThemedText
+          style={[styles.description, { color: theme.textSecondary }]}
+        >
+          Securely upload your prescription. We'll find you affordable
+          alternatives. It's that simple.
         </ThemedText>
 
         <Pressable
@@ -104,36 +110,53 @@ export default function UploadPrescriptionScreen() {
           ]}
         >
           <Feather name="file-text" size={32} color={theme.text} />
-          <ThemedText style={styles.uploadButtonTextDark}>Upload Document</ThemedText>
+          <ThemedText style={styles.uploadButtonTextDark}>
+            Upload Document
+          </ThemedText>
         </Pressable>
 
-        <View style={[styles.tipsCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.tipsCard,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <View style={styles.tipsHeader}>
             <Feather name="info" size={20} color={theme.success} />
-            <ThemedText style={styles.tipsTitle}>Quick Tips for a Clear Upload</ThemedText>
+            <ThemedText style={styles.tipsTitle}>
+              Quick Tips for a Clear Upload
+            </ThemedText>
           </View>
           <View style={styles.tipsList}>
             <View style={styles.tipItem}>
               <ThemedText style={styles.tipBullet}>•</ThemedText>
-              <ThemedText style={[styles.tipText, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.tipText, { color: theme.textSecondary }]}
+              >
                 Place prescription on a flat, well-lit surface.
               </ThemedText>
             </View>
             <View style={styles.tipItem}>
               <ThemedText style={styles.tipBullet}>•</ThemedText>
-              <ThemedText style={[styles.tipText, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.tipText, { color: theme.textSecondary }]}
+              >
                 Ensure all text, including doctor's info, is clear and readable.
               </ThemedText>
             </View>
             <View style={styles.tipItem}>
               <ThemedText style={styles.tipBullet}>•</ThemedText>
-              <ThemedText style={[styles.tipText, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.tipText, { color: theme.textSecondary }]}
+              >
                 Avoid shadows or glare on the document.
               </ThemedText>
             </View>
             <View style={styles.tipItem}>
               <ThemedText style={styles.tipBullet}>•</ThemedText>
-              <ThemedText style={[styles.tipText, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.tipText, { color: theme.textSecondary }]}
+              >
                 Include the entire prescription in the frame.
               </ThemedText>
             </View>
@@ -142,8 +165,11 @@ export default function UploadPrescriptionScreen() {
 
         <View style={styles.privacy}>
           <Feather name="lock" size={16} color={theme.textSecondary} />
-          <ThemedText style={[styles.privacyText, { color: theme.textSecondary }]}>
-            Your privacy is protected. All data is encrypted and handled under strict HIPAA guidelines.
+          <ThemedText
+            style={[styles.privacyText, { color: theme.textSecondary }]}
+          >
+            Your privacy is protected. All data is encrypted and handled under
+            strict HIPAA guidelines.
           </ThemedText>
         </View>
       </View>
@@ -224,4 +250,3 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
-

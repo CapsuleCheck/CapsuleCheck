@@ -17,22 +17,45 @@ export default function AboutScreen() {
   ];
 
   const legalLinks = [
-    { icon: "file-text" as keyof typeof Feather.glyphMap, title: "Terms of Service" },
-    { icon: "shield" as keyof typeof Feather.glyphMap, title: "Privacy Policy" },
+    {
+      icon: "file-text" as keyof typeof Feather.glyphMap,
+      title: "Terms of Service",
+    },
+    {
+      icon: "shield" as keyof typeof Feather.glyphMap,
+      title: "Privacy Policy",
+    },
     { icon: "award" as keyof typeof Feather.glyphMap, title: "Licenses" },
   ];
 
   const teamLinks = [
-    { icon: "globe" as keyof typeof Feather.glyphMap, title: "Visit Our Website", url: "capsulecheck.com" },
-    { icon: "twitter" as keyof typeof Feather.glyphMap, title: "Follow on Twitter", url: "@CapsuleCheck" },
-    { icon: "instagram" as keyof typeof Feather.glyphMap, title: "Follow on Instagram", url: "@CapsuleCheck" },
+    {
+      icon: "globe" as keyof typeof Feather.glyphMap,
+      title: "Visit Our Website",
+      url: "capsulecheck.com",
+    },
+    {
+      icon: "twitter" as keyof typeof Feather.glyphMap,
+      title: "Follow on Twitter",
+      url: "@CapsuleCheck",
+    },
+    {
+      icon: "instagram" as keyof typeof Feather.glyphMap,
+      title: "Follow on Instagram",
+      url: "@CapsuleCheck",
+    },
   ];
 
   return (
     <ScreenScrollView>
       <View style={styles.content}>
         <View style={styles.header}>
-          <View style={[styles.logoContainer, { backgroundColor: theme.primary + "20" }]}>
+          <View
+            style={[
+              styles.logoContainer,
+              { backgroundColor: theme.primary + "20" },
+            ]}
+          >
             <CapsuleIcon size={48} color={theme.primary} />
           </View>
           <ThemedText style={styles.appName}>CapsuleCheck</ThemedText>
@@ -41,17 +64,31 @@ export default function AboutScreen() {
           </ThemedText>
         </View>
 
-        <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <ThemedText style={styles.sectionTitle}>About CapsuleCheck</ThemedText>
-          <ThemedText style={[styles.description, { color: theme.textSecondary }]}>
-            CapsuleCheck is a prescription-as-a-service platform that connects patients with
-            affordable medications and independent prescribers. Our AI-powered analysis helps
-            you save money, understand your medications better, and make informed healthcare
-            decisions.
+        <View
+          style={[
+            styles.section,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
+          <ThemedText style={styles.sectionTitle}>
+            About CapsuleCheck
+          </ThemedText>
+          <ThemedText
+            style={[styles.description, { color: theme.textSecondary }]}
+          >
+            CapsuleCheck is a prescription-as-a-service platform that connects
+            patients with affordable medications and independent prescribers.
+            Our AI-powered analysis helps you save money, understand your
+            medications better, and make informed healthcare decisions.
           </ThemedText>
         </View>
 
-        <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.section,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <ThemedText style={styles.sectionTitle}>App Information</ThemedText>
           {appInfo.map((item, index) => (
             <View
@@ -62,7 +99,9 @@ export default function AboutScreen() {
                 index === appInfo.length - 1 && { borderBottomWidth: 0 },
               ]}
             >
-              <ThemedText style={[styles.infoLabel, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.infoLabel, { color: theme.textSecondary }]}
+              >
                 {item.label}
               </ThemedText>
               <ThemedText style={styles.infoValue}>{item.value}</ThemedText>
@@ -70,7 +109,12 @@ export default function AboutScreen() {
           ))}
         </View>
 
-        <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.section,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <ThemedText style={styles.sectionTitle}>Legal</ThemedText>
           {legalLinks.map((item, index) => (
             <Pressable
@@ -84,12 +128,21 @@ export default function AboutScreen() {
             >
               <Feather name={item.icon} size={20} color={theme.text} />
               <ThemedText style={styles.linkText}>{item.title}</ThemedText>
-              <Feather name="chevron-right" size={20} color={theme.textSecondary} />
+              <Feather
+                name="chevron-right"
+                size={20}
+                color={theme.textSecondary}
+              />
             </Pressable>
           ))}
         </View>
 
-        <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.section,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <ThemedText style={styles.sectionTitle}>Connect With Us</ThemedText>
           {teamLinks.map((item, index) => (
             <Pressable
@@ -104,11 +157,17 @@ export default function AboutScreen() {
               <Feather name={item.icon} size={20} color={theme.text} />
               <View style={styles.linkContent}>
                 <ThemedText style={styles.linkTitle}>{item.title}</ThemedText>
-                <ThemedText style={[styles.linkSubtitle, { color: theme.textSecondary }]}>
+                <ThemedText
+                  style={[styles.linkSubtitle, { color: theme.textSecondary }]}
+                >
                   {item.url}
                 </ThemedText>
               </View>
-              <Feather name="external-link" size={16} color={theme.textSecondary} />
+              <Feather
+                name="external-link"
+                size={16}
+                color={theme.textSecondary}
+              />
             </Pressable>
           ))}
         </View>

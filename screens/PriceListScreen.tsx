@@ -11,7 +11,10 @@ import { useTheme } from "@/hooks/useTheme";
 import { BorderRadius, Spacing } from "@/constants/theme";
 import { HomeStackParamList } from "@/navigation/HomeStackNavigator";
 
-type PriceListScreenNavigationProp = NativeStackNavigationProp<HomeStackParamList, "PriceList">;
+type PriceListScreenNavigationProp = NativeStackNavigationProp<
+  HomeStackParamList,
+  "PriceList"
+>;
 
 const MOCK_MEDICATIONS = [
   {
@@ -61,12 +64,22 @@ export default function PriceListScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<PriceListScreenNavigationProp>();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState<"price" | "generic" | null>("price");
+  const [selectedFilter, setSelectedFilter] = useState<
+    "price" | "generic" | null
+  >("price");
 
   return (
     <View style={{ flex: 1 }}>
       <View style={[styles.searchContainer, { paddingTop: insets.top }]}>
-        <View style={[styles.searchBox, { backgroundColor: theme.backgroundSecondary, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.searchBox,
+            {
+              backgroundColor: theme.backgroundSecondary,
+              borderColor: theme.border,
+            },
+          ]}
+        >
           <Feather name="search" size={20} color={theme.textSecondary} />
           <TextInput
             value={searchQuery}
@@ -79,18 +92,36 @@ export default function PriceListScreen() {
 
         <View style={styles.filtersRow}>
           <Pressable
-            onPress={() => setSelectedFilter(selectedFilter === "price" ? null : "price")}
+            onPress={() =>
+              setSelectedFilter(selectedFilter === "price" ? null : "price")
+            }
             style={({ pressed }) => [
               styles.filterChip,
               {
-                backgroundColor: selectedFilter === "price" ? theme.primary + "20" : theme.backgroundSecondary,
-                borderColor: selectedFilter === "price" ? theme.primary : theme.border,
+                backgroundColor:
+                  selectedFilter === "price"
+                    ? theme.primary + "20"
+                    : theme.backgroundSecondary,
+                borderColor:
+                  selectedFilter === "price" ? theme.primary : theme.border,
                 opacity: pressed ? 0.7 : 1,
               },
             ]}
           >
-            <Feather name="filter" size={16} color={selectedFilter === "price" ? theme.primary : theme.text} />
-            <ThemedText style={[styles.filterText, { color: selectedFilter === "price" ? theme.primary : theme.text }]}>
+            <Feather
+              name="filter"
+              size={16}
+              color={selectedFilter === "price" ? theme.primary : theme.text}
+            />
+            <ThemedText
+              style={[
+                styles.filterText,
+                {
+                  color:
+                    selectedFilter === "price" ? theme.primary : theme.text,
+                },
+              ]}
+            >
               Filters
             </ThemedText>
           </Pressable>
@@ -106,21 +137,37 @@ export default function PriceListScreen() {
             ]}
           >
             <Feather name="arrow-down" size={16} color={theme.text} />
-            <ThemedText style={styles.filterText}>Price: Low to High</ThemedText>
+            <ThemedText style={styles.filterText}>
+              Price: Low to High
+            </ThemedText>
           </Pressable>
 
           <Pressable
-            onPress={() => setSelectedFilter(selectedFilter === "generic" ? null : "generic")}
+            onPress={() =>
+              setSelectedFilter(selectedFilter === "generic" ? null : "generic")
+            }
             style={({ pressed }) => [
               styles.filterChip,
               {
-                backgroundColor: selectedFilter === "generic" ? theme.primary + "20" : theme.backgroundSecondary,
-                borderColor: selectedFilter === "generic" ? theme.primary : theme.border,
+                backgroundColor:
+                  selectedFilter === "generic"
+                    ? theme.primary + "20"
+                    : theme.backgroundSecondary,
+                borderColor:
+                  selectedFilter === "generic" ? theme.primary : theme.border,
                 opacity: pressed ? 0.7 : 1,
               },
             ]}
           >
-            <ThemedText style={[styles.filterText, { color: selectedFilter === "generic" ? theme.primary : theme.text }]}>
+            <ThemedText
+              style={[
+                styles.filterText,
+                {
+                  color:
+                    selectedFilter === "generic" ? theme.primary : theme.text,
+                },
+              ]}
+            >
               Generic
             </ThemedText>
           </Pressable>
@@ -136,11 +183,16 @@ export default function PriceListScreen() {
             type={item.type}
             price={item.price}
             sources={item.sources}
-            onPress={() => navigation.navigate("ComparePrices", { medicationId: item.id })}
+            onPress={() =>
+              navigation.navigate("ComparePrices", { medicationId: item.id })
+            }
           />
         )}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingHorizontal: Spacing.xl, paddingTop: Spacing.sm }}
+        contentContainerStyle={{
+          paddingHorizontal: Spacing.xl,
+          paddingTop: Spacing.sm,
+        }}
       />
     </View>
   );
@@ -183,4 +235,3 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
 });
-

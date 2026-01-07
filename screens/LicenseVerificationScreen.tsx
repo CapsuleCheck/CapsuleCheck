@@ -39,7 +39,7 @@ export default function LicenseVerificationScreen() {
 
   const handleSubmit = () => {
     if (!selectedFile) return;
-    
+
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
@@ -48,11 +48,11 @@ export default function LicenseVerificationScreen() {
   };
 
   return (
-    <ScrollView 
+    <ScrollView
       style={[styles.container, { backgroundColor: theme.backgroundRoot }]}
-      contentContainerStyle={{ 
+      contentContainerStyle={{
         paddingHorizontal: Spacing.xl,
-        paddingBottom: insets.bottom + Spacing.xl 
+        paddingBottom: insets.bottom + Spacing.xl,
       }}
     >
       <View style={[styles.header, { paddingTop: insets.top }]}>
@@ -65,26 +65,54 @@ export default function LicenseVerificationScreen() {
 
       <View style={styles.progressContainer}>
         <View style={styles.progressBar}>
-          <View style={[styles.progressStep, { backgroundColor: theme.primary }]} />
-          <View style={[styles.progressStep, { backgroundColor: theme.primary }]} />
-          <View style={[styles.progressStep, { backgroundColor: theme.backgroundTertiary }]} />
+          <View
+            style={[styles.progressStep, { backgroundColor: theme.primary }]}
+          />
+          <View
+            style={[styles.progressStep, { backgroundColor: theme.primary }]}
+          />
+          <View
+            style={[
+              styles.progressStep,
+              { backgroundColor: theme.backgroundTertiary },
+            ]}
+          />
         </View>
-        <ThemedText style={[styles.progressText, { color: theme.textSecondary }]}>
+        <ThemedText
+          style={[styles.progressText, { color: theme.textSecondary }]}
+        >
           Step 2 of 3
         </ThemedText>
       </View>
 
       <View style={styles.content}>
-        <View style={[styles.infoCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <View style={[styles.infoIcon, { backgroundColor: theme.secondary + "20" }]}>
+        <View
+          style={[
+            styles.infoCard,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
+          <View
+            style={[
+              styles.infoIcon,
+              { backgroundColor: theme.secondary + "20" },
+            ]}
+          >
             <Feather name="file-text" size={24} color={theme.secondary} />
           </View>
           <View style={styles.infoContent}>
-            <ThemedText style={styles.infoTitle}>License Requirements</ThemedText>
-            <ThemedText style={[styles.infoText, { color: theme.textSecondary }]}>
-              Please upload a clear image of your practicing license. Ensure all four corners are visible and the text is legible.
+            <ThemedText style={styles.infoTitle}>
+              License Requirements
             </ThemedText>
-            <ThemedText style={[styles.infoFormats, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.infoText, { color: theme.textSecondary }]}
+            >
+              Please upload a clear image of your practicing license. Ensure all
+              four corners are visible and the text is legible.
+            </ThemedText>
+            <ThemedText
+              style={[styles.infoFormats, { color: theme.textSecondary }]}
+            >
               Supported formats: PDF, JPG, PNG.
             </ThemedText>
           </View>
@@ -105,7 +133,9 @@ export default function LicenseVerificationScreen() {
           <ThemedText style={styles.uploadTitle}>
             {selectedFile ? selectedFile : "Upload your license"}
           </ThemedText>
-          <ThemedText style={[styles.uploadSubtitle, { color: theme.textSecondary }]}>
+          <ThemedText
+            style={[styles.uploadSubtitle, { color: theme.textSecondary }]}
+          >
             Tap to select a file
           </ThemedText>
           {selectedFile ? null : (
@@ -117,9 +147,16 @@ export default function LicenseVerificationScreen() {
           )}
         </Pressable>
 
-        <View style={[styles.securityNote, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.securityNote,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <Feather name="lock" size={16} color={theme.textSecondary} />
-          <ThemedText style={[styles.securityText, { color: theme.textSecondary }]}>
+          <ThemedText
+            style={[styles.securityText, { color: theme.textSecondary }]}
+          >
             Your documents are encrypted and stored securely.
           </ThemedText>
         </View>
@@ -132,7 +169,10 @@ export default function LicenseVerificationScreen() {
           style={styles.submitButton}
         />
 
-        <Pressable onPress={() => completeOnboarding("prescriber")} testID="skip-verification">
+        <Pressable
+          onPress={() => completeOnboarding("prescriber")}
+          testID="skip-verification"
+        >
           <ThemedText style={[styles.skipText, { color: theme.primary }]}>
             Skip for Now
           </ThemedText>
@@ -260,4 +300,3 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
-

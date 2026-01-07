@@ -44,10 +44,16 @@ interface AppDataState {
 
 type AppDataAction =
   | { type: "CREATE_PRESCRIPTION"; payload: Prescription }
-  | { type: "UPDATE_PRESCRIPTION"; payload: { id: string; updates: Partial<Prescription> } }
+  | {
+      type: "UPDATE_PRESCRIPTION";
+      payload: { id: string; updates: Partial<Prescription> };
+    }
   | { type: "DELETE_PRESCRIPTION"; payload: string }
   | { type: "CREATE_APPOINTMENT"; payload: Appointment }
-  | { type: "UPDATE_APPOINTMENT"; payload: { id: string; updates: Partial<Appointment> } }
+  | {
+      type: "UPDATE_APPOINTMENT";
+      payload: { id: string; updates: Partial<Appointment> };
+    }
   | { type: "CANCEL_APPOINTMENT"; payload: string }
   | { type: "CREATE_NOTIFICATION"; payload: Notification }
   | { type: "MARK_NOTIFICATION_READ"; payload: string }
@@ -56,11 +62,20 @@ type AppDataAction =
   | { type: "CREATE_AI_ANALYSIS"; payload: AIAnalysisResult }
   | { type: "UPDATE_USER_PROFILE"; payload: Partial<UserProfile> }
   | { type: "ADD_PAYMENT_METHOD"; payload: PaymentMethod }
-  | { type: "UPDATE_PAYMENT_METHOD"; payload: { id: string; updates: Partial<PaymentMethod> } }
+  | {
+      type: "UPDATE_PAYMENT_METHOD";
+      payload: { id: string; updates: Partial<PaymentMethod> };
+    }
   | { type: "DELETE_PAYMENT_METHOD"; payload: string }
-  | { type: "UPDATE_NOTIFICATION_PREFERENCES"; payload: Partial<NotificationPreferences> }
+  | {
+      type: "UPDATE_NOTIFICATION_PREFERENCES";
+      payload: Partial<NotificationPreferences>;
+    }
   | { type: "CREATE_REFILL_REQUEST"; payload: RefillRequest }
-  | { type: "UPDATE_REFILL_REQUEST"; payload: { id: string; updates: Partial<RefillRequest> } }
+  | {
+      type: "UPDATE_REFILL_REQUEST";
+      payload: { id: string; updates: Partial<RefillRequest> };
+    }
   | { type: "ADD_REVIEW"; payload: Review }
   | { type: "RESET_DATA" };
 
@@ -82,7 +97,9 @@ interface AppDataContextType {
   addPaymentMethod: (method: PaymentMethod) => void;
   updatePaymentMethod: (id: string, updates: Partial<PaymentMethod>) => void;
   deletePaymentMethod: (id: string) => void;
-  updateNotificationPreferences: (preferences: Partial<NotificationPreferences>) => void;
+  updateNotificationPreferences: (
+    preferences: Partial<NotificationPreferences>,
+  ) => void;
   createRefillRequest: (request: RefillRequest) => void;
   updateRefillRequest: (id: string, updates: Partial<RefillRequest>) => void;
   addReview: (review: Review) => void;
@@ -114,82 +131,89 @@ const initialState: AppDataState = {
   refillRequests: [],
 };
 
-function appDataReducer(state: AppDataState, action: AppDataAction): AppDataState {
+function appDataReducer(
+  state: AppDataState,
+  action: AppDataAction,
+): AppDataState {
   switch (action.type) {
     case "CREATE_PRESCRIPTION":
       return {
         ...state,
         prescriptions: [...state.prescriptions, action.payload],
       };
-    
+
     case "UPDATE_PRESCRIPTION":
       return {
         ...state,
         prescriptions: state.prescriptions.map((p) =>
-          p.id === action.payload.id ? { ...p, ...action.payload.updates } : p
+          p.id === action.payload.id ? { ...p, ...action.payload.updates } : p,
         ),
       };
-    
+
     case "DELETE_PRESCRIPTION":
       return {
         ...state,
-        prescriptions: state.prescriptions.filter((p) => p.id !== action.payload),
+        prescriptions: state.prescriptions.filter(
+          (p) => p.id !== action.payload,
+        ),
       };
-    
+
     case "CREATE_APPOINTMENT":
       return {
         ...state,
         appointments: [...state.appointments, action.payload],
       };
-    
+
     case "UPDATE_APPOINTMENT":
       return {
         ...state,
         appointments: state.appointments.map((a) =>
-          a.id === action.payload.id ? { ...a, ...action.payload.updates } : a
+          a.id === action.payload.id ? { ...a, ...action.payload.updates } : a,
         ),
       };
-    
+
     case "CANCEL_APPOINTMENT":
       return {
         ...state,
         appointments: state.appointments.map((a) =>
-          a.id === action.payload ? { ...a, status: "cancelled" as const } : a
+          a.id === action.payload ? { ...a, status: "cancelled" as const } : a,
         ),
       };
-    
+
     case "CREATE_NOTIFICATION":
       return {
         ...state,
         notifications: [action.payload, ...state.notifications],
       };
-    
+
     case "MARK_NOTIFICATION_READ":
       return {
         ...state,
         notifications: state.notifications.map((n) =>
-          n.id === action.payload ? { ...n, read: true } : n
+          n.id === action.payload ? { ...n, read: true } : n,
         ),
       };
-    
+
     case "MARK_ALL_NOTIFICATIONS_READ":
       return {
         ...state,
         notifications: state.notifications.map((n) => ({ ...n, read: true })),
       };
-    
+
     case "DELETE_NOTIFICATION":
       return {
         ...state,
-        notifications: state.notifications.filter((n) => n.id !== action.payload),
+        notifications: state.notifications.filter(
+          (n) => n.id !== action.payload,
+        ),
       };
-    
+
     case "CREATE_AI_ANALYSIS":
       return {
         ...state,
         aiAnalyses: [...state.aiAnalyses, action.payload],
       };
-    
+
     case "UPDATE_USER_PROFILE":
       return {
         ...state,
@@ -197,27 +221,31 @@ function appDataReducer(state: AppDataState, action: AppDataAction): AppDataStat
           ? { ...state.userProfile, ...action.payload }
           : null,
       };
-    
+
     case "ADD_PAYMENT_METHOD":
       return {
         ...state,
         paymentMethods: [...state.paymentMethods, action.payload],
       };
-    
+
     case "UPDATE_PAYMENT_METHOD":
       return {
         ...state,
         paymentMethods: state.paymentMethods.map((pm) =>
-          pm.id === action.payload.id ? { ...pm, ...action.payload.updates } : pm
+          pm.id === action.payload.id
+            ? { ...pm, ...action.payload.updates }
+            : pm,
         ),
       };
-    
+
     case "DELETE_PAYMENT_METHOD":
       return {
         ...state,
-        paymentMethods: state.paymentMethods.filter((pm) => pm.id !== action.payload),
+        paymentMethods: state.paymentMethods.filter(
+          (pm) => pm.id !== action.payload,
+        ),
       };
-    
+
     case "UPDATE_NOTIFICATION_PREFERENCES":
       return {
         ...state,
@@ -226,30 +254,32 @@ function appDataReducer(state: AppDataState, action: AppDataAction): AppDataStat
           ...action.payload,
         },
       };
-    
+
     case "CREATE_REFILL_REQUEST":
       return {
         ...state,
         refillRequests: [...state.refillRequests, action.payload],
       };
-    
+
     case "UPDATE_REFILL_REQUEST":
       return {
         ...state,
         refillRequests: state.refillRequests.map((rr) =>
-          rr.id === action.payload.id ? { ...rr, ...action.payload.updates } : rr
+          rr.id === action.payload.id
+            ? { ...rr, ...action.payload.updates }
+            : rr,
         ),
       };
-    
+
     case "ADD_REVIEW":
       return {
         ...state,
         reviews: [...state.reviews, action.payload],
       };
-    
+
     case "RESET_DATA":
       return initialState;
-    
+
     default:
       return state;
   }
@@ -305,15 +335,19 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     deletePaymentMethod: (id) =>
       dispatch({ type: "DELETE_PAYMENT_METHOD", payload: id }),
     updateNotificationPreferences: (preferences) =>
-      dispatch({ type: "UPDATE_NOTIFICATION_PREFERENCES", payload: preferences }),
+      dispatch({
+        type: "UPDATE_NOTIFICATION_PREFERENCES",
+        payload: preferences,
+      }),
     createRefillRequest: (request) =>
       dispatch({ type: "CREATE_REFILL_REQUEST", payload: request }),
     updateRefillRequest: (id, updates) =>
       dispatch({ type: "UPDATE_REFILL_REQUEST", payload: { id, updates } }),
-    addReview: (review) =>
-      dispatch({ type: "ADD_REVIEW", payload: review }),
+    addReview: (review) => dispatch({ type: "ADD_REVIEW", payload: review }),
     createPrescriptionAnalysis: async (prescriptionId: string) => {
-      const prescription = state.prescriptions.find((p) => p.id === prescriptionId);
+      const prescription = state.prescriptions.find(
+        (p) => p.id === prescriptionId,
+      );
       if (!prescription) {
         throw new Error("Prescription not found");
       }
@@ -325,7 +359,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       const analysis = await generateMockAnalysis(
         prescription,
         state.medications,
-        state.medicationPrices
+        state.medicationPrices,
       );
 
       dispatch({ type: "CREATE_AI_ANALYSIS", payload: analysis });
@@ -336,14 +370,11 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
 
       return analysis.id;
     },
-    resetData: () =>
-      dispatch({ type: "RESET_DATA" }),
+    resetData: () => dispatch({ type: "RESET_DATA" }),
   };
 
   return (
-    <AppDataContext.Provider value={value}>
-      {children}
-    </AppDataContext.Provider>
+    <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>
   );
 }
 
@@ -354,4 +385,3 @@ export function useAppData() {
   }
   return context;
 }
-

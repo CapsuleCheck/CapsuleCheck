@@ -12,7 +12,10 @@ import { useAppData } from "@/context/AppDataContext";
 import { ProfileStackParamList } from "@/navigation/ProfileStackNavigator";
 import { BorderRadius, Spacing } from "@/constants/theme";
 
-type ProfileScreenNavigationProp = NativeStackNavigationProp<ProfileStackParamList, "Profile">;
+type ProfileScreenNavigationProp = NativeStackNavigationProp<
+  ProfileStackParamList,
+  "Profile"
+>;
 
 type MenuItem = {
   icon: keyof typeof Feather.glyphMap;
@@ -28,7 +31,11 @@ export default function ProfileScreen() {
   const userProfile = state.userProfile;
 
   const menuItems: MenuItem[] = [
-    { icon: "user", label: "Personal Information", screen: "PersonalInformation" },
+    {
+      icon: "user",
+      label: "Personal Information",
+      screen: "PersonalInformation",
+    },
     { icon: "bell", label: "Notifications", screen: "Notifications" },
     { icon: "lock", label: "Privacy & Security", screen: "PrivacySecurity" },
     { icon: "credit-card", label: "Payment Methods", screen: "PaymentMethods" },
@@ -49,11 +56,14 @@ export default function ProfileScreen() {
   return (
     <ScreenScrollView>
       <View style={styles.profileSection}>
-        <View style={[styles.avatar, { backgroundColor: theme.primary + "20" }]}>
+        <View
+          style={[styles.avatar, { backgroundColor: theme.primary + "20" }]}
+        >
           <Feather name="user" size={40} color={theme.primary} />
         </View>
         <ThemedText style={styles.name}>
-          {userProfile?.name || (userRole === "patient" ? "Patient" : "Prescriber")}
+          {userProfile?.name ||
+            (userRole === "patient" ? "Patient" : "Prescriber")}
         </ThemedText>
         <View style={[styles.badge, { backgroundColor: theme.primary + "20" }]}>
           <ThemedText style={[styles.badgeText, { color: theme.primary }]}>
@@ -78,7 +88,11 @@ export default function ProfileScreen() {
           >
             <Feather name={item.icon} size={20} color={theme.text} />
             <ThemedText style={styles.menuText}>{item.label}</ThemedText>
-            <Feather name="chevron-right" size={20} color={theme.textSecondary} />
+            <Feather
+              name="chevron-right"
+              size={20}
+              color={theme.textSecondary}
+            />
           </Pressable>
         ))}
       </View>

@@ -32,11 +32,10 @@ export function PrimaryButton({
     variant === "primary"
       ? theme.primary
       : variant === "secondary"
-      ? theme.secondary
-      : "transparent";
+        ? theme.secondary
+        : "transparent";
 
-  const textColor =
-    variant === "outline" ? theme.primary : theme.buttonText;
+  const textColor = variant === "outline" ? theme.primary : theme.buttonText;
 
   const borderColor = variant === "outline" ? theme.primary : "transparent";
 

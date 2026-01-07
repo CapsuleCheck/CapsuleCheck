@@ -36,15 +36,16 @@ export default function MyRxScreen() {
   const getStatusText = (prescription: Prescription) => {
     if (prescription.status === "active" && prescription.nextRefillDate) {
       const daysUntilRefill = Math.ceil(
-        (new Date(prescription.nextRefillDate).getTime() - new Date().getTime()) /
-          (1000 * 60 * 60 * 24)
+        (new Date(prescription.nextRefillDate).getTime() -
+          new Date().getTime()) /
+          (1000 * 60 * 60 * 24),
       );
       if (daysUntilRefill <= 3) {
         return `Refill due in ${daysUntilRefill} ${daysUntilRefill === 1 ? "day" : "days"}`;
       }
       return "Status: Active";
     }
-    
+
     switch (prescription.status) {
       case "pending_refill":
         return "Refill Due Soon";
@@ -76,7 +77,9 @@ export default function MyRxScreen() {
       contentContainerStyle={{ paddingHorizontal: Spacing.xl }}
       ListEmptyComponent={
         <View style={styles.emptyContainer}>
-          <ThemedText style={[styles.emptyText, { color: theme.textSecondary }]}>
+          <ThemedText
+            style={[styles.emptyText, { color: theme.textSecondary }]}
+          >
             No prescriptions yet. Add your first prescription to get started.
           </ThemedText>
         </View>
@@ -98,4 +101,3 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
-

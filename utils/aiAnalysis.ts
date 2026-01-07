@@ -1,14 +1,19 @@
-import { AIAnalysisResult, Prescription, Medication, MedicationPrice } from "@/types/data";
+import {
+  AIAnalysisResult,
+  Prescription,
+  Medication,
+  MedicationPrice,
+} from "@/types/data";
 
 export async function generateMockAnalysis(
   prescription: Prescription,
   allMedications: Medication[],
-  medicationPrices: MedicationPrice[]
+  medicationPrices: MedicationPrice[],
 ): Promise<AIAnalysisResult> {
   await new Promise((resolve) => setTimeout(resolve, 1500));
 
   const priceData = medicationPrices.find(
-    (mp) => mp.medicationId === prescription.medicationId
+    (mp) => mp.medicationId === prescription.medicationId,
   );
 
   const genericAlternatives = allMedications.filter(
@@ -16,7 +21,7 @@ export async function generateMockAnalysis(
       med.genericName &&
       med.genericName.toLowerCase() ===
         prescription.medication.genericName?.toLowerCase() &&
-      med.id !== prescription.medicationId
+      med.id !== prescription.medicationId,
   );
 
   const recommendations = genericAlternatives.map((alt) => {
@@ -32,7 +37,9 @@ export async function generateMockAnalysis(
     };
   });
 
-  const commonInteractions = getCommonInteractions(prescription.medication.name);
+  const commonInteractions = getCommonInteractions(
+    prescription.medication.name,
+  );
   const safetyWarnings = getSafetyWarnings(prescription.medication);
 
   const analysisId = `analysis-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -55,13 +62,14 @@ export async function generateMockAnalysis(
       prescription,
       recommendations,
       priceData?.lowestPrice || 0,
-      priceData?.averagePrice || 0
+      priceData?.averagePrice || 0,
     ),
     priceInsights: {
       averagePrice: priceData?.averagePrice || 0,
       lowestPrice: priceData?.lowestPrice || 0,
       potentialSavings:
-        recommendations.reduce((sum, rec) => sum + rec.potentialSavings, 0) || 0,
+        recommendations.reduce((sum, rec) => sum + rec.potentialSavings, 0) ||
+        0,
     },
   };
 }
@@ -95,10 +103,12 @@ function getCommonInteractions(medicationName: string): string[] {
     ],
   };
 
-  return interactionMap[medicationName] || [
-    "Always inform healthcare providers of all medications you're taking",
-    "Report any unusual symptoms to your doctor promptly",
-  ];
+  return (
+    interactionMap[medicationName] || [
+      "Always inform healthcare providers of all medications you're taking",
+      "Report any unusual symptoms to your doctor promptly",
+    ]
+  );
 }
 
 function getSafetyWarnings(medication: Medication): string[] {
@@ -106,14 +116,16 @@ function getSafetyWarnings(medication: Medication): string[] {
 
   if (medication.sideEffects && medication.sideEffects.length > 0) {
     warnings.push(
-      `Common side effects may include: ${medication.sideEffects.slice(0, 3).join(", ")}`
+      `Common side effects may include: ${medication.sideEffects.slice(0, 3).join(", ")}`,
     );
   }
 
   const medName = medication.name.toLowerCase();
 
   if (medName.includes("statin")) {
-    warnings.push("Monitor for muscle pain or weakness - contact doctor if experienced");
+    warnings.push(
+      "Monitor for muscle pain or weakness - contact doctor if experienced",
+    );
     warnings.push("Regular liver function tests recommended");
   }
 
@@ -128,10 +140,14 @@ function getSafetyWarnings(medication: Medication): string[] {
     medName.includes("pressure")
   ) {
     warnings.push("Monitor blood pressure regularly");
-    warnings.push("Rise slowly from sitting or lying position to avoid dizziness");
+    warnings.push(
+      "Rise slowly from sitting or lying position to avoid dizziness",
+    );
   }
 
-  warnings.push("Do not stop taking this medication without consulting your doctor");
+  warnings.push(
+    "Do not stop taking this medication without consulting your doctor",
+  );
 
   return warnings;
 }
@@ -140,18 +156,21 @@ function generateSummary(
   prescription: Prescription,
   recommendations: Array<{ alternative: string; potentialSavings: number }>,
   lowestPrice: number,
-  averagePrice: number
+  averagePrice: number,
 ): string {
   const parts: string[] = [];
 
   parts.push(
-    `Analysis of ${prescription.medication.name} (${prescription.dosage}) prescribed for ${prescription.frequency} use.`
+    `Analysis of ${prescription.medication.name} (${prescription.dosage}) prescribed for ${prescription.frequency} use.`,
   );
 
   if (recommendations.length > 0) {
-    const totalSavings = recommendations.reduce((sum, rec) => sum + rec.potentialSavings, 0);
+    const totalSavings = recommendations.reduce(
+      (sum, rec) => sum + rec.potentialSavings,
+      0,
+    );
     parts.push(
-      `Found ${recommendations.length} cost-saving alternative${recommendations.length > 1 ? "s" : ""} with potential savings up to $${totalSavings.toFixed(2)}.`
+      `Found ${recommendations.length} cost-saving alternative${recommendations.length > 1 ? "s" : ""} with potential savings up to $${totalSavings.toFixed(2)}.`,
     );
   } else {
     parts.push("Currently taking the most cost-effective option available.");
@@ -161,13 +180,13 @@ function generateSummary(
     const priceDiff = averagePrice - lowestPrice;
     if (priceDiff > 1) {
       parts.push(
-        `You can save $${priceDiff.toFixed(2)} by choosing the lowest-priced pharmacy.`
+        `You can save $${priceDiff.toFixed(2)} by choosing the lowest-priced pharmacy.`,
       );
     }
   }
 
   parts.push(
-    "Please review the recommendations and warnings below. Always consult with your healthcare provider before making any changes to your medication regimen."
+    "Please review the recommendations and warnings below. Always consult with your healthcare provider before making any changes to your medication regimen.",
   );
 
   return parts.join(" ");

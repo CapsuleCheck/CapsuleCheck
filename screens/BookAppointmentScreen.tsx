@@ -28,21 +28,31 @@ export default function BookAppointmentScreen() {
   const [selectedTime, setSelectedTime] = useState("10:00 AM");
 
   return (
-    <ScreenScrollView contentContainerStyle={{ paddingBottom: screenInsets.paddingBottom }}>
+    <ScreenScrollView
+      contentContainerStyle={{ paddingBottom: screenInsets.paddingBottom }}
+    >
       <View style={styles.content}>
         <View style={styles.pharmacistInfo}>
-          <View style={[styles.avatar, { backgroundColor: theme.primary + "20" }]}>
+          <View
+            style={[styles.avatar, { backgroundColor: theme.primary + "20" }]}
+          >
             <Feather name="user" size={32} color={theme.primary} />
           </View>
           <View style={styles.pharmacistDetails}>
-            <ThemedText style={styles.pharmacistName}>Dr. Evelyn Reed</ThemedText>
-            <ThemedText style={[styles.pharmacistRole, { color: theme.textSecondary }]}>
+            <ThemedText style={styles.pharmacistName}>
+              Dr. Evelyn Reed
+            </ThemedText>
+            <ThemedText
+              style={[styles.pharmacistRole, { color: theme.textSecondary }]}
+            >
               Independent Prescriber
             </ThemedText>
             <View style={styles.ratingRow}>
               <Feather name="star" size={14} color="#F59E0B" />
               <ThemedText style={styles.rating}>4.8</ThemedText>
-              <ThemedText style={[styles.reviews, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.reviews, { color: theme.textSecondary }]}
+              >
                 (214 reviews)
               </ThemedText>
             </View>
@@ -62,7 +72,10 @@ export default function BookAppointmentScreen() {
 
         <View style={styles.weekDays}>
           {DAYS_OF_WEEK.map((day) => (
-            <ThemedText key={day} style={[styles.weekDay, { color: theme.textSecondary }]}>
+            <ThemedText
+              key={day}
+              style={[styles.weekDay, { color: theme.textSecondary }]}
+            >
               {day}
             </ThemedText>
           ))}
@@ -97,7 +110,9 @@ export default function BookAppointmentScreen() {
           })}
         </View>
 
-        <ThemedText style={styles.sectionTitle}>Available Time Slots</ThemedText>
+        <ThemedText style={styles.sectionTitle}>
+          Available Time Slots
+        </ThemedText>
         <View style={styles.timeSlotsGrid}>
           {TIME_SLOTS.map((time) => {
             const isSelected = time === selectedTime;
@@ -108,7 +123,9 @@ export default function BookAppointmentScreen() {
                 style={({ pressed }) => [
                   styles.timeSlot,
                   {
-                    backgroundColor: isSelected ? theme.primary + "20" : theme.backgroundSecondary,
+                    backgroundColor: isSelected
+                      ? theme.primary + "20"
+                      : theme.backgroundSecondary,
                     borderColor: isSelected ? theme.primary : theme.border,
                     opacity: pressed ? 0.7 : 1,
                   },
@@ -240,4 +257,3 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
   },
 });
-

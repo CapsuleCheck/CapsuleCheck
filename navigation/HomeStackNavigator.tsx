@@ -26,7 +26,8 @@ export default function HomeStackNavigator() {
   const { theme, isDark } = useTheme();
   const { userRole } = useUser();
 
-  const initialRoute = userRole === "prescriber" ? "PrescriberHome" : "PatientHome";
+  const initialRoute =
+    userRole === "prescriber" ? "PrescriberHome" : "PatientHome";
 
   return (
     <Stack.Navigator

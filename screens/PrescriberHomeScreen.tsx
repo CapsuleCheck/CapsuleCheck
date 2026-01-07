@@ -14,7 +14,8 @@ const UPCOMING_BOOKINGS = [
     startTime: "11:30 AM",
     endTime: "11:45 AM",
     type: "Video Call",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
   },
   {
     id: "2",
@@ -22,11 +23,13 @@ const UPCOMING_BOOKINGS = [
     startTime: "01:00 PM",
     endTime: "01:15 PM",
     type: "In-Person",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face",
   },
 ];
 
-const DOCTOR_AVATAR = "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face";
+const DOCTOR_AVATAR =
+  "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face";
 
 export default function PrescriberHomeScreen() {
   const { theme } = useTheme();
@@ -49,7 +52,9 @@ export default function PrescriberHomeScreen() {
   };
 
   return (
-    <ScreenScrollView contentContainerStyle={{ paddingBottom: screenInsets.paddingBottom }}>
+    <ScreenScrollView
+      contentContainerStyle={{ paddingBottom: screenInsets.paddingBottom }}
+    >
       {/* Header with Avatar and Greeting */}
       <View style={[styles.header, { paddingTop: screenInsets.paddingTop }]}>
         <View style={styles.headerLeft}>
@@ -57,7 +62,9 @@ export default function PrescriberHomeScreen() {
             source={{ uri: DOCTOR_AVATAR }}
             style={[styles.doctorAvatar, { borderColor: theme.primary }]}
           />
-          <ThemedText style={styles.greeting}>Good Morning, Dr. Smith</ThemedText>
+          <ThemedText style={styles.greeting}>
+            Good Morning, Dr. Smith
+          </ThemedText>
         </View>
         <Pressable style={styles.notificationButton}>
           <Feather name="bell" size={24} color={theme.text} />
@@ -68,16 +75,31 @@ export default function PrescriberHomeScreen() {
       </View>
 
       {/* Availability Toggle Card */}
-      <View style={[styles.availabilityCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
+      <View
+        style={[
+          styles.availabilityCard,
+          { backgroundColor: theme.card, borderColor: theme.border },
+        ]}
+      >
         <View style={styles.availabilityContent}>
-          <ThemedText style={styles.availabilityTitle}>Available for Consultations</ThemedText>
-          <ThemedText style={[styles.availabilitySubtitle, { color: theme.textSecondary }]}>
+          <ThemedText style={styles.availabilityTitle}>
+            Available for Consultations
+          </ThemedText>
+          <ThemedText
+            style={[
+              styles.availabilitySubtitle,
+              { color: theme.textSecondary },
+            ]}
+          >
             Toggle to go online or offline
           </ThemedText>
           <Switch
             value={isOnline}
             onValueChange={setIsOnline}
-            trackColor={{ false: theme.backgroundTertiary, true: theme.success }}
+            trackColor={{
+              false: theme.backgroundTertiary,
+              true: theme.success,
+            }}
             thumbColor="#FFFFFF"
             style={styles.toggleSwitch}
           />
@@ -86,19 +108,35 @@ export default function PrescriberHomeScreen() {
 
       {/* Stats Row */}
       <View style={styles.statsRow}>
-        <View style={[styles.statCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <ThemedText style={[styles.statLabel, { color: theme.textSecondary }]}>
+        <View
+          style={[
+            styles.statCard,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
+          <ThemedText
+            style={[styles.statLabel, { color: theme.textSecondary }]}
+          >
             Today's Bookings
           </ThemedText>
           <ThemedText style={styles.statValue}>5</ThemedText>
         </View>
-        <View style={[styles.statCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <ThemedText style={[styles.statLabel, { color: theme.textSecondary }]}>
+        <View
+          style={[
+            styles.statCard,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
+          <ThemedText
+            style={[styles.statLabel, { color: theme.textSecondary }]}
+          >
             Pending Requests
           </ThemedText>
           <View style={styles.statWithBadge}>
             <ThemedText style={styles.statValue}>2</ThemedText>
-            <View style={[styles.pendingBadge, { backgroundColor: theme.warning }]} />
+            <View
+              style={[styles.pendingBadge, { backgroundColor: theme.warning }]}
+            />
           </View>
         </View>
       </View>
@@ -110,18 +148,30 @@ export default function PrescriberHomeScreen() {
         {UPCOMING_BOOKINGS.map((booking) => (
           <View
             key={booking.id}
-            style={[styles.bookingCard, { backgroundColor: theme.card, borderColor: theme.border }]}
+            style={[
+              styles.bookingCard,
+              { backgroundColor: theme.card, borderColor: theme.border },
+            ]}
           >
             <View style={styles.bookingInfo}>
-              <ThemedText style={styles.patientName}>{booking.patientName}</ThemedText>
-              <ThemedText style={[styles.bookingDetail, { color: theme.textSecondary }]}>
+              <ThemedText style={styles.patientName}>
+                {booking.patientName}
+              </ThemedText>
+              <ThemedText
+                style={[styles.bookingDetail, { color: theme.textSecondary }]}
+              >
                 {booking.type}: {booking.startTime} - {booking.endTime}
               </ThemedText>
               <Pressable
-                style={[styles.viewDetailsButton, { backgroundColor: theme.backgroundSecondary }]}
+                style={[
+                  styles.viewDetailsButton,
+                  { backgroundColor: theme.backgroundSecondary },
+                ]}
                 onPress={() => handleViewDetails(booking.id)}
               >
-                <ThemedText style={styles.viewDetailsText}>View Details</ThemedText>
+                <ThemedText style={styles.viewDetailsText}>
+                  View Details
+                </ThemedText>
                 <Feather name="arrow-right" size={14} color={theme.text} />
               </Pressable>
             </View>
@@ -136,11 +186,16 @@ export default function PrescriberHomeScreen() {
       {/* Action Buttons */}
       <View style={styles.actionsSection}>
         <Pressable
-          style={[styles.primaryActionButton, { backgroundColor: theme.success }]}
+          style={[
+            styles.primaryActionButton,
+            { backgroundColor: theme.success },
+          ]}
           onPress={handleManageAvailability}
         >
           <Feather name="calendar" size={20} color="#FFFFFF" />
-          <ThemedText style={styles.primaryActionText}>Manage Availability</ThemedText>
+          <ThemedText style={styles.primaryActionText}>
+            Manage Availability
+          </ThemedText>
         </Pressable>
 
         <Pressable
@@ -148,7 +203,9 @@ export default function PrescriberHomeScreen() {
           onPress={handleUpdatePricing}
         >
           <Feather name="plus-square" size={20} color={theme.success} />
-          <ThemedText style={[styles.outlineActionText, { color: theme.success }]}>
+          <ThemedText
+            style={[styles.outlineActionText, { color: theme.success }]}
+          >
             Update Medication Pricing
           </ThemedText>
         </Pressable>

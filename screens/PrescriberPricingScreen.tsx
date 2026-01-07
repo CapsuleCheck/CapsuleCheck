@@ -12,7 +12,7 @@ const MEDICATIONS = [
     id: "1",
     name: "Atorvastatin",
     dosage: "20mg",
-    price: 8.50,
+    price: 8.5,
     supply: "30-day",
     inStock: true,
   },
@@ -44,7 +44,7 @@ const MEDICATIONS = [
     id: "5",
     name: "Omeprazole",
     dosage: "20mg",
-    price: 7.50,
+    price: 7.5,
     supply: "30-day",
     inStock: true,
   },
@@ -59,7 +59,7 @@ export default function PrescriberPricingScreen() {
   const filteredMedications = MEDICATIONS.filter(
     (med) =>
       med.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      med.dosage.toLowerCase().includes(searchQuery.toLowerCase())
+      med.dosage.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const handleEditPrice = (id: string) => {
@@ -72,7 +72,9 @@ export default function PrescriberPricingScreen() {
   };
 
   return (
-    <ScreenScrollView contentContainerStyle={{ paddingBottom: screenInsets.paddingBottom }}>
+    <ScreenScrollView
+      contentContainerStyle={{ paddingBottom: screenInsets.paddingBottom }}
+    >
       <View style={[styles.header, { paddingTop: screenInsets.paddingTop }]}>
         <ThemedText style={styles.title}>Medication Pricing</ThemedText>
         <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
@@ -82,7 +84,12 @@ export default function PrescriberPricingScreen() {
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
-        <View style={[styles.searchBar, { backgroundColor: theme.backgroundSecondary }]}>
+        <View
+          style={[
+            styles.searchBar,
+            { backgroundColor: theme.backgroundSecondary },
+          ]}
+        >
           <Feather name="search" size={20} color={theme.textSecondary} />
           <TextInput
             style={[styles.searchInput, { color: theme.text }]}
@@ -96,22 +103,45 @@ export default function PrescriberPricingScreen() {
 
       {/* Summary Cards */}
       <View style={styles.summaryRow}>
-        <View style={[styles.summaryCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <ThemedText style={[styles.summaryLabel, { color: theme.textSecondary }]}>
+        <View
+          style={[
+            styles.summaryCard,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
+          <ThemedText
+            style={[styles.summaryLabel, { color: theme.textSecondary }]}
+          >
             Total Products
           </ThemedText>
-          <ThemedText style={styles.summaryValue}>{MEDICATIONS.length}</ThemedText>
+          <ThemedText style={styles.summaryValue}>
+            {MEDICATIONS.length}
+          </ThemedText>
         </View>
-        <View style={[styles.summaryCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <ThemedText style={[styles.summaryLabel, { color: theme.textSecondary }]}>
+        <View
+          style={[
+            styles.summaryCard,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
+          <ThemedText
+            style={[styles.summaryLabel, { color: theme.textSecondary }]}
+          >
             In Stock
           </ThemedText>
           <ThemedText style={[styles.summaryValue, { color: theme.success }]}>
             {MEDICATIONS.filter((m) => m.inStock).length}
           </ThemedText>
         </View>
-        <View style={[styles.summaryCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <ThemedText style={[styles.summaryLabel, { color: theme.textSecondary }]}>
+        <View
+          style={[
+            styles.summaryCard,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
+          <ThemedText
+            style={[styles.summaryLabel, { color: theme.textSecondary }]}
+          >
             Out of Stock
           </ThemedText>
           <ThemedText style={[styles.summaryValue, { color: theme.error }]}>
@@ -125,24 +155,41 @@ export default function PrescriberPricingScreen() {
         {filteredMedications.map((medication) => (
           <View
             key={medication.id}
-            style={[styles.medicationCard, { backgroundColor: theme.card, borderColor: theme.border }]}
+            style={[
+              styles.medicationCard,
+              { backgroundColor: theme.card, borderColor: theme.border },
+            ]}
           >
             <View style={styles.medicationHeader}>
               <View style={styles.medicationInfo}>
-                <ThemedText style={styles.medicationName}>{medication.name}</ThemedText>
-                <ThemedText style={[styles.medicationDosage, { color: theme.textSecondary }]}>
+                <ThemedText style={styles.medicationName}>
+                  {medication.name}
+                </ThemedText>
+                <ThemedText
+                  style={[
+                    styles.medicationDosage,
+                    { color: theme.textSecondary },
+                  ]}
+                >
                   {medication.dosage} - {medication.supply} supply
                 </ThemedText>
               </View>
               <Pressable
                 style={[
                   styles.stockToggle,
-                  { backgroundColor: medication.inStock ? theme.success + "20" : theme.error + "20" },
+                  {
+                    backgroundColor: medication.inStock
+                      ? theme.success + "20"
+                      : theme.error + "20",
+                  },
                 ]}
                 onPress={() => handleToggleStock(medication.id)}
               >
                 <ThemedText
-                  style={[styles.stockText, { color: medication.inStock ? theme.success : theme.error }]}
+                  style={[
+                    styles.stockText,
+                    { color: medication.inStock ? theme.success : theme.error },
+                  ]}
                 >
                   {medication.inStock ? "In Stock" : "Out of Stock"}
                 </ThemedText>
@@ -151,10 +198,14 @@ export default function PrescriberPricingScreen() {
 
             <View style={styles.priceRow}>
               <View style={styles.priceDisplay}>
-                <ThemedText style={[styles.priceLabel, { color: theme.textSecondary }]}>
+                <ThemedText
+                  style={[styles.priceLabel, { color: theme.textSecondary }]}
+                >
                   Current Price
                 </ThemedText>
-                <ThemedText style={styles.priceValue}>${medication.price.toFixed(2)}</ThemedText>
+                <ThemedText style={styles.priceValue}>
+                  ${medication.price.toFixed(2)}
+                </ThemedText>
               </View>
 
               <Pressable
@@ -162,23 +213,42 @@ export default function PrescriberPricingScreen() {
                 onPress={() => handleEditPrice(medication.id)}
               >
                 <Feather name="edit-2" size={16} color={theme.buttonText} />
-                <ThemedText style={[styles.editButtonText, { color: theme.buttonText }]}>
+                <ThemedText
+                  style={[styles.editButtonText, { color: theme.buttonText }]}
+                >
                   Update Price
                 </ThemedText>
               </Pressable>
             </View>
 
             {editingId === medication.id && (
-              <View style={[styles.editSection, { borderTopColor: theme.border }]}>
+              <View
+                style={[styles.editSection, { borderTopColor: theme.border }]}
+              >
                 <TextInput
-                  style={[styles.priceInput, { backgroundColor: theme.backgroundSecondary, color: theme.text }]}
+                  style={[
+                    styles.priceInput,
+                    {
+                      backgroundColor: theme.backgroundSecondary,
+                      color: theme.text,
+                    },
+                  ]}
                   placeholder="Enter new price"
                   placeholderTextColor={theme.textSecondary}
                   keyboardType="decimal-pad"
                   defaultValue={medication.price.toFixed(2)}
                 />
-                <Pressable style={[styles.saveButton, { backgroundColor: theme.success }]}>
-                  <ThemedText style={[styles.saveButtonText, { color: "#FFFFFF" }]}>Save</ThemedText>
+                <Pressable
+                  style={[
+                    styles.saveButton,
+                    { backgroundColor: theme.success },
+                  ]}
+                >
+                  <ThemedText
+                    style={[styles.saveButtonText, { color: "#FFFFFF" }]}
+                  >
+                    Save
+                  </ThemedText>
                 </Pressable>
               </View>
             )}

@@ -35,23 +35,36 @@ export default function PatientHomeScreen() {
   ];
 
   return (
-    <ScreenScrollView contentContainerStyle={{ paddingBottom: screenInsets.paddingBottom + 70 }}>
+    <ScreenScrollView
+      contentContainerStyle={{ paddingBottom: screenInsets.paddingBottom + 70 }}
+    >
       <View style={[styles.header, { paddingTop: screenInsets.paddingTop }]}>
         <View>
           <ThemedText style={[styles.greeting, { color: theme.textSecondary }]}>
             Welcome, Mefe
           </ThemedText>
-          <ThemedText style={styles.subGreeting}>Your CapsuleCheck Hub</ThemedText>
+          <ThemedText style={styles.subGreeting}>
+            Your CapsuleCheck Hub
+          </ThemedText>
         </View>
         <Pressable style={styles.notificationButton}>
           <Feather name="bell" size={24} color={theme.text} />
         </Pressable>
       </View>
 
-      <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+      <View
+        style={[
+          styles.card,
+          { backgroundColor: theme.card, borderColor: theme.border },
+        ]}
+      >
         <View style={styles.cardHeader}>
-          <ThemedText style={styles.cardTitle}>Affordable Alternatives</ThemedText>
-          <ThemedText style={[styles.cardSubtitle, { color: theme.textSecondary }]}>
+          <ThemedText style={styles.cardTitle}>
+            Affordable Alternatives
+          </ThemedText>
+          <ThemedText
+            style={[styles.cardSubtitle, { color: theme.textSecondary }]}
+          >
             Find the best prices for your prescriptions.
           </ThemedText>
         </View>
@@ -62,16 +75,25 @@ export default function PatientHomeScreen() {
         />
       </View>
 
-      <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+      <View
+        style={[
+          styles.card,
+          { backgroundColor: theme.card, borderColor: theme.border },
+        ]}
+      >
         <View style={styles.cardHeader}>
           <ThemedText style={styles.cardTitle}>Consult a Prescriber</ThemedText>
-          <ThemedText style={[styles.cardSubtitle, { color: theme.textSecondary }]}>
+          <ThemedText
+            style={[styles.cardSubtitle, { color: theme.textSecondary }]}
+          >
             Book an appointment with an independent prescriber.
           </ThemedText>
         </View>
         <PrimaryButton
           title="Book Appointment"
-          onPress={() => navigation.navigate("BookAppointment", { prescriberId: "1" })}
+          onPress={() =>
+            navigation.navigate("BookAppointment", { prescriberId: "1" })
+          }
           variant="secondary"
           style={styles.cardButton}
         />
@@ -222,4 +244,3 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
 });
-

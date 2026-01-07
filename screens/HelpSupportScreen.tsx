@@ -73,30 +73,49 @@ export default function HelpSupportScreen() {
   return (
     <ScreenScrollView>
       <View style={styles.content}>
-        <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <ThemedText style={styles.sectionTitle}>Frequently Asked Questions</ThemedText>
-          
+        <View
+          style={[
+            styles.section,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
+          <ThemedText style={styles.sectionTitle}>
+            Frequently Asked Questions
+          </ThemedText>
+
           {faqs.map((faq, index) => (
             <View key={index}>
               <Pressable
                 style={[
                   styles.faqItem,
                   { borderBottomColor: theme.border },
-                  index === faqs.length - 1 && expandedFAQ !== index && { borderBottomWidth: 0 },
+                  index === faqs.length - 1 &&
+                    expandedFAQ !== index && { borderBottomWidth: 0 },
                 ]}
-                onPress={() => setExpandedFAQ(expandedFAQ === index ? null : index)}
+                onPress={() =>
+                  setExpandedFAQ(expandedFAQ === index ? null : index)
+                }
               >
-                <ThemedText style={styles.faqQuestion}>{faq.question}</ThemedText>
+                <ThemedText style={styles.faqQuestion}>
+                  {faq.question}
+                </ThemedText>
                 <Feather
                   name={expandedFAQ === index ? "chevron-up" : "chevron-down"}
                   size={20}
                   color={theme.textSecondary}
                 />
               </Pressable>
-              
+
               {expandedFAQ === index && (
-                <View style={[styles.faqAnswer, { borderBottomColor: theme.border }]}>
-                  <ThemedText style={[styles.answerText, { color: theme.textSecondary }]}>
+                <View
+                  style={[
+                    styles.faqAnswer,
+                    { borderBottomColor: theme.border },
+                  ]}
+                >
+                  <ThemedText
+                    style={[styles.answerText, { color: theme.textSecondary }]}
+                  >
                     {faq.answer}
                   </ThemedText>
                 </View>
@@ -105,9 +124,16 @@ export default function HelpSupportScreen() {
           ))}
         </View>
 
-        <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.section,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <ThemedText style={styles.sectionTitle}>Contact Support</ThemedText>
-          <ThemedText style={[styles.sectionDescription, { color: theme.textSecondary }]}>
+          <ThemedText
+            style={[styles.sectionDescription, { color: theme.textSecondary }]}
+          >
             Need more help? Our support team is here for you.
           </ThemedText>
 
@@ -130,26 +156,46 @@ export default function HelpSupportScreen() {
                 <Feather name={option.icon} size={20} color={theme.primary} />
               </View>
               <View style={styles.contactInfo}>
-                <ThemedText style={styles.contactTitle}>{option.title}</ThemedText>
-                <ThemedText style={[styles.contactSubtitle, { color: theme.textSecondary }]}>
+                <ThemedText style={styles.contactTitle}>
+                  {option.title}
+                </ThemedText>
+                <ThemedText
+                  style={[
+                    styles.contactSubtitle,
+                    { color: theme.textSecondary },
+                  ]}
+                >
                   {option.subtitle}
                 </ThemedText>
               </View>
-              <Feather name="chevron-right" size={20} color={theme.textSecondary} />
+              <Feather
+                name="chevron-right"
+                size={20}
+                color={theme.textSecondary}
+              />
             </Pressable>
           ))}
         </View>
 
-        <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.section,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <ThemedText style={styles.sectionTitle}>Resources</ThemedText>
-          
+
           <Pressable
             style={[styles.resourceItem, { borderBottomColor: theme.border }]}
             onPress={() => {}}
           >
             <Feather name="book-open" size={20} color={theme.text} />
             <ThemedText style={styles.resourceText}>User Guide</ThemedText>
-            <Feather name="external-link" size={16} color={theme.textSecondary} />
+            <Feather
+              name="external-link"
+              size={16}
+              color={theme.textSecondary}
+            />
           </Pressable>
 
           <Pressable
@@ -158,20 +204,25 @@ export default function HelpSupportScreen() {
           >
             <Feather name="video" size={20} color={theme.text} />
             <ThemedText style={styles.resourceText}>Tutorial Videos</ThemedText>
-            <Feather name="external-link" size={16} color={theme.textSecondary} />
+            <Feather
+              name="external-link"
+              size={16}
+              color={theme.textSecondary}
+            />
           </Pressable>
 
           <Pressable style={styles.resourceItem} onPress={() => {}}>
             <Feather name="file-text" size={20} color={theme.text} />
             <ThemedText style={styles.resourceText}>Documentation</ThemedText>
-            <Feather name="external-link" size={16} color={theme.textSecondary} />
+            <Feather
+              name="external-link"
+              size={16}
+              color={theme.textSecondary}
+            />
           </Pressable>
         </View>
 
-        <PrimaryButton
-          title="Submit Feedback"
-          onPress={() => {}}
-        />
+        <PrimaryButton title="Submit Feedback" onPress={() => {}} />
       </View>
     </ScreenScrollView>
   );

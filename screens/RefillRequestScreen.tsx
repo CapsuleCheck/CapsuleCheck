@@ -21,10 +21,11 @@ export default function RefillRequestScreen() {
   const route = useRoute<RefillRequestRouteProp>();
   const navigation = useNavigation<NavigationProp>();
   const { prescriptionId } = route.params;
-  
+
   const prescriptions = usePrescriptions();
-  const { createRefillRequest, updatePrescription, createNotification } = useAppData();
-  
+  const { createRefillRequest, updatePrescription, createNotification } =
+    useAppData();
+
   const prescription = prescriptions.getById(prescriptionId);
   const [selectedPharmacy, setSelectedPharmacy] = useState("CVS Pharmacy");
   const [deliveryAddress, setDeliveryAddress] = useState("");
@@ -43,14 +44,15 @@ export default function RefillRequestScreen() {
       prescriptionId: prescription.id,
       pharmacyId: "pharm-1",
       pharmacyName: selectedPharmacy,
-      deliveryAddress: deliveryAddress || "123 Main Street, San Francisco, CA 94102",
+      deliveryAddress:
+        deliveryAddress || "123 Main Street, San Francisco, CA 94102",
       notes,
       requestedDate: new Date().toISOString(),
       status: "pending" as const,
     };
 
     createRefillRequest(refillRequest);
-    
+
     updatePrescription(prescription.id, {
       status: "refill_requested",
     });
@@ -76,22 +78,39 @@ export default function RefillRequestScreen() {
       contentContainerStyle={{ paddingBottom: screenInsets.paddingBottom }}
     >
       <View style={styles.content}>
-        <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.section,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <ThemedText style={styles.sectionTitle}>Prescription</ThemedText>
-          <ThemedText style={styles.medicationName}>{prescription.medication.name}</ThemedText>
+          <ThemedText style={styles.medicationName}>
+            {prescription.medication.name}
+          </ThemedText>
           <ThemedText style={[styles.dosage, { color: theme.textSecondary }]}>
             {prescription.dosage} • {prescription.frequency}
           </ThemedText>
         </View>
 
-        <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.section,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <ThemedText style={styles.sectionTitle}>Pharmacy</ThemedText>
           <ThemedText style={[styles.infoText, { color: theme.textSecondary }]}>
             {selectedPharmacy}
           </ThemedText>
         </View>
 
-        <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.section,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <ThemedText style={styles.sectionTitle}>Delivery Address</ThemedText>
           <ThemedText style={[styles.infoText, { color: theme.textSecondary }]}>
             123 Main Street, San Francisco, CA 94102

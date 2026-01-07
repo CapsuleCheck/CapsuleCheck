@@ -58,7 +58,9 @@ export default function NotificationsScreen() {
     },
   ];
 
-  const toggleNotification = (id: keyof import("@/types/data").NotificationPreferences) => {
+  const toggleNotification = (
+    id: keyof import("@/types/data").NotificationPreferences,
+  ) => {
     updateNotificationPreferences({
       [id]: !prefs[id],
     });
@@ -67,7 +69,9 @@ export default function NotificationsScreen() {
   return (
     <ScreenScrollView>
       <View style={styles.content}>
-        <ThemedText style={[styles.description, { color: theme.textSecondary }]}>
+        <ThemedText
+          style={[styles.description, { color: theme.textSecondary }]}
+        >
           Manage how you receive notifications from CapsuleCheck
         </ThemedText>
 
@@ -94,7 +98,9 @@ export default function NotificationsScreen() {
 
               <View style={styles.textContainer}>
                 <ThemedText style={styles.title}>{item.title}</ThemedText>
-                <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
+                <ThemedText
+                  style={[styles.subtitle, { color: theme.textSecondary }]}
+                >
                   {item.description}
                 </ThemedText>
               </View>
@@ -106,17 +112,24 @@ export default function NotificationsScreen() {
                   false: theme.backgroundSecondary,
                   true: theme.primary + "60",
                 }}
-                thumbColor={prefs[item.id] ? theme.primary : theme.textSecondary}
+                thumbColor={
+                  prefs[item.id] ? theme.primary : theme.textSecondary
+                }
               />
             </Pressable>
           ))}
         </View>
 
-        <View style={[styles.infoCard, { backgroundColor: theme.backgroundSecondary }]}>
+        <View
+          style={[
+            styles.infoCard,
+            { backgroundColor: theme.backgroundSecondary },
+          ]}
+        >
           <Feather name="info" size={16} color={theme.textSecondary} />
           <ThemedText style={[styles.infoText, { color: theme.textSecondary }]}>
-            You can change these settings anytime. Some notifications may be required for
-            essential service updates.
+            You can change these settings anytime. Some notifications may be
+            required for essential service updates.
           </ThemedText>
         </View>
       </View>

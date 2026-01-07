@@ -9,20 +9,25 @@ import { useAIAnalyses } from "@/hooks/useAppDataHooks";
 import { BorderRadius, Spacing } from "@/constants/theme";
 import { MyRxStackParamList } from "@/navigation/MyRxStackNavigator";
 
-type AnalysisResultsRouteProp = RouteProp<MyRxStackParamList, "AnalysisResults">;
+type AnalysisResultsRouteProp = RouteProp<
+  MyRxStackParamList,
+  "AnalysisResults"
+>;
 
 export default function AnalysisResultsScreen() {
   const { theme } = useTheme();
   const screenInsets = useScreenInsets();
   const route = useRoute<AnalysisResultsRouteProp>();
   const { analysisId } = route.params;
-  
+
   const analyses = useAIAnalyses();
   const analysis = analyses.getById(analysisId);
 
   if (!analysis) {
     return (
-      <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
+      <View
+        style={[styles.container, { backgroundColor: theme.backgroundRoot }]}
+      >
         <ThemedText style={[styles.errorText, { color: theme.textSecondary }]}>
           Analysis not found
         </ThemedText>
@@ -31,22 +36,45 @@ export default function AnalysisResultsScreen() {
   }
 
   return (
-    <ScreenScrollView contentContainerStyle={{ paddingBottom: screenInsets.paddingBottom }}>
+    <ScreenScrollView
+      contentContainerStyle={{ paddingBottom: screenInsets.paddingBottom }}
+    >
       <View style={styles.content}>
-        <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <ThemedText style={styles.sectionTitle}>AI Analysis Summary</ThemedText>
+        <View
+          style={[
+            styles.section,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
+          <ThemedText style={styles.sectionTitle}>
+            AI Analysis Summary
+          </ThemedText>
           <ThemedText style={[styles.summary, { color: theme.textSecondary }]}>
             {analysis.summary}
           </ThemedText>
         </View>
 
         {analysis.detectedMedications.length > 0 && (
-          <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
-            <ThemedText style={styles.sectionTitle}>Detected Medications</ThemedText>
+          <View
+            style={[
+              styles.section,
+              { backgroundColor: theme.card, borderColor: theme.border },
+            ]}
+          >
+            <ThemedText style={styles.sectionTitle}>
+              Detected Medications
+            </ThemedText>
             {analysis.detectedMedications.map((med, index) => (
               <View key={index} style={styles.medicationItem}>
-                <ThemedText style={styles.medicationName}>{med.name}</ThemedText>
-                <ThemedText style={[styles.medicationDosage, { color: theme.textSecondary }]}>
+                <ThemedText style={styles.medicationName}>
+                  {med.name}
+                </ThemedText>
+                <ThemedText
+                  style={[
+                    styles.medicationDosage,
+                    { color: theme.textSecondary },
+                  ]}
+                >
                   {med.dosage}
                 </ThemedText>
               </View>
@@ -55,12 +83,23 @@ export default function AnalysisResultsScreen() {
         )}
 
         {analysis.recommendations.length > 0 && (
-          <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
-            <ThemedText style={styles.sectionTitle}>Cost-Saving Recommendations</ThemedText>
+          <View
+            style={[
+              styles.section,
+              { backgroundColor: theme.card, borderColor: theme.border },
+            ]}
+          >
+            <ThemedText style={styles.sectionTitle}>
+              Cost-Saving Recommendations
+            </ThemedText>
             {analysis.recommendations.map((rec, index) => (
               <View key={index} style={styles.recommendationItem}>
-                <ThemedText style={styles.alternativeName}>{rec.alternative}</ThemedText>
-                <ThemedText style={[styles.reason, { color: theme.textSecondary }]}>
+                <ThemedText style={styles.alternativeName}>
+                  {rec.alternative}
+                </ThemedText>
+                <ThemedText
+                  style={[styles.reason, { color: theme.textSecondary }]}
+                >
                   {rec.reason}
                 </ThemedText>
                 <ThemedText style={[styles.savings, { color: theme.success }]}>
@@ -71,10 +110,17 @@ export default function AnalysisResultsScreen() {
           </View>
         )}
 
-        <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.section,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <ThemedText style={styles.sectionTitle}>Price Insights</ThemedText>
           <View style={styles.priceRow}>
-            <ThemedText style={[styles.priceLabel, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.priceLabel, { color: theme.textSecondary }]}
+            >
               Average Price:
             </ThemedText>
             <ThemedText style={styles.priceValue}>
@@ -82,7 +128,9 @@ export default function AnalysisResultsScreen() {
             </ThemedText>
           </View>
           <View style={styles.priceRow}>
-            <ThemedText style={[styles.priceLabel, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.priceLabel, { color: theme.textSecondary }]}
+            >
               Lowest Price:
             </ThemedText>
             <ThemedText style={[styles.priceValue, { color: theme.success }]}>
@@ -90,10 +138,17 @@ export default function AnalysisResultsScreen() {
             </ThemedText>
           </View>
           <View style={styles.priceRow}>
-            <ThemedText style={[styles.priceLabel, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.priceLabel, { color: theme.textSecondary }]}
+            >
               Potential Savings:
             </ThemedText>
-            <ThemedText style={[styles.priceValue, { color: theme.success, fontWeight: "700" }]}>
+            <ThemedText
+              style={[
+                styles.priceValue,
+                { color: theme.success, fontWeight: "700" },
+              ]}
+            >
               ${analysis.priceInsights.potentialSavings.toFixed(2)}
             </ThemedText>
           </View>

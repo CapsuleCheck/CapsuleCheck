@@ -10,7 +10,8 @@ import { BorderRadius, Spacing, Typography } from "@/constants/theme";
 
 export default function PaymentMethodsScreen() {
   const { theme } = useTheme();
-  const { state, updatePaymentMethod, deletePaymentMethod, addPaymentMethod } = useAppData();
+  const { state, updatePaymentMethod, deletePaymentMethod, addPaymentMethod } =
+    useAppData();
   const paymentMethods = state.paymentMethods;
 
   const getCardIcon = (): keyof typeof Feather.glyphMap => {
@@ -18,7 +19,7 @@ export default function PaymentMethodsScreen() {
   };
 
   const setDefaultPaymentMethod = (id: string) => {
-    const currentDefault = paymentMethods.find(m => m.isDefault);
+    const currentDefault = paymentMethods.find((m) => m.isDefault);
     if (currentDefault && currentDefault.id !== id) {
       updatePaymentMethod(currentDefault.id, { isDefault: false });
     }
@@ -32,13 +33,14 @@ export default function PaymentMethodsScreen() {
   const handleAddPaymentMethod = () => {
     const newId = `pm-${Date.now()}`;
     const mockCardNumbers = ["4242", "5555", "3782", "6011"];
-    const randomLast4 = mockCardNumbers[Math.floor(Math.random() * mockCardNumbers.length)];
-    
+    const randomLast4 =
+      mockCardNumbers[Math.floor(Math.random() * mockCardNumbers.length)];
+
     addPaymentMethod({
       id: newId,
       type: "credit_card",
       lastFour: randomLast4,
-      expiryDate: `${(Math.floor(Math.random() * 12) + 1).toString().padStart(2, '0')}/${new Date().getFullYear() % 100 + Math.floor(Math.random() * 5) + 1}`,
+      expiryDate: `${(Math.floor(Math.random() * 12) + 1).toString().padStart(2, "0")}/${(new Date().getFullYear() % 100) + Math.floor(Math.random() * 5) + 1}`,
       cardholderName: state.userProfile?.name || "Cardholder",
       isDefault: paymentMethods.length === 0,
     });
@@ -47,7 +49,9 @@ export default function PaymentMethodsScreen() {
   return (
     <ScreenScrollView>
       <View style={styles.content}>
-        <ThemedText style={[styles.description, { color: theme.textSecondary }]}>
+        <ThemedText
+          style={[styles.description, { color: theme.textSecondary }]}
+        >
           Manage your payment methods for prescription purchases and refills
         </ThemedText>
 
@@ -58,7 +62,10 @@ export default function PaymentMethodsScreen() {
               style={[
                 styles.paymentCard,
                 { backgroundColor: theme.card, borderColor: theme.border },
-                method.isDefault && { borderColor: theme.primary, borderWidth: 2 },
+                method.isDefault && {
+                  borderColor: theme.primary,
+                  borderWidth: 2,
+                },
               ]}
             >
               <View style={styles.cardHeader}>
@@ -77,19 +84,36 @@ export default function PaymentMethodsScreen() {
                   </View>
                   <View style={styles.cardDetails}>
                     <ThemedText style={styles.cardBrand}>
-                      {method.type === "credit_card" ? "Credit Card" : method.type === "debit_card" ? "Debit Card" : "Bank Account"} •••• {method.lastFour}
+                      {method.type === "credit_card"
+                        ? "Credit Card"
+                        : method.type === "debit_card"
+                          ? "Debit Card"
+                          : "Bank Account"}{" "}
+                      •••• {method.lastFour}
                     </ThemedText>
                     {method.expiryDate && (
-                      <ThemedText style={[styles.cardExpiry, { color: theme.textSecondary }]}>
+                      <ThemedText
+                        style={[
+                          styles.cardExpiry,
+                          { color: theme.textSecondary },
+                        ]}
+                      >
                         Expires {method.expiryDate}
                       </ThemedText>
                     )}
                   </View>
                 </View>
-                
+
                 {method.isDefault && (
-                  <View style={[styles.defaultBadge, { backgroundColor: theme.primary + "20" }]}>
-                    <ThemedText style={[styles.defaultText, { color: theme.primary }]}>
+                  <View
+                    style={[
+                      styles.defaultBadge,
+                      { backgroundColor: theme.primary + "20" },
+                    ]}
+                  >
+                    <ThemedText
+                      style={[styles.defaultText, { color: theme.primary }]}
+                    >
                       Default
                     </ThemedText>
                   </View>
@@ -105,8 +129,14 @@ export default function PaymentMethodsScreen() {
                     ]}
                     onPress={() => setDefaultPaymentMethod(method.id)}
                   >
-                    <Feather name="check-circle" size={16} color={theme.primary} />
-                    <ThemedText style={[styles.actionText, { color: theme.primary }]}>
+                    <Feather
+                      name="check-circle"
+                      size={16}
+                      color={theme.primary}
+                    />
+                    <ThemedText
+                      style={[styles.actionText, { color: theme.primary }]}
+                    >
                       Set as Default
                     </ThemedText>
                   </Pressable>
@@ -119,7 +149,9 @@ export default function PaymentMethodsScreen() {
                   onPress={() => handleRemovePaymentMethod(method.id)}
                 >
                   <Feather name="trash-2" size={16} color={theme.error} />
-                  <ThemedText style={[styles.actionText, { color: theme.error }]}>
+                  <ThemedText
+                    style={[styles.actionText, { color: theme.error }]}
+                  >
                     Remove
                   </ThemedText>
                 </Pressable>
@@ -133,11 +165,17 @@ export default function PaymentMethodsScreen() {
           onPress={handleAddPaymentMethod}
         />
 
-        <View style={[styles.infoCard, { backgroundColor: theme.backgroundSecondary }]}>
+        <View
+          style={[
+            styles.infoCard,
+            { backgroundColor: theme.backgroundSecondary },
+          ]}
+        >
           <Feather name="shield" size={16} color={theme.textSecondary} />
           <ThemedText style={[styles.infoText, { color: theme.textSecondary }]}>
-            Your payment information is encrypted and secure. We never store your full card
-            details. (Note: In production, this would integrate with a payment provider like Stripe)
+            Your payment information is encrypted and secure. We never store
+            your full card details. (Note: In production, this would integrate
+            with a payment provider like Stripe)
           </ThemedText>
         </View>
       </View>

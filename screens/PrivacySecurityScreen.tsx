@@ -44,9 +44,16 @@ export default function PrivacySecurityScreen() {
   return (
     <ScreenScrollView>
       <View style={styles.content}>
-        <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <ThemedText style={styles.sectionTitle}>Password & Authentication</ThemedText>
-          
+        <View
+          style={[
+            styles.section,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
+          <ThemedText style={styles.sectionTitle}>
+            Password & Authentication
+          </ThemedText>
+
           <Pressable
             style={[styles.menuItem, { borderBottomColor: theme.border }]}
             onPress={() => {}}
@@ -54,11 +61,17 @@ export default function PrivacySecurityScreen() {
             <Feather name="key" size={20} color={theme.text} />
             <View style={styles.menuTextContainer}>
               <ThemedText style={styles.menuTitle}>Change Password</ThemedText>
-              <ThemedText style={[styles.menuSubtitle, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.menuSubtitle, { color: theme.textSecondary }]}
+              >
                 Update your account password (Requires backend authentication)
               </ThemedText>
             </View>
-            <Feather name="chevron-right" size={20} color={theme.textSecondary} />
+            <Feather
+              name="chevron-right"
+              size={20}
+              color={theme.textSecondary}
+            />
           </Pressable>
 
           {securityOptions.map((option, index) => (
@@ -66,13 +79,17 @@ export default function PrivacySecurityScreen() {
               key={option.id}
               style={[
                 styles.menuItem,
-                index < securityOptions.length - 1 && { borderBottomColor: theme.border },
+                index < securityOptions.length - 1 && {
+                  borderBottomColor: theme.border,
+                },
               ]}
             >
               <Feather name={option.icon} size={20} color={theme.text} />
               <View style={styles.menuTextContainer}>
                 <ThemedText style={styles.menuTitle}>{option.title}</ThemedText>
-                <ThemedText style={[styles.menuSubtitle, { color: theme.textSecondary }]}>
+                <ThemedText
+                  style={[styles.menuSubtitle, { color: theme.textSecondary }]}
+                >
                   {option.description}
                 </ThemedText>
               </View>
@@ -83,15 +100,22 @@ export default function PrivacySecurityScreen() {
                   false: theme.backgroundSecondary,
                   true: theme.primary + "60",
                 }}
-                thumbColor={option.enabled ? theme.primary : theme.textSecondary}
+                thumbColor={
+                  option.enabled ? theme.primary : theme.textSecondary
+                }
               />
             </View>
           ))}
         </View>
 
-        <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.section,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
           <ThemedText style={styles.sectionTitle}>Privacy Controls</ThemedText>
-          
+
           <Pressable
             style={[styles.menuItem, { borderBottomColor: theme.border }]}
             onPress={() => {}}
@@ -99,28 +123,47 @@ export default function PrivacySecurityScreen() {
             <Feather name="eye-off" size={20} color={theme.text} />
             <View style={styles.menuTextContainer}>
               <ThemedText style={styles.menuTitle}>Privacy Settings</ThemedText>
-              <ThemedText style={[styles.menuSubtitle, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.menuSubtitle, { color: theme.textSecondary }]}
+              >
                 Control who can see your information (Requires backend)
               </ThemedText>
             </View>
-            <Feather name="chevron-right" size={20} color={theme.textSecondary} />
+            <Feather
+              name="chevron-right"
+              size={20}
+              color={theme.textSecondary}
+            />
           </Pressable>
 
           <Pressable style={styles.menuItem} onPress={() => {}}>
             <Feather name="download" size={20} color={theme.text} />
             <View style={styles.menuTextContainer}>
               <ThemedText style={styles.menuTitle}>Download My Data</ThemedText>
-              <ThemedText style={[styles.menuSubtitle, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.menuSubtitle, { color: theme.textSecondary }]}
+              >
                 Request a copy of your personal data (Requires backend)
               </ThemedText>
             </View>
-            <Feather name="chevron-right" size={20} color={theme.textSecondary} />
+            <Feather
+              name="chevron-right"
+              size={20}
+              color={theme.textSecondary}
+            />
           </Pressable>
         </View>
 
-        <View style={[styles.section, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <ThemedText style={styles.sectionTitle}>Account Management</ThemedText>
-          
+        <View
+          style={[
+            styles.section,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
+          <ThemedText style={styles.sectionTitle}>
+            Account Management
+          </ThemedText>
+
           <PrimaryButton
             title="Delete Account"
             onPress={() => {}}
@@ -128,7 +171,8 @@ export default function PrivacySecurityScreen() {
             style={styles.dangerButton}
           />
           <ThemedText style={[styles.dangerText, { color: theme.error }]}>
-            This action is permanent and cannot be undone. All your data will be deleted.
+            This action is permanent and cannot be undone. All your data will be
+            deleted.
           </ThemedText>
         </View>
       </View>

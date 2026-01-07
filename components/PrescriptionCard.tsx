@@ -34,12 +34,7 @@ export function PrescriptionCard({
       ]}
     >
       <View style={styles.iconContainer}>
-        <View
-          style={[
-            styles.icon,
-            { backgroundColor: theme.primary + "20" },
-          ]}
-        >
+        <View style={[styles.icon, { backgroundColor: theme.primary + "20" }]}>
           <CapsuleIcon size={20} color={theme.primary} />
         </View>
       </View>

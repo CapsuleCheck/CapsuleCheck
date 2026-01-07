@@ -23,7 +23,10 @@ export default function RootNavigator() {
       {!hasCompletedOnboarding ? (
         <>
           <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-          <Stack.Screen name="PatientOnboarding" component={PatientOnboardingScreen} />
+          <Stack.Screen
+            name="PatientOnboarding"
+            component={PatientOnboardingScreen}
+          />
           <Stack.Screen
             name="LicenseVerification"
             component={LicenseVerificationScreen}

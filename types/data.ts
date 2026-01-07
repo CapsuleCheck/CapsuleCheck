@@ -1,35 +1,32 @@
-export type PrescriptionStatus = 
-  | "active" 
-  | "pending_refill" 
-  | "refill_requested" 
-  | "expired" 
+export type PrescriptionStatus =
+  | "active"
+  | "pending_refill"
+  | "refill_requested"
+  | "expired"
   | "cancelled";
 
-export type AppointmentStatus = 
-  | "scheduled" 
-  | "completed" 
-  | "cancelled" 
+export type AppointmentStatus =
+  | "scheduled"
+  | "completed"
+  | "cancelled"
   | "no_show";
 
-export type AppointmentType = 
-  | "video_call" 
-  | "in_person" 
-  | "phone_call";
+export type AppointmentType = "video_call" | "in_person" | "phone_call";
 
-export type MedicationType = 
-  | "tablet" 
-  | "capsule" 
-  | "liquid" 
-  | "injection" 
-  | "cream" 
+export type MedicationType =
+  | "tablet"
+  | "capsule"
+  | "liquid"
+  | "injection"
+  | "cream"
   | "inhaler";
 
-export type NotificationType = 
-  | "refill_reminder" 
-  | "appointment_reminder" 
-  | "price_alert" 
-  | "prescription_ready" 
-  | "appointment_confirmed" 
+export type NotificationType =
+  | "refill_reminder"
+  | "appointment_reminder"
+  | "price_alert"
+  | "prescription_ready"
+  | "appointment_confirmed"
   | "general";
 
 export interface Medication {
@@ -185,6 +182,7 @@ export interface UserProfile {
     street: string;
     city: string;
     state: string;
+    country: string;
     zip: string;
   };
   dateOfBirth: string;

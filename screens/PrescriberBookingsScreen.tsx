@@ -64,7 +64,9 @@ export default function PrescriberBookingsScreen() {
   };
 
   return (
-    <ScreenScrollView contentContainerStyle={{ paddingBottom: screenInsets.paddingBottom }}>
+    <ScreenScrollView
+      contentContainerStyle={{ paddingBottom: screenInsets.paddingBottom }}
+    >
       <View style={[styles.header, { paddingTop: screenInsets.paddingTop }]}>
         <ThemedText style={styles.title}>Your Bookings</ThemedText>
         <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
@@ -73,16 +75,37 @@ export default function PrescriberBookingsScreen() {
       </View>
 
       <View style={styles.filterRow}>
-        <Pressable style={[styles.filterChip, { backgroundColor: theme.primary }]}>
-          <ThemedText style={[styles.filterChipText, { color: theme.buttonText }]}>All</ThemedText>
+        <Pressable
+          style={[styles.filterChip, { backgroundColor: theme.primary }]}
+        >
+          <ThemedText
+            style={[styles.filterChipText, { color: theme.buttonText }]}
+          >
+            All
+          </ThemedText>
         </Pressable>
-        <Pressable style={[styles.filterChip, { backgroundColor: theme.backgroundSecondary }]}>
+        <Pressable
+          style={[
+            styles.filterChip,
+            { backgroundColor: theme.backgroundSecondary },
+          ]}
+        >
           <ThemedText style={styles.filterChipText}>Today</ThemedText>
         </Pressable>
-        <Pressable style={[styles.filterChip, { backgroundColor: theme.backgroundSecondary }]}>
+        <Pressable
+          style={[
+            styles.filterChip,
+            { backgroundColor: theme.backgroundSecondary },
+          ]}
+        >
           <ThemedText style={styles.filterChipText}>This Week</ThemedText>
         </Pressable>
-        <Pressable style={[styles.filterChip, { backgroundColor: theme.backgroundSecondary }]}>
+        <Pressable
+          style={[
+            styles.filterChip,
+            { backgroundColor: theme.backgroundSecondary },
+          ]}
+        >
           <ThemedText style={styles.filterChipText}>Pending</ThemedText>
         </Pressable>
       </View>
@@ -91,18 +114,36 @@ export default function PrescriberBookingsScreen() {
         {BOOKINGS.map((booking) => (
           <Pressable
             key={booking.id}
-            style={[styles.bookingCard, { backgroundColor: theme.card, borderColor: theme.border }]}
+            style={[
+              styles.bookingCard,
+              { backgroundColor: theme.card, borderColor: theme.border },
+            ]}
           >
             <View style={styles.bookingHeader}>
               <View style={styles.bookingInfo}>
-                <ThemedText style={styles.patientName}>{booking.patientName}</ThemedText>
-                <ThemedText style={[styles.bookingDate, { color: theme.textSecondary }]}>
+                <ThemedText style={styles.patientName}>
+                  {booking.patientName}
+                </ThemedText>
+                <ThemedText
+                  style={[styles.bookingDate, { color: theme.textSecondary }]}
+                >
                   {booking.date}
                 </ThemedText>
               </View>
-              <View style={[styles.statusBadge, { backgroundColor: getStatusColor(booking.status) + "20" }]}>
-                <ThemedText style={[styles.statusText, { color: getStatusColor(booking.status) }]}>
-                  {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+              <View
+                style={[
+                  styles.statusBadge,
+                  { backgroundColor: getStatusColor(booking.status) + "20" },
+                ]}
+              >
+                <ThemedText
+                  style={[
+                    styles.statusText,
+                    { color: getStatusColor(booking.status) },
+                  ]}
+                >
+                  {booking.status.charAt(0).toUpperCase() +
+                    booking.status.slice(1)}
                 </ThemedText>
               </View>
             </View>
@@ -110,24 +151,46 @@ export default function PrescriberBookingsScreen() {
             <View style={styles.bookingDetails}>
               <View style={styles.detailRow}>
                 <Feather name="clock" size={16} color={theme.textSecondary} />
-                <ThemedText style={[styles.detailText, { color: theme.textSecondary }]}>
+                <ThemedText
+                  style={[styles.detailText, { color: theme.textSecondary }]}
+                >
                   {booking.startTime} - {booking.endTime}
                 </ThemedText>
               </View>
               <View style={styles.detailRow}>
-                <Feather name={booking.type === "Video Call" ? "video" : "user"} size={16} color={theme.textSecondary} />
-                <ThemedText style={[styles.detailText, { color: theme.textSecondary }]}>
+                <Feather
+                  name={booking.type === "Video Call" ? "video" : "user"}
+                  size={16}
+                  color={theme.textSecondary}
+                />
+                <ThemedText
+                  style={[styles.detailText, { color: theme.textSecondary }]}
+                >
                   {booking.type}
                 </ThemedText>
               </View>
             </View>
 
             <View style={styles.actionButtons}>
-              <Pressable style={[styles.actionButton, { backgroundColor: theme.backgroundSecondary }]}>
-                <ThemedText style={styles.actionButtonText}>Reschedule</ThemedText>
+              <Pressable
+                style={[
+                  styles.actionButton,
+                  { backgroundColor: theme.backgroundSecondary },
+                ]}
+              >
+                <ThemedText style={styles.actionButtonText}>
+                  Reschedule
+                </ThemedText>
               </Pressable>
-              <Pressable style={[styles.actionButton, { backgroundColor: theme.primary }]}>
-                <ThemedText style={[styles.actionButtonText, { color: theme.buttonText }]}>
+              <Pressable
+                style={[
+                  styles.actionButton,
+                  { backgroundColor: theme.primary },
+                ]}
+              >
+                <ThemedText
+                  style={[styles.actionButtonText, { color: theme.buttonText }]}
+                >
                   {booking.type === "Video Call" ? "Join Call" : "View Details"}
                 </ThemedText>
               </Pressable>

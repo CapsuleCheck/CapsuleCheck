@@ -29,7 +29,9 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <ThemedView style={[styles.container, { paddingBottom: insets.bottom + Spacing.xl }]}>
+    <ThemedView
+      style={[styles.container, { paddingBottom: insets.bottom + Spacing.xl }]}
+    >
       <View style={[styles.header, { paddingTop: insets.top + Spacing.xl }]}>
         <View style={styles.logoContainer}>
           <Image
@@ -58,12 +60,20 @@ export default function OnboardingScreen() {
               },
             ]}
           >
-            <View style={[styles.iconCircle, { backgroundColor: theme.primary + "20" }]}>
+            <View
+              style={[
+                styles.iconCircle,
+                { backgroundColor: theme.primary + "20" },
+              ]}
+            >
               <Feather name="user" size={32} color={theme.primary} />
             </View>
             <ThemedText style={styles.optionTitle}>Patients</ThemedText>
-            <ThemedText style={[styles.optionDescription, { color: theme.textSecondary }]}>
-              Save on medications by finding affordable alternatives at local pharmacies.
+            <ThemedText
+              style={[styles.optionDescription, { color: theme.textSecondary }]}
+            >
+              Save on medications by finding affordable alternatives at local
+              pharmacies.
             </ThemedText>
             <PrimaryButton
               title="Get Started"
@@ -83,11 +93,18 @@ export default function OnboardingScreen() {
               },
             ]}
           >
-            <View style={[styles.iconCircle, { backgroundColor: theme.warning + "20" }]}>
+            <View
+              style={[
+                styles.iconCircle,
+                { backgroundColor: theme.warning + "20" },
+              ]}
+            >
               <Feather name="briefcase" size={32} color={theme.warning} />
             </View>
             <ThemedText style={styles.optionTitle}>Prescribers</ThemedText>
-            <ThemedText style={[styles.optionDescription, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.optionDescription, { color: theme.textSecondary }]}
+            >
               Expand your reach and help patients access affordable care.
             </ThemedText>
             <PrimaryButton
@@ -100,7 +117,9 @@ export default function OnboardingScreen() {
         </View>
 
         <View style={styles.footer}>
-          <ThemedText style={[styles.footerText, { color: theme.textSecondary }]}>
+          <ThemedText
+            style={[styles.footerText, { color: theme.textSecondary }]}
+          >
             Already have an account?{" "}
             <ThemedText style={[styles.link, { color: theme.primary }]}>
               Sign In
@@ -186,4 +205,3 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
-
