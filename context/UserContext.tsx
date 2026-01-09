@@ -7,17 +7,28 @@ interface UserContextType {
   setUserRole: (role: UserRole) => void;
   hasCompletedOnboarding: boolean;
   completeOnboarding: (role: UserRole) => void;
+  userData: any;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [userRole, setUserRole] = useState<UserRole>(null);
+  const [userData, setUserData] = useState(null);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
 
-  const completeOnboarding = (role: UserRole) => {
-    setUserRole(role);
+  const completeOnboarding = (data: any) => {
+    setUserRole(data.selectedRole);
     setHasCompletedOnboarding(true);
+    localStorage.setItem(
+      "userData",
+      JSON.stringify({
+        ...data,
+        selectedRole: data.selectedRole,
+      })
+    );
+    delete data.token;
+    setUserData(data);
   };
 
   return (
@@ -27,6 +38,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         setUserRole,
         hasCompletedOnboarding,
         completeOnboarding,
+        userData,
       }}
     >
       {children}

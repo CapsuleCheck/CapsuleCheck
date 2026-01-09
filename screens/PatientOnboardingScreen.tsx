@@ -5,16 +5,17 @@ import {
   TextInput,
   Pressable,
   ScrollView,
+  Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import Toast from "react-native-toast-message";
 import { ThemedText } from "@/components/ThemedText";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { useTheme } from "@/hooks/useTheme";
-import { useUser } from "@/context/UserContext";
-import { useAppData } from "@/context/AppDataContext";
 import { BorderRadius, Spacing, Typography } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootNavigator";
 
@@ -39,14 +40,13 @@ export default function PatientOnboardingScreen() {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
-  const { completeOnboarding } = useUser();
-  const { dispatch } = useAppData();
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [dob, setDob] = useState("");
+  const [dob, setDob] = useState<Date | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
@@ -56,13 +56,31 @@ export default function PatientOnboardingScreen() {
   const [allergies, setAllergies] = useState("");
   const [showGenderPicker, setShowGenderPicker] = useState(false);
   const [showAllergyPicker, setShowAllergyPicker] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+
+  const validateEmail = (emailValue: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(emailValue);
+  };
+
+  const handleEmailChange = (text: string) => {
+    setEmail(text);
+    if (text.trim() && !validateEmail(text.trim())) {
+      setEmailError("Please enter a valid email address");
+    } else {
+      setEmailError(null);
+    }
+  };
+
+  const isEmailValid = !email.trim() || validateEmail(email.trim());
 
   const isFormValid =
     firstName.trim() &&
     lastName.trim() &&
     email.trim() &&
+    isEmailValid &&
     phoneNumber.trim() &&
-    dob.trim() &&
+    dob !== null &&
     address.trim() &&
     city.trim() &&
     state.trim() &&
@@ -70,34 +88,172 @@ export default function PatientOnboardingScreen() {
     zip.trim() &&
     gender;
 
+  const formatDate = (date: Date | null): string => {
+    if (!date) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const formatDateForDisplay = (date: Date | null): string => {
+    if (!date) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${month}/${day}/${year}`;
+  };
+
+  const handleDateChange = (event: { type: string }, selectedDate?: Date) => {
+    setShowDatePicker(Platform.OS === "ios");
+    if (selectedDate) {
+      setDob(selectedDate);
+    }
+  };
+
   const handleSubmit = () => {
-    if (!isFormValid) return;
+    // Validate all required fields
+    if (!firstName.trim()) {
+      Toast.show({
+        type: "error",
+        text1: "First Name Required",
+        text2: "Please enter your first name",
+        position: "top",
+      });
+      return;
+    }
+
+    if (!lastName.trim()) {
+      Toast.show({
+        type: "error",
+        text1: "Last Name Required",
+        text2: "Please enter your last name",
+        position: "top",
+      });
+      return;
+    }
+
+    if (!email.trim()) {
+      Toast.show({
+        type: "error",
+        text1: "Email Required",
+        text2: "Please enter your email address",
+        position: "top",
+      });
+      return;
+    }
+
+    if (!validateEmail(email.trim())) {
+      Toast.show({
+        type: "error",
+        text1: "Invalid Email",
+        text2: "Please enter a valid email address",
+        position: "top",
+      });
+      return;
+    }
+
+    if (!phoneNumber.trim()) {
+      Toast.show({
+        type: "error",
+        text1: "Phone Number Required",
+        text2: "Please enter your phone number",
+        position: "top",
+      });
+      return;
+    }
+
+    if (!dob) {
+      Toast.show({
+        type: "error",
+        text1: "Date of Birth Required",
+        text2: "Please select your date of birth",
+        position: "top",
+      });
+      return;
+    }
+
+    if (!address.trim()) {
+      Toast.show({
+        type: "error",
+        text1: "Address Required",
+        text2: "Please enter your street address",
+        position: "top",
+      });
+      return;
+    }
+
+    if (!city.trim()) {
+      Toast.show({
+        type: "error",
+        text1: "City Required",
+        text2: "Please enter your city",
+        position: "top",
+      });
+      return;
+    }
+
+    if (!state.trim()) {
+      Toast.show({
+        type: "error",
+        text1: "State Required",
+        text2: "Please enter your state",
+        position: "top",
+      });
+      return;
+    }
+
+    if (!country.trim()) {
+      Toast.show({
+        type: "error",
+        text1: "Country Required",
+        text2: "Please enter your country",
+        position: "top",
+      });
+      return;
+    }
+
+    if (!zip.trim()) {
+      Toast.show({
+        type: "error",
+        text1: "ZIP Code Required",
+        text2: "Please enter your ZIP code",
+        position: "top",
+      });
+      return;
+    }
+
+    if (!gender) {
+      Toast.show({
+        type: "error",
+        text1: "Gender Required",
+        text2: "Please select your gender",
+        position: "top",
+      });
+      return;
+    }
 
     const allergiesArray = allergies && allergies !== "None" ? [allergies] : [];
 
-    dispatch({
-      type: "UPDATE_USER_PROFILE",
-      payload: {
-        name: `${firstName.trim()} ${lastName.trim()}`,
-        email: email.trim(),
-        phone: phoneNumber.trim(),
-        dateOfBirth: dob.trim(),
-        address: {
-          street: address.trim(),
-          city: city.trim(),
-          state: state.trim(),
-          country: country.trim(),
-          zip: zip.trim(),
-        },
-        allergies: allergiesArray,
+    const formData = {
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: email.trim(),
+      phoneNumber: phoneNumber.trim(),
+      dateOfBirth: dob ? formatDate(dob) : "",
+      address: {
+        street: address.trim(),
+        city: city.trim(),
+        state: state.trim(),
+        country: country.trim(),
+        zip: zip.trim(),
       },
-    });
+      gender: gender,
+      allergies: allergiesArray,
+    };
 
-    completeOnboarding("patient");
-  };
-
-  const handleSkip = () => {
-    completeOnboarding("patient");
+    // Navigate to step 3 (password screen) with form data
+    navigation.navigate("PatientPassword", { formData });
   };
 
   return (
@@ -194,17 +350,22 @@ export default function PatientOnboardingScreen() {
               {
                 backgroundColor: theme.backgroundSecondary,
                 color: theme.text,
-                borderColor: theme.border,
+                borderColor: emailError ? theme.error : theme.border,
               },
             ]}
             placeholder='Enter your email'
             placeholderTextColor={theme.textSecondary}
             value={email}
-            onChangeText={setEmail}
+            onChangeText={handleEmailChange}
             keyboardType='email-address'
             autoCapitalize='none'
             autoCorrect={false}
           />
+          {emailError && (
+            <ThemedText style={[styles.errorText, { color: theme.error }]}>
+              {emailError}
+            </ThemedText>
+          )}
         </View>
 
         {/* Phone Number */}
@@ -230,21 +391,142 @@ export default function PatientOnboardingScreen() {
         {/* Date of Birth */}
         <View style={styles.inputGroup}>
           <ThemedText style={styles.inputLabel}>Date of Birth</ThemedText>
-          <TextInput
-            style={[
-              styles.textInput,
-              {
-                backgroundColor: theme.backgroundSecondary,
-                color: theme.text,
-                borderColor: theme.border,
-              },
-            ]}
-            placeholder='YYYY-MM-DD'
-            placeholderTextColor={theme.textSecondary}
-            value={dob}
-            onChangeText={setDob}
-            keyboardType='numeric'
-          />
+          {Platform.OS === "web" ? (
+            <View style={styles.webDateInputContainer}>
+              <input
+                type='date'
+                value={dob ? formatDate(dob) : ""}
+                max={formatDate(new Date())}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value) {
+                    const date = new Date(value);
+                    if (!isNaN(date.getTime())) {
+                      setDob(date);
+                    }
+                  } else {
+                    setDob(null);
+                  }
+                }}
+                style={{
+                  width: "100%",
+                  padding: `${Spacing.md}px ${Spacing.lg}px`,
+                  borderRadius: `${BorderRadius.lg}px`,
+                  borderWidth: "1px",
+                  borderStyle: "solid",
+                  borderColor: theme.border,
+                  backgroundColor: theme.backgroundSecondary,
+                  color: theme.text,
+                  fontSize: `${Typography.sizes.md}px`,
+                  fontFamily: "inherit",
+                  outline: "none",
+                  boxSizing: "border-box",
+                }}
+              />
+            </View>
+          ) : (
+            <>
+              <Pressable
+                onPress={() => {
+                  console.log("show date picker");
+                  setShowDatePicker(true);
+                  setShowGenderPicker(false);
+                  setShowAllergyPicker(false);
+                }}
+                style={[
+                  styles.selectInput,
+                  {
+                    backgroundColor: theme.backgroundSecondary,
+                    borderColor: theme.border,
+                  },
+                ]}
+              >
+                <ThemedText
+                  style={
+                    dob
+                      ? styles.selectText
+                      : [
+                          styles.selectPlaceholder,
+                          { color: theme.textSecondary },
+                        ]
+                  }
+                >
+                  {dob
+                    ? formatDateForDisplay(dob)
+                    : "Select your date of birth"}
+                </ThemedText>
+                <Feather
+                  name='calendar'
+                  size={20}
+                  color={theme.textSecondary}
+                />
+              </Pressable>
+              {showDatePicker && (
+                <>
+                  {Platform.OS === "ios" && (
+                    <View
+                      style={[
+                        styles.datePickerContainer,
+                        {
+                          backgroundColor: theme.card,
+                          borderColor: theme.border,
+                        },
+                      ]}
+                    >
+                      <View style={styles.datePickerHeader}>
+                        <Pressable
+                          onPress={() => setShowDatePicker(false)}
+                          style={styles.datePickerButton}
+                        >
+                          <ThemedText
+                            style={[
+                              styles.datePickerButtonText,
+                              { color: theme.primary },
+                            ]}
+                          >
+                            Cancel
+                          </ThemedText>
+                        </Pressable>
+                        <ThemedText style={styles.datePickerTitle}>
+                          Select Date
+                        </ThemedText>
+                        <Pressable
+                          onPress={() => setShowDatePicker(false)}
+                          style={styles.datePickerButton}
+                        >
+                          <ThemedText
+                            style={[
+                              styles.datePickerButtonText,
+                              { color: theme.primary },
+                            ]}
+                          >
+                            Done
+                          </ThemedText>
+                        </Pressable>
+                      </View>
+                      <DateTimePicker
+                        value={dob || new Date()}
+                        mode='date'
+                        display='spinner'
+                        onChange={handleDateChange}
+                        maximumDate={new Date()}
+                        style={styles.datePicker}
+                      />
+                    </View>
+                  )}
+                  {Platform.OS === "android" && (
+                    <DateTimePicker
+                      value={dob || new Date()}
+                      mode='date'
+                      display='default'
+                      onChange={handleDateChange}
+                      maximumDate={new Date()}
+                    />
+                  )}
+                </>
+              )}
+            </>
+          )}
         </View>
 
         {/* Address */}
@@ -497,15 +779,14 @@ export default function PatientOnboardingScreen() {
         <PrimaryButton
           title='Continue'
           onPress={handleSubmit}
-          disabled={!isFormValid}
           style={styles.continueButton}
         />
 
-        <Pressable onPress={handleSkip}>
+        {/* <Pressable onPress={handleSkip}>
           <ThemedText style={[styles.skipText, { color: theme.primary }]}>
             Skip for Now
           </ThemedText>
-        </Pressable>
+        </Pressable> */}
       </View>
     </ScrollView>
   );
@@ -616,5 +897,41 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.md,
     fontWeight: "600",
     textAlign: "center",
+  },
+  datePickerContainer: {
+    marginTop: Spacing.sm,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
+    overflow: "hidden",
+  },
+  datePickerHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: "transparent",
+  },
+  datePickerTitle: {
+    fontSize: Typography.sizes.md,
+    fontWeight: "600",
+  },
+  datePickerButton: {
+    padding: Spacing.xs,
+  },
+  datePickerButtonText: {
+    fontSize: Typography.sizes.md,
+    fontWeight: "600",
+  },
+  datePicker: {
+    height: 200,
+  },
+  webDateInputContainer: {
+    width: "100%",
+  },
+  errorText: {
+    fontSize: Typography.sizes.xs,
+    marginTop: Spacing.xs,
   },
 });
