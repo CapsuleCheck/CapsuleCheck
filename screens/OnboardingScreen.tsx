@@ -28,6 +28,10 @@ export default function OnboardingScreen() {
     navigation.navigate("LicenseVerification");
   };
 
+  const handleSignInSelect = () => {
+    navigation.navigate("Login");
+  };
+
   return (
     <ThemedView
       style={[styles.container, { paddingBottom: insets.bottom + Spacing.xl }]}
@@ -116,14 +120,17 @@ export default function OnboardingScreen() {
           </Pressable>
         </View>
 
+
         <View style={styles.footer}>
           <ThemedText
             style={[styles.footerText, { color: theme.textSecondary }]}
           >
             Already have an account?{" "}
-            <ThemedText style={[styles.link, { color: theme.primary }]}>
+            <Pressable onPress={handleSignInSelect}>
+               <ThemedText style={[styles.link, { color: theme.primary }]}>
               Sign In
             </ThemedText>
+            </Pressable>
           </ThemedText>
         </View>
       </View>
