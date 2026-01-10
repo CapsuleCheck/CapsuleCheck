@@ -131,7 +131,7 @@ export default function LoginScreen() {
       });
 
       // Complete onboarding and navigate to main app
-      completeOnboarding({ ...response.data, selectedRole });
+      completeOnboarding({ ...response.data.data, selectedRole });
     } catch (err) {
       console.error("Error logging in:", err);
 

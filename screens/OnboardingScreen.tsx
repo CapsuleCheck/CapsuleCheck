@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, StyleSheet, Image, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
@@ -19,6 +19,19 @@ export default function OnboardingScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
   const { completeOnboarding } = useUser();
+
+  useEffect(() => {
+    handleCheckAuth();
+  }, []);
+
+  const handleCheckAuth = () => {
+    const userData = localStorage.getItem("userData")
+      ? JSON.parse(localStorage.getItem("userData"))
+      : null;
+    console.log({ userData });
+    if (userData && userData?.token)
+      return navigation.navigate("PatientHomeScreen");
+  };
 
   const handlePatientSelect = () => {
     navigation.navigate("PatientOnboarding");
@@ -41,7 +54,7 @@ export default function OnboardingScreen() {
           <Image
             source={require("../assets/images/icon.png")}
             style={styles.logo}
-            resizeMode="contain"
+            resizeMode='contain'
           />
           <ThemedText style={styles.appName}>CapsuleCheck</ThemedText>
         </View>
@@ -70,7 +83,7 @@ export default function OnboardingScreen() {
                 { backgroundColor: theme.primary + "20" },
               ]}
             >
-              <Feather name="user" size={32} color={theme.primary} />
+              <Feather name='user' size={32} color={theme.primary} />
             </View>
             <ThemedText style={styles.optionTitle}>Patients</ThemedText>
             <ThemedText
@@ -80,7 +93,7 @@ export default function OnboardingScreen() {
               pharmacies.
             </ThemedText>
             <PrimaryButton
-              title="Get Started"
+              title='Get Started'
               onPress={handlePatientSelect}
               style={styles.optionButton}
             />
@@ -103,7 +116,7 @@ export default function OnboardingScreen() {
                 { backgroundColor: theme.warning + "20" },
               ]}
             >
-              <Feather name="briefcase" size={32} color={theme.warning} />
+              <Feather name='briefcase' size={32} color={theme.warning} />
             </View>
             <ThemedText style={styles.optionTitle}>Prescribers</ThemedText>
             <ThemedText
@@ -112,14 +125,13 @@ export default function OnboardingScreen() {
               Expand your reach and help patients access affordable care.
             </ThemedText>
             <PrimaryButton
-              title="Join the Network"
+              title='Join the Network'
               onPress={handlePharmacistSelect}
-              variant="outline"
+              variant='outline'
               style={styles.optionButton}
             />
           </Pressable>
         </View>
-
 
         <View style={styles.footer}>
           <ThemedText
@@ -127,9 +139,9 @@ export default function OnboardingScreen() {
           >
             Already have an account?{" "}
             <Pressable onPress={handleSignInSelect}>
-               <ThemedText style={[styles.link, { color: theme.primary }]}>
-              Sign In
-            </ThemedText>
+              <ThemedText style={[styles.link, { color: theme.primary }]}>
+                Sign In
+              </ThemedText>
             </Pressable>
           </ThemedText>
         </View>

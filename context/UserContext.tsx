@@ -20,6 +20,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const completeOnboarding = (data: any) => {
     setUserRole(data.selectedRole);
     setHasCompletedOnboarding(true);
+    delete data.password;
     localStorage.setItem(
       "userData",
       JSON.stringify({

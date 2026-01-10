@@ -7,6 +7,7 @@ import LoginScreen from "@/screens/LoginScreen";
 import LicenseVerificationScreen from "@/screens/LicenseVerificationScreen";
 import MainTabNavigator from "@/navigation/MainTabNavigator";
 import { useUser } from "@/context/UserContext";
+import PatientHomeScreen from "@/screens/PatientHomeScreen";
 
 export type RootStackParamList = {
   Onboarding: undefined;
@@ -26,23 +27,27 @@ export default function RootNavigator() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {!hasCompletedOnboarding ? (
         <>
-          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+          <Stack.Screen name='Onboarding' component={OnboardingScreen} />
           <Stack.Screen
-            name="PatientOnboarding"
+            name='PatientOnboarding'
             component={PatientOnboardingScreen}
           />
           <Stack.Screen
-            name="PatientPassword"
+            name='PatientPassword'
             component={PatientPasswordScreen}
           />
-          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name='Login' component={LoginScreen} />
           <Stack.Screen
-            name="LicenseVerification"
+            name='LicenseVerification'
             component={LicenseVerificationScreen}
           />
+          {/* <Stack.Screen
+            name='PatientHomeScreen'
+            component={PatientHomeScreen}
+          /> */}
         </>
       ) : (
-        <Stack.Screen name="Main" component={MainTabNavigator} />
+        <Stack.Screen name='Main' component={MainTabNavigator} />
       )}
     </Stack.Navigator>
   );

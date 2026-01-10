@@ -11,6 +11,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { useScreenInsets } from "@/hooks/useScreenInsets";
 import { BorderRadius, Spacing } from "@/constants/theme";
 import { HomeStackParamList } from "@/navigation/HomeStackNavigator";
+import { useUser } from "@/context/UserContext";
 
 type NavigationProp = NativeStackNavigationProp<HomeStackParamList>;
 
@@ -18,6 +19,7 @@ export default function PatientHomeScreen() {
   const { theme } = useTheme();
   const navigation = useNavigation<NavigationProp>();
   const screenInsets = useScreenInsets();
+  const { userData } = useUser();
 
   const mockPrescriptions = [
     {
@@ -41,14 +43,14 @@ export default function PatientHomeScreen() {
       <View style={[styles.header, { paddingTop: screenInsets.paddingTop }]}>
         <View>
           <ThemedText style={[styles.greeting, { color: theme.textSecondary }]}>
-            Welcome, Mefe
+            Welcome, {userData?.firstName || "Mefe"}
           </ThemedText>
           <ThemedText style={styles.subGreeting}>
             Your CapsuleCheck Hub
           </ThemedText>
         </View>
         <Pressable style={styles.notificationButton}>
-          <Feather name="bell" size={24} color={theme.text} />
+          <Feather name='bell' size={24} color={theme.text} />
         </Pressable>
       </View>
 
@@ -69,7 +71,7 @@ export default function PatientHomeScreen() {
           </ThemedText>
         </View>
         <PrimaryButton
-          title="Compare Prices"
+          title='Compare Prices'
           onPress={() => navigation.navigate("PriceList")}
           style={styles.cardButton}
         />
@@ -90,11 +92,11 @@ export default function PatientHomeScreen() {
           </ThemedText>
         </View>
         <PrimaryButton
-          title="Book Appointment"
+          title='Book Appointment'
           onPress={() =>
             navigation.navigate("BookAppointment", { prescriberId: "1" })
           }
-          variant="secondary"
+          variant='secondary'
           style={styles.cardButton}
         />
       </View>
@@ -130,11 +132,11 @@ export default function PatientHomeScreen() {
           ]}
           onPress={() => navigation.navigate("UploadPrescription")}
         >
-          <Feather name="plus" size={20} color={theme.primary} />
+          <Feather name='plus' size={20} color={theme.primary} />
           <ThemedText style={[styles.addText, { color: theme.primary }]}>
             Add New Prescription
           </ThemedText>
-          <Feather name="chevron-right" size={20} color={theme.primary} />
+          <Feather name='chevron-right' size={20} color={theme.primary} />
         </Pressable>
       </View>
 
@@ -149,7 +151,7 @@ export default function PatientHomeScreen() {
         ]}
         onPress={() => navigation.navigate("UploadPrescription")}
       >
-        <Feather name="camera" size={24} color="#FFFFFF" />
+        <Feather name='camera' size={24} color='#FFFFFF' />
       </Pressable>
     </ScreenScrollView>
   );
