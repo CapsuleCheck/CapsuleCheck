@@ -38,7 +38,7 @@ export default function OnboardingScreen() {
   };
 
   const handlePharmacistSelect = () => {
-    navigation.navigate("LicenseVerification");
+    navigation.navigate("PrescriberRegistration");
   };
 
   const handleSignInSelect = () => {

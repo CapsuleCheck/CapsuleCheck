@@ -53,7 +53,7 @@ export default function PatientOnboardingScreen() {
   const [country, setCountry] = useState("");
   const [zip, setZip] = useState("");
   const [gender, setGender] = useState("");
-  const [allergies, setAllergies] = useState("");
+  const [allergies, setAllergies] = useState<string[]>([]);
   const [showGenderPicker, setShowGenderPicker] = useState(false);
   const [showAllergyPicker, setShowAllergyPicker] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -233,7 +233,8 @@ export default function PatientOnboardingScreen() {
       return;
     }
 
-    const allergiesArray = allergies && allergies !== "None" ? [allergies] : [];
+    // Filter out "None" from allergies array if present
+    const allergiesArray = allergies.filter((allergy) => allergy !== "None");
 
     const formData = {
       firstName: firstName.trim(),
@@ -724,12 +725,16 @@ export default function PatientOnboardingScreen() {
           >
             <ThemedText
               style={
-                allergies
+                allergies.length > 0
                   ? styles.selectText
                   : [styles.selectPlaceholder, { color: theme.textSecondary }]
               }
             >
-              {allergies || "Select allergies"}
+              {allergies.length > 0
+                ? allergies.length === 1
+                  ? allergies[0]
+                  : `${allergies.length} selected`
+                : "Select allergies"}
             </ThemedText>
             <Feather
               name={showAllergyPicker ? "chevron-up" : "chevron-down"}
@@ -745,35 +750,86 @@ export default function PatientOnboardingScreen() {
                 { backgroundColor: theme.card, borderColor: theme.border },
               ]}
             >
-              {ALLERGY_OPTIONS.map((option) => (
-                <Pressable
-                  key={option}
-                  style={[
-                    styles.optionItem,
-                    allergies === option && {
-                      backgroundColor: theme.primary + "20",
-                    },
-                  ]}
-                  onPress={() => {
-                    setAllergies(option);
-                    setShowAllergyPicker(false);
-                  }}
-                >
-                  <ThemedText
+              {ALLERGY_OPTIONS.map((option) => {
+                const isSelected = allergies.includes(option);
+                return (
+                  <Pressable
+                    key={option}
                     style={[
-                      styles.optionText,
-                      allergies === option && { color: theme.primary },
+                      styles.optionItem,
+                      isSelected && {
+                        backgroundColor: theme.primary + "20",
+                      },
                     ]}
+                    onPress={() => {
+                      if (option === "None") {
+                        // If "None" is selected, clear all other selections
+                        setAllergies(["None"]);
+                      } else {
+                        // Remove "None" if it's selected and add/remove the option
+                        const newAllergies = allergies.filter(
+                          (a) => a !== "None"
+                        );
+                        if (isSelected) {
+                          // Remove the option if already selected
+                          setAllergies(
+                            newAllergies.filter((a) => a !== option)
+                          );
+                        } else {
+                          // Add the option
+                          setAllergies([...newAllergies, option]);
+                        }
+                      }
+                    }}
                   >
-                    {option}
-                  </ThemedText>
-                  {allergies === option ? (
-                    <Feather name='check' size={18} color={theme.primary} />
-                  ) : null}
-                </Pressable>
-              ))}
+                    <ThemedText
+                      style={[
+                        styles.optionText,
+                        isSelected && { color: theme.primary },
+                      ]}
+                    >
+                      {option}
+                    </ThemedText>
+                    {isSelected ? (
+                      <Feather name='check' size={18} color={theme.primary} />
+                    ) : null}
+                  </Pressable>
+                );
+              })}
             </View>
           ) : null}
+
+          {/* Display selected allergies as chips */}
+          {allergies.length > 0 && allergies[0] !== "None" && (
+            <View style={styles.selectedAllergiesContainer}>
+              {allergies.map((allergy) => (
+                <View
+                  key={allergy}
+                  style={[
+                    styles.allergyChip,
+                    {
+                      backgroundColor: theme.primary + "20",
+                      borderColor: theme.primary,
+                    },
+                  ]}
+                >
+                  <ThemedText
+                    style={[styles.allergyChipText, { color: theme.primary }]}
+                  >
+                    {allergy}
+                  </ThemedText>
+                  <Pressable
+                    onPress={() => {
+                      setAllergies(allergies.filter((a) => a !== allergy));
+                    }}
+                    style={styles.removeChipButton}
+                  >
+                    <Feather name='x' size={14} color={theme.primary} />
+                  </Pressable>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
 
         <PrimaryButton
@@ -933,5 +989,27 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: Typography.sizes.xs,
     marginTop: Spacing.xs,
+  },
+  selectedAllergiesContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: Spacing.sm,
+    marginTop: Spacing.sm,
+  },
+  allergyChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
+    gap: Spacing.xs,
+  },
+  allergyChipText: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: "500",
+  },
+  removeChipButton: {
+    padding: Spacing.xxs,
   },
 });

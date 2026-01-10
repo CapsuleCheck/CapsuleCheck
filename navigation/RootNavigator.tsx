@@ -5,6 +5,8 @@ import PatientOnboardingScreen from "@/screens/PatientOnboardingScreen";
 import PatientPasswordScreen from "@/screens/PatientPasswordScreen";
 import LoginScreen from "@/screens/LoginScreen";
 import LicenseVerificationScreen from "@/screens/LicenseVerificationScreen";
+import PrescriberRegistrationScreen from "@/screens/PrescriberRegistrationScreen";
+import PrescriberPasswordScreen from "@/screens/PrescriberPasswordScreen";
 import MainTabNavigator from "@/navigation/MainTabNavigator";
 import { useUser } from "@/context/UserContext";
 import PatientHomeScreen from "@/screens/PatientHomeScreen";
@@ -15,6 +17,8 @@ export type RootStackParamList = {
   PatientPassword: { formData: unknown };
   Login: undefined;
   LicenseVerification: undefined;
+  PrescriberRegistration: undefined;
+  PrescriberPassword: { formData: unknown };
   Main: undefined;
 };
 
@@ -40,6 +44,14 @@ export default function RootNavigator() {
           <Stack.Screen
             name='LicenseVerification'
             component={LicenseVerificationScreen}
+          />
+          <Stack.Screen
+            name='PrescriberRegistration'
+            component={PrescriberRegistrationScreen}
+          />
+          <Stack.Screen
+            name='PrescriberPassword'
+            component={PrescriberPasswordScreen}
           />
           {/* <Stack.Screen
             name='PatientHomeScreen'
