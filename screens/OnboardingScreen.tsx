@@ -11,6 +11,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { useUser } from "@/context/UserContext";
 import { BorderRadius, Spacing } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootNavigator";
+import { ScrollView } from "react-native-gesture-handler";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -46,8 +47,13 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <ThemedView
+    // <ThemedView
+    //   style={[styles.container, { paddingBottom: insets.bottom + Spacing.xl }]}
+    // >
+    <ScrollView
       style={[styles.container, { paddingBottom: insets.bottom + Spacing.xl }]}
+      keyboardShouldPersistTaps='handled'
+      contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}
     >
       <View style={[styles.header, { paddingTop: insets.top + Spacing.xl }]}>
         <View style={styles.logoContainer}>
@@ -146,7 +152,8 @@ export default function OnboardingScreen() {
           </ThemedText>
         </View>
       </View>
-    </ThemedView>
+      {/* </ThemedView> */}
+    </ScrollView>
   );
 }
 
