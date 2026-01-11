@@ -51,7 +51,11 @@ export default function OnboardingScreen() {
     //   style={[styles.container, { paddingBottom: insets.bottom + Spacing.xl }]}
     // >
     <ScrollView
-      style={[styles.container, { paddingBottom: insets.bottom + Spacing.xl }]}
+      style={[
+        styles.container,
+        { paddingBottom: insets.bottom + Spacing.xl },
+        { backgroundColor: theme.backgroundRoot },
+      ]}
       keyboardShouldPersistTaps='handled'
       contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}
     >
