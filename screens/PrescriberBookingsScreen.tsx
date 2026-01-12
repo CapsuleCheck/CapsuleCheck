@@ -1,63 +1,72 @@
 import React from "react";
 import { View, StyleSheet, Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ScreenScrollView } from "@/components/ScreenScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useScreenInsets } from "@/hooks/useScreenInsets";
+import { useAppointments } from "@/hooks/useAppDataHooks";
 import { BorderRadius, Spacing, Typography } from "@/constants/theme";
+import { BookingsStackParamList } from "@/navigation/BookingsStackNavigator";
 
-const BOOKINGS = [
-  {
-    id: "1",
-    patientName: "Arthur Morgan",
-    date: "Today",
-    startTime: "11:30 AM",
-    endTime: "11:45 AM",
-    type: "Video Call",
-    status: "confirmed",
-  },
-  {
-    id: "2",
-    patientName: "Sadie Adler",
-    date: "Today",
-    startTime: "01:00 PM",
-    endTime: "01:15 PM",
-    type: "In-Person",
-    status: "confirmed",
-  },
-  {
-    id: "3",
-    patientName: "John Marston",
-    date: "Tomorrow",
-    startTime: "09:00 AM",
-    endTime: "09:30 AM",
-    type: "Video Call",
-    status: "pending",
-  },
-  {
-    id: "4",
-    patientName: "Abigail Roberts",
-    date: "Tomorrow",
-    startTime: "02:00 PM",
-    endTime: "02:15 PM",
-    type: "In-Person",
-    status: "confirmed",
-  },
-];
+type NavigationProp = NativeStackNavigationProp<BookingsStackParamList>;
 
 export default function PrescriberBookingsScreen() {
   const { theme } = useTheme();
   const screenInsets = useScreenInsets();
+  const navigation = useNavigation<NavigationProp>();
+  const appointments = useAppointments();
+
+  // For now, show all appointments. In a real app, you'd filter by logged-in prescriber ID
+  const bookings = appointments.all.filter((a) => a.status === "scheduled");
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return "Today";
+    } else if (date.toDateString() === tomorrow.toDateString()) {
+      return "Tomorrow";
+    } else {
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+    }
+  };
+
+  const getTypeText = (type: string) => {
+    switch (type) {
+      case "video_call":
+        return "Video Call";
+      case "in_person":
+        return "In-Person";
+      case "phone_call":
+        return "Phone Call";
+      default:
+        return type;
+    }
+  };
+
+  const handleBookingPress = (bookingId: string) => {
+    navigation.navigate("BookingDetails", { bookingId });
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "confirmed":
+      case "scheduled":
         return theme.success;
-      case "pending":
-        return theme.warning;
+      case "completed":
+        return theme.textSecondary;
       case "cancelled":
         return theme.error;
+      case "no_show":
+        return theme.warning;
       default:
         return theme.textSecondary;
     }
@@ -111,92 +120,120 @@ export default function PrescriberBookingsScreen() {
       </View>
 
       <View style={styles.bookingsList}>
-        {BOOKINGS.map((booking) => (
-          <Pressable
-            key={booking.id}
-            style={[
-              styles.bookingCard,
-              { backgroundColor: theme.card, borderColor: theme.border },
-            ]}
-          >
-            <View style={styles.bookingHeader}>
-              <View style={styles.bookingInfo}>
-                <ThemedText style={styles.patientName}>
-                  {booking.patientName}
-                </ThemedText>
-                <ThemedText
-                  style={[styles.bookingDate, { color: theme.textSecondary }]}
-                >
-                  {booking.date}
-                </ThemedText>
-              </View>
-              <View
-                style={[
-                  styles.statusBadge,
-                  { backgroundColor: getStatusColor(booking.status) + "20" },
-                ]}
-              >
-                <ThemedText
+        {bookings.length === 0 ? (
+          <View style={styles.emptyState}>
+            <ThemedText
+              style={[styles.emptyText, { color: theme.textSecondary }]}
+            >
+              No bookings found
+            </ThemedText>
+          </View>
+        ) : (
+          bookings.map((booking) => (
+            <Pressable
+              key={booking.id}
+              style={[
+                styles.bookingCard,
+                { backgroundColor: theme.card, borderColor: theme.border },
+              ]}
+              onPress={() => handleBookingPress(booking.id)}
+            >
+              <View style={styles.bookingHeader}>
+                <View style={styles.bookingInfo}>
+                  <ThemedText style={styles.patientName}>
+                    {booking.patientName}
+                  </ThemedText>
+                  <ThemedText
+                    style={[styles.bookingDate, { color: theme.textSecondary }]}
+                  >
+                    {formatDate(booking.date)}
+                  </ThemedText>
+                </View>
+                <View
                   style={[
-                    styles.statusText,
-                    { color: getStatusColor(booking.status) },
+                    styles.statusBadge,
+                    { backgroundColor: getStatusColor(booking.status) + "20" },
                   ]}
                 >
-                  {booking.status.charAt(0).toUpperCase() +
-                    booking.status.slice(1)}
-                </ThemedText>
+                  <ThemedText
+                    style={[
+                      styles.statusText,
+                      { color: getStatusColor(booking.status) },
+                    ]}
+                  >
+                    {booking.status.charAt(0).toUpperCase() +
+                      booking.status.slice(1)}
+                  </ThemedText>
+                </View>
               </View>
-            </View>
 
-            <View style={styles.bookingDetails}>
-              <View style={styles.detailRow}>
-                <Feather name="clock" size={16} color={theme.textSecondary} />
-                <ThemedText
-                  style={[styles.detailText, { color: theme.textSecondary }]}
-                >
-                  {booking.startTime} - {booking.endTime}
-                </ThemedText>
+              <View style={styles.bookingDetails}>
+                <View style={styles.detailRow}>
+                  <Feather name='clock' size={16} color={theme.textSecondary} />
+                  <ThemedText
+                    style={[styles.detailText, { color: theme.textSecondary }]}
+                  >
+                    {booking.time}
+                  </ThemedText>
+                </View>
+                <View style={styles.detailRow}>
+                  <Feather
+                    name={
+                      booking.type === "video_call"
+                        ? "video"
+                        : booking.type === "in_person"
+                          ? "user"
+                          : "phone"
+                    }
+                    size={16}
+                    color={theme.textSecondary}
+                  />
+                  <ThemedText
+                    style={[styles.detailText, { color: theme.textSecondary }]}
+                  >
+                    {getTypeText(booking.type)}
+                  </ThemedText>
+                </View>
               </View>
-              <View style={styles.detailRow}>
-                <Feather
-                  name={booking.type === "Video Call" ? "video" : "user"}
-                  size={16}
-                  color={theme.textSecondary}
-                />
-                <ThemedText
-                  style={[styles.detailText, { color: theme.textSecondary }]}
-                >
-                  {booking.type}
-                </ThemedText>
-              </View>
-            </View>
 
-            <View style={styles.actionButtons}>
-              <Pressable
-                style={[
-                  styles.actionButton,
-                  { backgroundColor: theme.backgroundSecondary },
-                ]}
-              >
-                <ThemedText style={styles.actionButtonText}>
-                  Reschedule
-                </ThemedText>
-              </Pressable>
-              <Pressable
-                style={[
-                  styles.actionButton,
-                  { backgroundColor: theme.primary },
-                ]}
-              >
-                <ThemedText
-                  style={[styles.actionButtonText, { color: theme.buttonText }]}
+              <View style={styles.actionButtons}>
+                <Pressable
+                  style={[
+                    styles.actionButton,
+                    { backgroundColor: theme.backgroundSecondary },
+                  ]}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    // TODO: Handle reschedule
+                  }}
                 >
-                  {booking.type === "Video Call" ? "Join Call" : "View Details"}
-                </ThemedText>
-              </Pressable>
-            </View>
-          </Pressable>
-        ))}
+                  <ThemedText style={styles.actionButtonText}>
+                    Reschedule
+                  </ThemedText>
+                </Pressable>
+                <Pressable
+                  style={[
+                    styles.actionButton,
+                    { backgroundColor: theme.primary },
+                  ]}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    handleBookingPress(booking.id);
+                  }}
+                >
+                  <ThemedText
+                    style={[
+                      styles.actionButtonText,
+                      { color: theme.buttonText },
+                    ]}
+                  >
+                    View Details
+                  </ThemedText>
+                </Pressable>
+              </View>
+            </Pressable>
+          ))
+        )}
       </View>
     </ScreenScrollView>
   );
@@ -291,5 +328,14 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: Typography.sizes.sm,
     fontWeight: "600",
+  },
+  emptyState: {
+    padding: Spacing.xl,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyText: {
+    fontSize: Typography.sizes.md,
+    textAlign: "center",
   },
 });
