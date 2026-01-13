@@ -92,12 +92,12 @@ export interface RefillRequest {
 }
 
 export interface Prescriber {
-  id: string;
+  _id: string;
   name: string;
   title: string;
   specialty: string[];
-  rating: number;
-  reviewCount: number;
+  ratings: number;
+  ratingsCount: number;
   licenseNumber?: string;
   yearsExperience: number;
   bio?: string;
@@ -195,6 +195,24 @@ export interface UserProfile {
     phone: string;
     relationship: string;
   };
+}
+
+export interface PrescriberProfile {
+  _id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  createdAt: string;
+  title: string;
+  ratings: number;
+  ratingsCount: number;
+  verificationStatus: boolean;
+  availability: { day: string; startTime: string; endTime: string }[];
+  bio: string;
+  yearsExperience: number;
+  specialty: string[];
+  licenseFile: string;
+  consultationFee: number;
 }
 
 export interface PaymentMethod {

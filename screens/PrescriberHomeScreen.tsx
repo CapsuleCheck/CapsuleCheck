@@ -1,44 +1,153 @@
-import React, { useState } from "react";
-import { View, StyleSheet, Pressable, Switch, Image } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  StyleSheet,
+  Pressable,
+  Switch,
+  Image,
+  ActivityIndicator,
+} from "react-native";
 import { Feather } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import axios from "axios";
 import { ScreenScrollView } from "@/components/ScreenScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useScreenInsets } from "@/hooks/useScreenInsets";
 import { BorderRadius, Spacing, Typography } from "@/constants/theme";
+import { usePrescriberProfile } from "@/hooks/useAppDataHooks";
+import { API_BASE_URL } from "@/constants/api";
+import { MainTabParamList } from "@/navigation/MainTabNavigator";
 
-const UPCOMING_BOOKINGS = [
-  {
-    id: "1",
-    patientName: "Arthur Morgan",
-    startTime: "11:30 AM",
-    endTime: "11:45 AM",
-    type: "Video Call",
-    avatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-  },
-  {
-    id: "2",
-    patientName: "Sadie Adler",
-    startTime: "01:00 PM",
-    endTime: "01:15 PM",
-    type: "In-Person",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face",
-  },
-];
+interface Booking {
+  _id?: string;
+  id?: string;
+  prescriberId: string;
+  patientId: { firstName?: string; lastName?: string; _id?: string };
+  date: string;
+  time: string;
+  type?: string;
+  status?: string;
+  meetingLink?: string;
+}
 
 const DOCTOR_AVATAR =
   "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face";
 
+type NavigationProp = NativeStackNavigationProp<MainTabParamList>;
+
 export default function PrescriberHomeScreen() {
   const { theme } = useTheme();
   const screenInsets = useScreenInsets();
+  const navigation = useNavigation<NavigationProp>();
   const [isOnline, setIsOnline] = useState(true);
+  const prescriberProfile = usePrescriberProfile();
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [isLoadingBookings, setIsLoadingBookings] = useState(true);
+
+  useEffect(() => {
+    fetchBookings();
+  }, [prescriberProfile?._id]);
+
+  const fetchBookings = async () => {
+    if (!prescriberProfile?._id) {
+      setIsLoadingBookings(false);
+      return;
+    }
+
+    setIsLoadingBookings(true);
+    try {
+      const response = await axios.get(`${API_BASE_URL}/bookings`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        params: {
+          prescriberId: prescriberProfile._id,
+        },
+      });
+
+      // Handle both array response and object with data property
+      const bookingsData = Array.isArray(response.data)
+        ? response.data
+        : response.data?.data || response.data?.bookings || [];
+
+      setBookings(bookingsData);
+    } catch (err) {
+      console.error("Error fetching bookings:", err);
+      // On error, set empty array to show no bookings
+      setBookings([]);
+    } finally {
+      setIsLoadingBookings(false);
+    }
+  };
+
+  // Filter upcoming bookings (future dates or today's future times)
+  const getUpcomingBookings = () => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    console.log({ today });
+
+    return bookings
+      .filter((booking) => {
+        const bookingDate = new Date(booking.date);
+        console.log({ bookingDate });
+        const bookingDateTime = new Date(bookingDate);
+        console.log({ bookingDateTime });
+
+        // Parse time (assuming format like "10:00 AM" or "02:00 PM")
+        const timeMatch = booking.time.match(/(\d+):(\d+)\s*(AM|PM)/i);
+        console.log({ timeMatch });
+        if (timeMatch) {
+          let hours = parseInt(timeMatch[1], 10);
+          const minutes = parseInt(timeMatch[2], 10);
+          const period = timeMatch[3].toUpperCase();
+
+          if (period === "PM" && hours !== 12) hours += 12;
+          if (period === "AM" && hours === 12) hours = 0;
+
+          bookingDateTime.setHours(hours, minutes, 0, 0);
+        }
+        console.log({ now });
+        // Check if booking is in the future
+        return bookingDateTime >= now && booking.status !== "cancelled";
+      })
+      .sort((a, b) => {
+        // Sort by date and time
+        const dateA = new Date(`${a.date} ${a.time}`);
+        const dateB = new Date(`${b.date} ${b.time}`);
+        return dateA.getTime() - dateB.getTime();
+      })
+      .slice(0, 5); // Limit to 5 upcoming bookings
+  };
+
+  const upcomingBookings = getUpcomingBookings();
+
+  console.log({ upcomingBookings });
+
+  // Get today's bookings count
+  const getTodaysBookingsCount = () => {
+    const today = new Date().toISOString().split("T")[0];
+    return bookings.filter(
+      (booking) => booking.date === today && booking.status !== "cancelled"
+    ).length;
+  };
+
+  // Get pending requests count (bookings with pending status)
+  const getPendingRequestsCount = () => {
+    return bookings.filter(
+      (booking) =>
+        booking.status === "pending" || booking.status === "scheduled"
+    ).length;
+  };
 
   const handleViewDetails = (bookingId: string) => {
-    // TODO: Navigate to booking details screen
-    console.log("View details for booking:", bookingId);
+    // Navigate to BookingsTab and then to BookingDetails screen
+    (navigation as any).navigate("BookingsTab", {
+      screen: "BookingDetails",
+      params: { bookingId },
+    });
   };
 
   const handleManageAvailability = () => {
@@ -63,11 +172,13 @@ export default function PrescriberHomeScreen() {
             style={[styles.doctorAvatar, { borderColor: theme.primary }]}
           />
           <ThemedText style={styles.greeting}>
-            Good Morning, Dr. Smith
+            {prescriberProfile
+              ? `Good Morning, ${prescriberProfile.title} ${prescriberProfile.name.split(" ")[0]}`
+              : "Good Morning"}
           </ThemedText>
         </View>
         <Pressable style={styles.notificationButton}>
-          <Feather name="bell" size={24} color={theme.text} />
+          <Feather name='bell' size={24} color={theme.text} />
           <View style={[styles.badge, { backgroundColor: theme.error }]}>
             <ThemedText style={styles.badgeText}>2</ThemedText>
           </View>
@@ -100,7 +211,7 @@ export default function PrescriberHomeScreen() {
               false: theme.backgroundTertiary,
               true: theme.success,
             }}
-            thumbColor="#FFFFFF"
+            thumbColor='#FFFFFF'
             style={styles.toggleSwitch}
           />
         </View>
@@ -119,7 +230,9 @@ export default function PrescriberHomeScreen() {
           >
             Today's Bookings
           </ThemedText>
-          <ThemedText style={styles.statValue}>5</ThemedText>
+          <ThemedText style={styles.statValue}>
+            {isLoadingBookings ? "-" : getTodaysBookingsCount()}
+          </ThemedText>
         </View>
         <View
           style={[
@@ -133,10 +246,17 @@ export default function PrescriberHomeScreen() {
             Pending Requests
           </ThemedText>
           <View style={styles.statWithBadge}>
-            <ThemedText style={styles.statValue}>2</ThemedText>
-            <View
-              style={[styles.pendingBadge, { backgroundColor: theme.warning }]}
-            />
+            <ThemedText style={styles.statValue}>
+              {isLoadingBookings ? "-" : getPendingRequestsCount()}
+            </ThemedText>
+            {!isLoadingBookings && getPendingRequestsCount() > 0 && (
+              <View
+                style={[
+                  styles.pendingBadge,
+                  { backgroundColor: theme.warning },
+                ]}
+              />
+            )}
           </View>
         </View>
       </View>
@@ -145,42 +265,84 @@ export default function PrescriberHomeScreen() {
       <View style={styles.section}>
         <ThemedText style={styles.sectionTitle}>Upcoming Bookings</ThemedText>
 
-        {UPCOMING_BOOKINGS.map((booking) => (
-          <View
-            key={booking.id}
-            style={[
-              styles.bookingCard,
-              { backgroundColor: theme.card, borderColor: theme.border },
-            ]}
-          >
-            <View style={styles.bookingInfo}>
-              <ThemedText style={styles.patientName}>
-                {booking.patientName}
-              </ThemedText>
-              <ThemedText
-                style={[styles.bookingDetail, { color: theme.textSecondary }]}
-              >
-                {booking.type}: {booking.startTime} - {booking.endTime}
-              </ThemedText>
-              <Pressable
-                style={[
-                  styles.viewDetailsButton,
-                  { backgroundColor: theme.backgroundSecondary },
-                ]}
-                onPress={() => handleViewDetails(booking.id)}
-              >
-                <ThemedText style={styles.viewDetailsText}>
-                  View Details
-                </ThemedText>
-                <Feather name="arrow-right" size={14} color={theme.text} />
-              </Pressable>
-            </View>
-            <Image
-              source={{ uri: booking.avatar }}
-              style={styles.patientAvatar}
-            />
+        {isLoadingBookings ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size='large' color={theme.primary} />
+            <ThemedText
+              style={[styles.loadingText, { color: theme.textSecondary }]}
+            >
+              Loading bookings...
+            </ThemedText>
           </View>
-        ))}
+        ) : upcomingBookings.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Feather name='calendar' size={48} color={theme.textSecondary} />
+            <ThemedText
+              style={[styles.emptyText, { color: theme.textSecondary }]}
+            >
+              No upcoming bookings
+            </ThemedText>
+          </View>
+        ) : (
+          upcomingBookings.map((booking) => {
+            const bookingId = booking._id || booking.id || "";
+            const patientName =
+              `${booking.patientId?.firstName} ${booking.patientId.lastName}` ||
+              "Patient";
+            const bookingType = booking?.type || "Consultation";
+            const defaultAvatar =
+              "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face";
+
+            return (
+              <View
+                key={bookingId}
+                style={[
+                  styles.bookingCard,
+                  { backgroundColor: theme.card, borderColor: theme.border },
+                ]}
+              >
+                <View style={styles.bookingInfo}>
+                  <ThemedText style={styles.patientName}>
+                    {patientName}
+                  </ThemedText>
+                  <ThemedText
+                    style={[
+                      styles.bookingDetail,
+                      { color: theme.textSecondary },
+                    ]}
+                  >
+                    {bookingType}: {booking.time}
+                  </ThemedText>
+                  <ThemedText
+                    style={[styles.bookingDate, { color: theme.textSecondary }]}
+                  >
+                    {new Date(booking.date).toLocaleDateString("en-US", {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </ThemedText>
+                  <Pressable
+                    style={[
+                      styles.viewDetailsButton,
+                      { backgroundColor: theme.backgroundSecondary },
+                    ]}
+                    onPress={() => handleViewDetails(bookingId)}
+                  >
+                    <ThemedText style={styles.viewDetailsText}>
+                      View Details
+                    </ThemedText>
+                    <Feather name='arrow-right' size={14} color={theme.text} />
+                  </Pressable>
+                </View>
+                <Image
+                  source={{ uri: defaultAvatar }}
+                  style={styles.patientAvatar}
+                />
+              </View>
+            );
+          })
+        )}
       </View>
 
       {/* Action Buttons */}
@@ -192,7 +354,7 @@ export default function PrescriberHomeScreen() {
           ]}
           onPress={handleManageAvailability}
         >
-          <Feather name="calendar" size={20} color="#FFFFFF" />
+          <Feather name='calendar' size={20} color='#FFFFFF' />
           <ThemedText style={styles.primaryActionText}>
             Manage Availability
           </ThemedText>
@@ -202,7 +364,7 @@ export default function PrescriberHomeScreen() {
           style={[styles.outlineActionButton, { borderColor: theme.success }]}
           onPress={handleUpdatePricing}
         >
-          <Feather name="plus-square" size={20} color={theme.success} />
+          <Feather name='plus-square' size={20} color={theme.success} />
           <ThemedText
             style={[styles.outlineActionText, { color: theme.success }]}
           >
@@ -388,5 +550,27 @@ const styles = StyleSheet.create({
   outlineActionText: {
     fontSize: Typography.sizes.md,
     fontWeight: "600",
+  },
+  loadingContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: Spacing["3xl"],
+  },
+  loadingText: {
+    fontSize: Typography.sizes.md,
+    marginTop: Spacing.md,
+  },
+  emptyContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: Spacing["3xl"],
+  },
+  emptyText: {
+    fontSize: Typography.sizes.md,
+    marginTop: Spacing.md,
+  },
+  bookingDate: {
+    fontSize: Typography.sizes.xs,
+    marginBottom: Spacing.sm,
   },
 });

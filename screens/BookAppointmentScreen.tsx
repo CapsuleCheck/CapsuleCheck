@@ -1,12 +1,19 @@
-import React, { useState } from "react";
-import { View, StyleSheet, Pressable } from "react-native";
+import React, { useState, useMemo } from "react";
+import { View, StyleSheet, Pressable, ActivityIndicator } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import { useRoute, useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import Toast from "react-native-toast-message";
 import { ScreenScrollView } from "@/components/ScreenScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { useTheme } from "@/hooks/useTheme";
 import { useScreenInsets } from "@/hooks/useScreenInsets";
 import { BorderRadius, Spacing } from "@/constants/theme";
+import { usePrescribers } from "@/hooks/useAppDataHooks";
+import { HomeStackParamList } from "@/navigation/HomeStackNavigator";
+import { API_BASE_URL } from "@/constants/api";
+import { useUser } from "@/context/UserContext";
 
 const DAYS_OF_WEEK = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const TIME_SLOTS = [
@@ -24,8 +31,142 @@ const TIME_SLOTS = [
 export default function BookAppointmentScreen() {
   const { theme } = useTheme();
   const screenInsets = useScreenInsets();
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { userData } = useUser();
+  const { prescriberId, prescriber } =
+    (route.params as HomeStackParamList["BookAppointment"]) || {};
+
   const [selectedDate, setSelectedDate] = useState(10);
   const [selectedTime, setSelectedTime] = useState("10:00 AM");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Get current month/year for display
+  const currentDate = useMemo(() => {
+    const date = new Date();
+    return {
+      month: date.toLocaleString("default", { month: "long" }),
+      year: date.getFullYear(),
+      currentMonth: date.getMonth(),
+      currentYear: date.getFullYear(),
+    };
+  }, []);
+
+  // Format selected date to YYYY-MM-DD format
+  const formatSelectedDate = () => {
+    const selectedDateObj = new Date(
+      currentDate.currentYear,
+      currentDate.currentMonth,
+      selectedDate
+    );
+    const year = selectedDateObj.getFullYear();
+    const month = String(selectedDateObj.getMonth() + 1).padStart(2, "0");
+    const day = String(selectedDateObj.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  // Generate meeting link (you can customize this logic)
+  const generateMeetingLink = () => {
+    // For now, generate a simple meeting link
+    // In production, you might want to integrate with Zoom, Google Meet, etc.
+    const meetingId = `meeting-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `https://meet.capsulecheck.com/${meetingId}`;
+  };
+
+  const handleConfirmAppointment = async () => {
+    if (!prescriberId || !prescriber) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Prescriber information is missing",
+        position: "top",
+      });
+      return;
+    }
+
+    const patientId = userData?._id || userData?.id;
+    if (!patientId) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Patient information is missing. Please log in again.",
+        position: "top",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const bookingDate = formatSelectedDate();
+      const meetingLink = generateMeetingLink();
+
+      const bookingData = {
+        prescriberId: prescriberId,
+        patientId: patientId,
+        date: bookingDate,
+        time: selectedTime,
+        meetingLink: meetingLink,
+      };
+
+      const response = await axios.post(
+        `${API_BASE_URL}/bookings`,
+        bookingData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      Toast.show({
+        type: "success",
+        text1: "Appointment Confirmed!",
+        text2: "Your appointment has been successfully booked.",
+        position: "top",
+      });
+
+      // Navigate back after successful booking
+      setTimeout(() => {
+        navigation.goBack();
+      }, 1500);
+    } catch (err) {
+      console.error("Error creating booking:", err);
+      let errorMessage = "Failed to book appointment. Please try again.";
+
+      if (axios.isAxiosError(err)) {
+        if (err.response) {
+          errorMessage =
+            err.response.data?.message ||
+            `Failed to book appointment: ${err.response.status}`;
+        } else if (err.request) {
+          errorMessage =
+            "Unable to connect to server. Please check your connection.";
+        }
+      }
+
+      Toast.show({
+        type: "error",
+        text1: "Booking Failed",
+        text2: errorMessage,
+        position: "top",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!prescriber) {
+    return (
+      <ScreenScrollView
+        contentContainerStyle={{ paddingBottom: screenInsets.paddingBottom }}
+      >
+        <View style={styles.content}>
+          <ThemedText style={styles.errorText}>Prescriber not found</ThemedText>
+        </View>
+      </ScreenScrollView>
+    );
+  }
 
   return (
     <ScreenScrollView
@@ -36,37 +177,58 @@ export default function BookAppointmentScreen() {
           <View
             style={[styles.avatar, { backgroundColor: theme.primary + "20" }]}
           >
-            <Feather name="user" size={32} color={theme.primary} />
+            <Feather name='user' size={32} color={theme.primary} />
           </View>
           <View style={styles.pharmacistDetails}>
             <ThemedText style={styles.pharmacistName}>
-              Dr. Evelyn Reed
+              {prescriber.name} {prescriber.title}
             </ThemedText>
             <ThemedText
               style={[styles.pharmacistRole, { color: theme.textSecondary }]}
             >
-              Independent Prescriber
+              {/* {prescriber.specialty.join(", ")} */}
             </ThemedText>
             <View style={styles.ratingRow}>
-              <Feather name="star" size={14} color="#F59E0B" />
-              <ThemedText style={styles.rating}>4.8</ThemedText>
+              <Feather name='star' size={14} color='#F59E0B' />
+              <ThemedText style={styles.rating}>
+                {prescriber.ratings.toFixed(1)}
+              </ThemedText>
               <ThemedText
                 style={[styles.reviews, { color: theme.textSecondary }]}
               >
-                (214 reviews)
+                ({prescriber.ratingsCount} reviews)
               </ThemedText>
             </View>
+            {prescriber.bio && (
+              <ThemedText style={[styles.bio, { color: theme.textSecondary }]}>
+                {prescriber.bio || "-"}
+              </ThemedText>
+            )}
+            {prescriber.consultationFee && (
+              <ThemedText style={[styles.fee, { color: theme.primary }]}>
+                Consultation Fee: ${prescriber.consultationFee}
+              </ThemedText>
+            )}
+            {prescriber.yearsExperience > 0 && (
+              <ThemedText
+                style={[styles.experience, { color: theme.textSecondary }]}
+              >
+                {prescriber.yearsExperience} years of experience
+              </ThemedText>
+            )}
           </View>
         </View>
 
         <ThemedText style={styles.sectionTitle}>Select a Date</ThemedText>
         <View style={styles.calendarHeader}>
           <Pressable>
-            <Feather name="chevron-left" size={24} color={theme.text} />
+            <Feather name='chevron-left' size={24} color={theme.text} />
           </Pressable>
-          <ThemedText style={styles.monthYear}>October 2024</ThemedText>
+          <ThemedText style={styles.monthYear}>
+            {currentDate.month} {currentDate.year}
+          </ThemedText>
           <Pressable>
-            <Feather name="chevron-right" size={24} color={theme.text} />
+            <Feather name='chevron-right' size={24} color={theme.text} />
           </Pressable>
         </View>
 
@@ -145,10 +307,16 @@ export default function BookAppointmentScreen() {
         </View>
 
         <PrimaryButton
-          title="Confirm Appointment"
-          onPress={() => {}}
+          title={isLoading ? "Booking..." : "Confirm Appointment"}
+          onPress={handleConfirmAppointment}
           style={styles.confirmButton}
+          disabled={isLoading}
         />
+        {isLoading && (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="small" color={theme.primary} />
+          </View>
+        )}
       </View>
     </ScreenScrollView>
   );
@@ -193,6 +361,25 @@ const styles = StyleSheet.create({
   },
   reviews: {
     fontSize: 14,
+  },
+  bio: {
+    fontSize: 14,
+    marginTop: Spacing.sm,
+    lineHeight: 20,
+  },
+  fee: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginTop: Spacing.xs,
+  },
+  experience: {
+    fontSize: 14,
+    marginTop: Spacing.xs,
+  },
+  errorText: {
+    fontSize: 16,
+    textAlign: "center",
+    marginTop: Spacing["3xl"],
   },
   sectionTitle: {
     fontSize: 18,
@@ -255,5 +442,9 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     marginBottom: Spacing.xl,
+  },
+  loadingContainer: {
+    alignItems: "center",
+    marginTop: Spacing.md,
   },
 });

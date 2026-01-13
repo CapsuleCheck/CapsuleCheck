@@ -6,17 +6,20 @@ import UploadPrescriptionScreen from "@/screens/UploadPrescriptionScreen";
 import PriceListScreen from "@/screens/PriceListScreen";
 import BookAppointmentScreen from "@/screens/BookAppointmentScreen";
 import ComparePricesScreen from "@/screens/ComparePricesScreen";
+import PrescribersListScreen from "@/screens/PrescribersListScreen";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { useTheme } from "@/hooks/useTheme";
 import { useUser } from "@/context/UserContext";
 import { getCommonScreenOptions } from "@/navigation/screenOptions";
+import { Prescriber } from "@/types/data";
 
 export type HomeStackParamList = {
   PatientHome: undefined;
   PrescriberHome: undefined;
   UploadPrescription: undefined;
   PriceList: undefined;
-  BookAppointment: { prescriberId: string };
+  PrescribersList: undefined;
+  BookAppointment: { prescriberId: string; prescriber: Prescriber };
   ComparePrices: { medicationId: string };
 };
 
@@ -37,36 +40,41 @@ export default function HomeStackNavigator() {
       }}
     >
       <Stack.Screen
-        name="PatientHome"
+        name='PatientHome'
         component={PatientHomeScreen}
         options={{
-          headerTitle: () => <HeaderTitle title="CapsuleCheck" />,
+          headerTitle: () => <HeaderTitle title='CapsuleCheck' />,
         }}
       />
       <Stack.Screen
-        name="PrescriberHome"
+        name='PrescriberHome'
         component={PrescriberHomeScreen}
         options={{
-          headerTitle: () => <HeaderTitle title="CapsuleCheck" />,
+          headerTitle: () => <HeaderTitle title='CapsuleCheck' />,
         }}
       />
       <Stack.Screen
-        name="UploadPrescription"
+        name='UploadPrescription'
         component={UploadPrescriptionScreen}
         options={{ headerTitle: "Upload Prescription" }}
       />
       <Stack.Screen
-        name="PriceList"
+        name='PriceList'
         component={PriceListScreen}
         options={{ headerTitle: "Price List" }}
       />
       <Stack.Screen
-        name="BookAppointment"
+        name='PrescribersList'
+        component={PrescribersListScreen}
+        options={{ headerTitle: "Select Prescriber" }}
+      />
+      <Stack.Screen
+        name='BookAppointment'
         component={BookAppointmentScreen}
         options={{ headerTitle: "Book Appointment" }}
       />
       <Stack.Screen
-        name="ComparePrices"
+        name='ComparePrices'
         component={ComparePricesScreen}
         options={{ headerTitle: "Compare Prices" }}
       />

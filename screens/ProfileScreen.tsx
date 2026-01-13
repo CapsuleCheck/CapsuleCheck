@@ -1,6 +1,5 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ThemedText } from "@/components/ThemedText";
@@ -9,6 +8,7 @@ import { PrimaryButton } from "@/components/PrimaryButton";
 import { useTheme } from "@/hooks/useTheme";
 import { useUser } from "@/context/UserContext";
 import { useAppData } from "@/context/AppDataContext";
+import { usePrescriberProfile } from "@/hooks/useAppDataHooks";
 import { ProfileStackParamList } from "@/navigation/ProfileStackNavigator";
 import { BorderRadius, Spacing } from "@/constants/theme";
 
@@ -29,6 +29,7 @@ export default function ProfileScreen() {
   const { setUserRole, userRole } = useUser();
   const { state } = useAppData();
   const userProfile = state.userProfile;
+  const prescriberProfile = usePrescriberProfile();
 
   const menuItems: MenuItem[] = [
     {
@@ -52,6 +53,21 @@ export default function ProfileScreen() {
       navigation.navigate(screen);
     }
   };
+  // Get display data based on user role
+  const displayName =
+    userRole === "prescriber"
+      ? prescriberProfile?.name || "Prescriber"
+      : userProfile?.name || "Patient";
+
+  const displayEmail =
+    userRole === "prescriber"
+      ? prescriberProfile?.email || ""
+      : userProfile?.email || "";
+
+  const displayPhone =
+    userRole === "prescriber"
+      ? prescriberProfile?.phoneNumber || ""
+      : userProfile?.phone || "";
 
   return (
     <ScreenScrollView>
@@ -59,17 +75,139 @@ export default function ProfileScreen() {
         <View
           style={[styles.avatar, { backgroundColor: theme.primary + "20" }]}
         >
-          <Feather name="user" size={40} color={theme.primary} />
+          <Feather name='user' size={40} color={theme.primary} />
         </View>
-        <ThemedText style={styles.name}>
-          {userProfile?.name ||
-            (userRole === "patient" ? "Patient" : "Prescriber")}
-        </ThemedText>
+        <ThemedText style={styles.name}>{displayName}</ThemedText>
+        {userRole === "prescriber" && prescriberProfile?.title && (
+          <ThemedText style={[styles.title, { color: theme.textSecondary }]}>
+            {prescriberProfile.title}
+          </ThemedText>
+        )}
         <View style={[styles.badge, { backgroundColor: theme.primary + "20" }]}>
           <ThemedText style={[styles.badgeText, { color: theme.primary }]}>
             {userRole === "patient" ? "Patient" : "Prescriber"}
           </ThemedText>
         </View>
+      </View>
+
+      {/* User Details Section */}
+      <View style={styles.detailsSection}>
+        {displayEmail && (
+          <View style={styles.detailRow}>
+            <Feather name='mail' size={18} color={theme.textSecondary} />
+            <ThemedText style={[styles.detailText, { color: theme.text }]}>
+              {displayEmail}
+            </ThemedText>
+          </View>
+        )}
+        {displayPhone && (
+          <View style={styles.detailRow}>
+            <Feather name='phone' size={18} color={theme.textSecondary} />
+            <ThemedText style={[styles.detailText, { color: theme.text }]}>
+              {displayPhone}
+            </ThemedText>
+          </View>
+        )}
+
+        {/* Prescriber-specific details */}
+        {userRole === "prescriber" && prescriberProfile && (
+          <>
+            {prescriberProfile.specialty &&
+              prescriberProfile.specialty.length > 0 && (
+                <View style={styles.detailRow}>
+                  <Feather
+                    name='briefcase'
+                    size={18}
+                    color={theme.textSecondary}
+                  />
+                  <View style={styles.specialtyContainer}>
+                    {prescriberProfile.specialty.map((spec, index) => (
+                      <View
+                        key={index}
+                        style={[
+                          styles.specialtyChip,
+                          { backgroundColor: theme.primary + "20" },
+                        ]}
+                      >
+                        <ThemedText
+                          style={[
+                            styles.specialtyText,
+                            { color: theme.primary },
+                          ]}
+                        >
+                          {spec}
+                        </ThemedText>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              )}
+            {prescriberProfile.yearsExperience > 0 && (
+              <View style={styles.detailRow}>
+                <Feather name='award' size={18} color={theme.textSecondary} />
+                <ThemedText style={[styles.detailText, { color: theme.text }]}>
+                  {prescriberProfile.yearsExperience} years of experience
+                </ThemedText>
+              </View>
+            )}
+            {prescriberProfile.ratings > 0 && (
+              <View style={styles.detailRow}>
+                <Feather name='star' size={18} color='#F59E0B' />
+                <ThemedText style={[styles.detailText, { color: theme.text }]}>
+                  {prescriberProfile.ratings.toFixed(1)} (
+                  {prescriberProfile.ratingsCount} reviews)
+                </ThemedText>
+              </View>
+            )}
+            {prescriberProfile.consultationFee && (
+              <View style={styles.detailRow}>
+                <Feather
+                  name='dollar-sign'
+                  size={18}
+                  color={theme.textSecondary}
+                />
+                <ThemedText style={[styles.detailText, { color: theme.text }]}>
+                  ${prescriberProfile.consultationFee} consultation fee
+                </ThemedText>
+              </View>
+            )}
+            {prescriberProfile.bio && (
+              <View style={styles.bioSection}>
+                <ThemedText
+                  style={[styles.bioLabel, { color: theme.textSecondary }]}
+                >
+                  Bio
+                </ThemedText>
+                <ThemedText style={[styles.bioText, { color: theme.text }]}>
+                  {prescriberProfile.bio}
+                </ThemedText>
+              </View>
+            )}
+          </>
+        )}
+
+        {/* Patient-specific details */}
+        {userRole === "patient" && userProfile && (
+          <>
+            {userProfile.address && (
+              <View style={styles.detailRow}>
+                <Feather name='map-pin' size={18} color={theme.textSecondary} />
+                <ThemedText style={[styles.detailText, { color: theme.text }]}>
+                  {userProfile.address.street}, {userProfile.address.city},{" "}
+                  {userProfile.address.state} {userProfile.address.zip}
+                </ThemedText>
+              </View>
+            )}
+            {userProfile.insuranceProvider && (
+              <View style={styles.detailRow}>
+                <Feather name='shield' size={18} color={theme.textSecondary} />
+                <ThemedText style={[styles.detailText, { color: theme.text }]}>
+                  {userProfile.insuranceProvider}
+                </ThemedText>
+              </View>
+            )}
+          </>
+        )}
       </View>
 
       <View style={styles.menuSection}>
@@ -89,7 +227,7 @@ export default function ProfileScreen() {
             <Feather name={item.icon} size={20} color={theme.text} />
             <ThemedText style={styles.menuText}>{item.label}</ThemedText>
             <Feather
-              name="chevron-right"
+              name='chevron-right'
               size={20}
               color={theme.textSecondary}
             />
@@ -99,9 +237,9 @@ export default function ProfileScreen() {
 
       <View style={styles.logoutSection}>
         <PrimaryButton
-          title="Log Out"
+          title='Log Out'
           onPress={handleLogout}
-          variant="outline"
+          variant='outline'
         />
       </View>
     </ScreenScrollView>
@@ -112,6 +250,7 @@ const styles = StyleSheet.create({
   profileSection: {
     alignItems: "center",
     paddingVertical: Spacing["3xl"],
+    paddingHorizontal: Spacing.xl,
   },
   avatar: {
     width: 80,
@@ -124,6 +263,10 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 24,
     fontWeight: "700",
+    marginBottom: Spacing.xs,
+  },
+  title: {
+    fontSize: 16,
     marginBottom: Spacing.sm,
   },
   badge: {
@@ -134,6 +277,51 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 14,
     fontWeight: "600",
+  },
+  detailsSection: {
+    paddingHorizontal: Spacing.xl,
+    marginBottom: Spacing.xl,
+  },
+  detailRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    paddingVertical: Spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0,0,0,0.05)",
+    gap: Spacing.md,
+  },
+  detailText: {
+    flex: 1,
+    fontSize: 16,
+  },
+  specialtyContainer: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: Spacing.xs,
+  },
+  specialtyChip: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+    borderRadius: BorderRadius.full,
+  },
+  specialtyText: {
+    fontSize: 12,
+    fontWeight: "500",
+  },
+  bioSection: {
+    paddingVertical: Spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0,0,0,0.05)",
+  },
+  bioLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: Spacing.xs,
+  },
+  bioText: {
+    fontSize: 16,
+    lineHeight: 24,
   },
   menuSection: {
     paddingHorizontal: Spacing.xl,

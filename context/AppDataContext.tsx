@@ -12,6 +12,7 @@ import {
   PaymentMethod,
   NotificationPreferences,
   RefillRequest,
+  PrescriberProfile,
 } from "@/types/data";
 import {
   SEED_MEDICATIONS,
@@ -37,6 +38,7 @@ interface AppDataState {
   notifications: Notification[];
   aiAnalyses: AIAnalysisResult[];
   userProfile: UserProfile | null;
+  prescriberProfile: PrescriberProfile | null;
   paymentMethods: PaymentMethod[];
   notificationPreferences: NotificationPreferences;
   refillRequests: RefillRequest[];
@@ -61,6 +63,8 @@ type AppDataAction =
   | { type: "DELETE_NOTIFICATION"; payload: string }
   | { type: "CREATE_AI_ANALYSIS"; payload: AIAnalysisResult }
   | { type: "UPDATE_USER_PROFILE"; payload: Partial<UserProfile> }
+  | { type: "SET_PRESCRIBER_PROFILE"; payload: PrescriberProfile }
+  | { type: "UPDATE_PRESCRIBER_PROFILE"; payload: Partial<PrescriberProfile> }
   | { type: "ADD_PAYMENT_METHOD"; payload: PaymentMethod }
   | {
       type: "UPDATE_PAYMENT_METHOD";
@@ -94,11 +98,13 @@ interface AppDataContextType {
   deleteNotification: (id: string) => void;
   createAIAnalysis: (analysis: AIAnalysisResult) => void;
   updateUserProfile: (updates: Partial<UserProfile>) => void;
+  setPrescriberProfile: (profile: PrescriberProfile) => void;
+  updatePrescriberProfile: (updates: Partial<PrescriberProfile>) => void;
   addPaymentMethod: (method: PaymentMethod) => void;
   updatePaymentMethod: (id: string, updates: Partial<PaymentMethod>) => void;
   deletePaymentMethod: (id: string) => void;
   updateNotificationPreferences: (
-    preferences: Partial<NotificationPreferences>,
+    preferences: Partial<NotificationPreferences>
   ) => void;
   createRefillRequest: (request: RefillRequest) => void;
   updateRefillRequest: (id: string, updates: Partial<RefillRequest>) => void;
@@ -119,6 +125,7 @@ const initialState: AppDataState = {
   notifications: [],
   aiAnalyses: [],
   userProfile: null,
+  prescriberProfile: null,
   paymentMethods: [],
   notificationPreferences: {
     refillReminders: true,
@@ -133,7 +140,7 @@ const initialState: AppDataState = {
 
 function appDataReducer(
   state: AppDataState,
-  action: AppDataAction,
+  action: AppDataAction
 ): AppDataState {
   switch (action.type) {
     case "CREATE_PRESCRIPTION":
@@ -146,7 +153,7 @@ function appDataReducer(
       return {
         ...state,
         prescriptions: state.prescriptions.map((p) =>
-          p.id === action.payload.id ? { ...p, ...action.payload.updates } : p,
+          p.id === action.payload.id ? { ...p, ...action.payload.updates } : p
         ),
       };
 
@@ -154,7 +161,7 @@ function appDataReducer(
       return {
         ...state,
         prescriptions: state.prescriptions.filter(
-          (p) => p.id !== action.payload,
+          (p) => p.id !== action.payload
         ),
       };
 
@@ -168,7 +175,7 @@ function appDataReducer(
       return {
         ...state,
         appointments: state.appointments.map((a) =>
-          a.id === action.payload.id ? { ...a, ...action.payload.updates } : a,
+          a.id === action.payload.id ? { ...a, ...action.payload.updates } : a
         ),
       };
 
@@ -176,7 +183,7 @@ function appDataReducer(
       return {
         ...state,
         appointments: state.appointments.map((a) =>
-          a.id === action.payload ? { ...a, status: "cancelled" as const } : a,
+          a.id === action.payload ? { ...a, status: "cancelled" as const } : a
         ),
       };
 
@@ -190,7 +197,7 @@ function appDataReducer(
       return {
         ...state,
         notifications: state.notifications.map((n) =>
-          n.id === action.payload ? { ...n, read: true } : n,
+          n.id === action.payload ? { ...n, read: true } : n
         ),
       };
 
@@ -204,7 +211,7 @@ function appDataReducer(
       return {
         ...state,
         notifications: state.notifications.filter(
-          (n) => n.id !== action.payload,
+          (n) => n.id !== action.payload
         ),
       };
 
@@ -222,6 +229,20 @@ function appDataReducer(
           : null,
       };
 
+    case "SET_PRESCRIBER_PROFILE":
+      return {
+        ...state,
+        prescriberProfile: action.payload,
+      };
+
+    case "UPDATE_PRESCRIBER_PROFILE":
+      return {
+        ...state,
+        prescriberProfile: state.prescriberProfile
+          ? { ...state.prescriberProfile, ...action.payload }
+          : null,
+      };
+
     case "ADD_PAYMENT_METHOD":
       return {
         ...state,
@@ -234,7 +255,7 @@ function appDataReducer(
         paymentMethods: state.paymentMethods.map((pm) =>
           pm.id === action.payload.id
             ? { ...pm, ...action.payload.updates }
-            : pm,
+            : pm
         ),
       };
 
@@ -242,7 +263,7 @@ function appDataReducer(
       return {
         ...state,
         paymentMethods: state.paymentMethods.filter(
-          (pm) => pm.id !== action.payload,
+          (pm) => pm.id !== action.payload
         ),
       };
 
@@ -267,7 +288,7 @@ function appDataReducer(
         refillRequests: state.refillRequests.map((rr) =>
           rr.id === action.payload.id
             ? { ...rr, ...action.payload.updates }
-            : rr,
+            : rr
         ),
       };
 
@@ -328,6 +349,10 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       dispatch({ type: "CREATE_AI_ANALYSIS", payload: analysis }),
     updateUserProfile: (updates) =>
       dispatch({ type: "UPDATE_USER_PROFILE", payload: updates }),
+    setPrescriberProfile: (profile) =>
+      dispatch({ type: "SET_PRESCRIBER_PROFILE", payload: profile }),
+    updatePrescriberProfile: (updates) =>
+      dispatch({ type: "UPDATE_PRESCRIBER_PROFILE", payload: updates }),
     addPaymentMethod: (method) =>
       dispatch({ type: "ADD_PAYMENT_METHOD", payload: method }),
     updatePaymentMethod: (id, updates) =>
@@ -346,7 +371,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     addReview: (review) => dispatch({ type: "ADD_REVIEW", payload: review }),
     createPrescriptionAnalysis: async (prescriptionId: string) => {
       const prescription = state.prescriptions.find(
-        (p) => p.id === prescriptionId,
+        (p) => p.id === prescriptionId
       );
       if (!prescription) {
         throw new Error("Prescription not found");
@@ -359,7 +384,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       const analysis = await generateMockAnalysis(
         prescription,
         state.medications,
-        state.medicationPrices,
+        state.medicationPrices
       );
 
       dispatch({ type: "CREATE_AI_ANALYSIS", payload: analysis });

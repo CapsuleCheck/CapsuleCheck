@@ -26,12 +26,12 @@ export function usePrescriptions() {
       all: state.prescriptions,
       active: state.prescriptions.filter((p) => p.status === "active"),
       needingRefill: state.prescriptions.filter(
-        (p) => p.status === "pending_refill",
+        (p) => p.status === "pending_refill"
       ),
       expired: state.prescriptions.filter((p) => p.status === "expired"),
       getById: (id: string) => state.prescriptions.find((p) => p.id === id),
     }),
-    [state.prescriptions],
+    [state.prescriptions]
   );
 }
 
@@ -46,10 +46,10 @@ export function useMedications() {
         state.medications.filter(
           (m) =>
             m.name.toLowerCase().includes(query.toLowerCase()) ||
-            m.genericName?.toLowerCase().includes(query.toLowerCase()),
+            m.genericName?.toLowerCase().includes(query.toLowerCase())
         ),
     }),
-    [state.medications],
+    [state.medications]
   );
 }
 
@@ -67,14 +67,14 @@ export function useMedicationPrices() {
             mp.medication.name.toLowerCase().includes(query.toLowerCase()) ||
             mp.medication.genericName
               ?.toLowerCase()
-              .includes(query.toLowerCase()),
+              .includes(query.toLowerCase())
         ),
       sortedByPrice: () =>
         [...state.medicationPrices].sort(
-          (a, b) => a.lowestPrice - b.lowestPrice,
+          (a, b) => a.lowestPrice - b.lowestPrice
         ),
     }),
-    [state.medicationPrices],
+    [state.medicationPrices]
   );
 }
 
@@ -85,19 +85,19 @@ export function usePrescribers() {
     () => ({
       all: state.prescribers,
       available: state.prescribers.filter((p) => p.acceptingNewPatients),
-      getById: (id: string) => state.prescribers.find((p) => p.id === id),
+      getById: (id: string) => state.prescribers.find((p) => p._id === id),
       search: (query: string) =>
         state.prescribers.filter(
           (p) =>
             p.name.toLowerCase().includes(query.toLowerCase()) ||
             p.specialty.some((s) =>
-              s.toLowerCase().includes(query.toLowerCase()),
-            ),
+              s.toLowerCase().includes(query.toLowerCase())
+            )
         ),
       sortedByRating: () =>
-        [...state.prescribers].sort((a, b) => b.rating - a.rating),
+        [...state.prescribers].sort((a, b) => b.ratings - a.ratings),
     }),
-    [state.prescribers],
+    [state.prescribers]
   );
 }
 
@@ -111,7 +111,7 @@ export function useReviews() {
         state.reviews.filter((r) => r.prescriberId === prescriberId),
       verified: state.reviews.filter((r) => r.verified),
     }),
-    [state.reviews],
+    [state.reviews]
   );
 }
 
@@ -123,17 +123,17 @@ export function useAppointments() {
     () => ({
       all: state.appointments,
       upcoming: state.appointments.filter(
-        (a) => a.status === "scheduled" && new Date(a.date) >= new Date(),
+        (a) => a.status === "scheduled" && new Date(a.date) >= new Date()
       ),
       past: state.appointments.filter(
-        (a) => a.status === "completed" || new Date(a.date) < new Date(),
+        (a) => a.status === "completed" || new Date(a.date) < new Date()
       ),
       getById: (id: string) => state.appointments.find((a) => a.id === id),
       today: state.appointments.filter(
-        (a) => a.status === "scheduled" && isToday(new Date(a.date)),
+        (a) => a.status === "scheduled" && isToday(new Date(a.date))
       ),
     }),
-    [state.appointments, userRole],
+    [state.appointments, userRole]
   );
 }
 
@@ -148,7 +148,7 @@ export function useNotifications() {
       unreadCount: state.notifications.filter((n) => !n.read).length,
       getById: (id: string) => state.notifications.find((n) => n.id === id),
     }),
-    [state.notifications],
+    [state.notifications]
   );
 }
 
@@ -162,13 +162,18 @@ export function useAIAnalyses() {
       getByPrescriptionId: (prescriptionId: string) =>
         state.aiAnalyses.find((a) => a.prescriptionId === prescriptionId),
     }),
-    [state.aiAnalyses],
+    [state.aiAnalyses]
   );
 }
 
 export function useUserProfile() {
   const { state } = useAppData();
   return state.userProfile;
+}
+
+export function usePrescriberProfile() {
+  const { state } = useAppData();
+  return state.prescriberProfile;
 }
 
 export function usePaymentMethods() {
@@ -180,7 +185,7 @@ export function usePaymentMethods() {
       default: state.paymentMethods.find((pm) => pm.isDefault),
       getById: (id: string) => state.paymentMethods.find((pm) => pm.id === id),
     }),
-    [state.paymentMethods],
+    [state.paymentMethods]
   );
 }
 
@@ -198,9 +203,9 @@ export function useRefillRequests() {
       pending: state.refillRequests.filter((rr) => rr.status === "pending"),
       getByPrescriptionId: (prescriptionId: string) =>
         state.refillRequests.filter(
-          (rr) => rr.prescriptionId === prescriptionId,
+          (rr) => rr.prescriptionId === prescriptionId
         ),
     }),
-    [state.refillRequests],
+    [state.refillRequests]
   );
 }

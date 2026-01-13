@@ -1,26 +1,147 @@
-import React from "react";
-import { View, StyleSheet, Pressable } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet, Pressable, ActivityIndicator } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import axios from "axios";
 import { ScreenScrollView } from "@/components/ScreenScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useScreenInsets } from "@/hooks/useScreenInsets";
-import { useAppointments } from "@/hooks/useAppDataHooks";
 import { BorderRadius, Spacing, Typography } from "@/constants/theme";
 import { BookingsStackParamList } from "@/navigation/BookingsStackNavigator";
+import { API_BASE_URL } from "@/constants/api";
+import { usePrescriberProfile } from "@/hooks/useAppDataHooks";
 
 type NavigationProp = NativeStackNavigationProp<BookingsStackParamList>;
+
+type FilterType =
+  | "all"
+  | "today"
+  | "thisWeek"
+  | "pending"
+  | "scheduled"
+  | "completed"
+  | "cancelled";
+
+interface Booking {
+  _id?: string;
+  id?: string;
+  prescriberId: string;
+  patientId: string | { firstName?: string; lastName?: string; _id?: string };
+  patientName?: string;
+  date: string;
+  time: string;
+  type?: string;
+  status?: string;
+  meetingLink?: string;
+  address?: string;
+  reason?: string;
+  notes?: string;
+}
 
 export default function PrescriberBookingsScreen() {
   const { theme } = useTheme();
   const screenInsets = useScreenInsets();
   const navigation = useNavigation<NavigationProp>();
-  const appointments = useAppointments();
+  const prescriberProfile = usePrescriberProfile();
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedFilter, setSelectedFilter] = useState<FilterType>("all");
 
-  // For now, show all appointments. In a real app, you'd filter by logged-in prescriber ID
-  const bookings = appointments.all.filter((a) => a.status === "scheduled");
+  useEffect(() => {
+    fetchBookings();
+  }, [prescriberProfile?._id]);
+
+  const fetchBookings = async () => {
+    if (!prescriberProfile?._id) {
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await axios.get(`${API_BASE_URL}/bookings`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        params: {
+          prescriberId: prescriberProfile._id,
+        },
+      });
+
+      // Handle different response formats
+      const bookingsData = Array.isArray(response.data)
+        ? response.data
+        : response.data?.data || response.data?.bookings || [];
+
+      // Extract patient names if needed
+      const processedBookings = bookingsData.map((booking: Booking) => {
+        if (
+          typeof booking.patientId === "object" &&
+          booking.patientId !== null &&
+          !booking.patientName
+        ) {
+          const patient = booking.patientId as {
+            firstName?: string;
+            lastName?: string;
+          };
+          booking.patientName =
+            `${patient.firstName || ""} ${patient.lastName || ""}`.trim() ||
+            "Patient";
+        }
+        return booking;
+      });
+
+      setBookings(processedBookings);
+    } catch (err) {
+      console.error("Error fetching bookings:", err);
+      setBookings([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const filterBookings = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const endOfWeek = new Date(today);
+    endOfWeek.setDate(today.getDate() + 7);
+
+    switch (selectedFilter) {
+      case "today":
+        return bookings.filter((booking) => {
+          const bookingDate = new Date(booking.date);
+          bookingDate.setHours(0, 0, 0, 0);
+          return bookingDate.getTime() === today.getTime();
+        });
+      case "thisWeek":
+        return bookings.filter((booking) => {
+          const bookingDate = new Date(booking.date);
+          return bookingDate >= today && bookingDate <= endOfWeek;
+        });
+      case "pending":
+        return bookings.filter(
+          (booking) =>
+            booking.status === "pending" || booking.status === "scheduled"
+        );
+      case "scheduled":
+        return bookings.filter((booking) => booking.status === "scheduled");
+      case "completed":
+        return bookings.filter((booking) => booking.status === "completed");
+      case "cancelled":
+        return bookings.filter((booking) => booking.status === "cancelled");
+      default:
+        return bookings;
+    }
+  };
+
+  const filteredBookings = filterBookings().sort((a, b) => {
+    // Sort by date and time
+    const dateA = new Date(`${a.date} ${a.time}`);
+    const dateB = new Date(`${b.date} ${b.time}`);
+    return dateA.getTime() - dateB.getTime();
+  });
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -53,8 +174,11 @@ export default function PrescriberBookingsScreen() {
     }
   };
 
-  const handleBookingPress = (bookingId: string) => {
-    navigation.navigate("BookingDetails", { bookingId });
+  const handleBookingPress = (booking: Booking) => {
+    const bookingId = booking._id || booking.id || "";
+    if (bookingId) {
+      navigation.navigate("BookingDetails", { bookingId });
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -85,154 +209,268 @@ export default function PrescriberBookingsScreen() {
 
       <View style={styles.filterRow}>
         <Pressable
-          style={[styles.filterChip, { backgroundColor: theme.primary }]}
+          onPress={() => setSelectedFilter("all")}
+          style={[
+            styles.filterChip,
+            {
+              backgroundColor:
+                selectedFilter === "all"
+                  ? theme.primary
+                  : theme.backgroundSecondary,
+            },
+          ]}
         >
           <ThemedText
-            style={[styles.filterChipText, { color: theme.buttonText }]}
+            style={[
+              styles.filterChipText,
+              {
+                color:
+                  selectedFilter === "all"
+                    ? theme.buttonText || "#FFFFFF"
+                    : theme.text,
+              },
+            ]}
           >
-            All
+            All ({bookings.length})
           </ThemedText>
         </Pressable>
         <Pressable
+          onPress={() => setSelectedFilter("today")}
           style={[
             styles.filterChip,
-            { backgroundColor: theme.backgroundSecondary },
+            {
+              backgroundColor:
+                selectedFilter === "today"
+                  ? theme.primary
+                  : theme.backgroundSecondary,
+            },
           ]}
         >
-          <ThemedText style={styles.filterChipText}>Today</ThemedText>
+          <ThemedText
+            style={[
+              styles.filterChipText,
+              {
+                color:
+                  selectedFilter === "today"
+                    ? theme.buttonText || "#FFFFFF"
+                    : theme.text,
+              },
+            ]}
+          >
+            Today
+          </ThemedText>
         </Pressable>
         <Pressable
+          onPress={() => setSelectedFilter("thisWeek")}
           style={[
             styles.filterChip,
-            { backgroundColor: theme.backgroundSecondary },
+            {
+              backgroundColor:
+                selectedFilter === "thisWeek"
+                  ? theme.primary
+                  : theme.backgroundSecondary,
+            },
           ]}
         >
-          <ThemedText style={styles.filterChipText}>This Week</ThemedText>
+          <ThemedText
+            style={[
+              styles.filterChipText,
+              {
+                color:
+                  selectedFilter === "thisWeek"
+                    ? theme.buttonText || "#FFFFFF"
+                    : theme.text,
+              },
+            ]}
+          >
+            This Week
+          </ThemedText>
         </Pressable>
         <Pressable
+          onPress={() => setSelectedFilter("pending")}
           style={[
             styles.filterChip,
-            { backgroundColor: theme.backgroundSecondary },
+            {
+              backgroundColor:
+                selectedFilter === "pending"
+                  ? theme.primary
+                  : theme.backgroundSecondary,
+            },
           ]}
         >
-          <ThemedText style={styles.filterChipText}>Pending</ThemedText>
+          <ThemedText
+            style={[
+              styles.filterChipText,
+              {
+                color:
+                  selectedFilter === "pending"
+                    ? theme.buttonText || "#FFFFFF"
+                    : theme.text,
+              },
+            ]}
+          >
+            Pending
+          </ThemedText>
         </Pressable>
       </View>
 
       <View style={styles.bookingsList}>
-        {bookings.length === 0 ? (
+        {isLoading ? (
           <View style={styles.emptyState}>
+            <ActivityIndicator size='large' color={theme.primary} />
             <ThemedText
               style={[styles.emptyText, { color: theme.textSecondary }]}
             >
-              No bookings found
+              Loading bookings...
+            </ThemedText>
+          </View>
+        ) : filteredBookings.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Feather name='inbox' size={48} color={theme.textSecondary} />
+            <ThemedText
+              style={[styles.emptyText, { color: theme.textSecondary }]}
+            >
+              {selectedFilter === "all"
+                ? "No bookings found"
+                : `No ${selectedFilter.replace(/([A-Z])/g, " $1").toLowerCase()} bookings`}
             </ThemedText>
           </View>
         ) : (
-          bookings.map((booking) => (
-            <Pressable
-              key={booking.id}
-              style={[
-                styles.bookingCard,
-                { backgroundColor: theme.card, borderColor: theme.border },
-              ]}
-              onPress={() => handleBookingPress(booking.id)}
-            >
-              <View style={styles.bookingHeader}>
-                <View style={styles.bookingInfo}>
-                  <ThemedText style={styles.patientName}>
-                    {booking.patientName}
-                  </ThemedText>
-                  <ThemedText
-                    style={[styles.bookingDate, { color: theme.textSecondary }]}
-                  >
-                    {formatDate(booking.date)}
-                  </ThemedText>
-                </View>
-                <View
-                  style={[
-                    styles.statusBadge,
-                    { backgroundColor: getStatusColor(booking.status) + "20" },
-                  ]}
-                >
-                  <ThemedText
+          filteredBookings.map((booking) => {
+            const bookingId = booking._id || booking.id || "";
+            return (
+              <Pressable
+                key={bookingId}
+                style={({ pressed }) => [
+                  styles.bookingCard,
+                  {
+                    backgroundColor: theme.card,
+                    borderColor: theme.border,
+                    opacity: pressed ? 0.7 : 1,
+                  },
+                ]}
+                onPress={() => handleBookingPress(booking)}
+              >
+                <View style={styles.bookingHeader}>
+                  <View style={styles.bookingInfo}>
+                    <ThemedText style={styles.patientName}>
+                      {booking.patientName || "Patient"}
+                    </ThemedText>
+                    <ThemedText
+                      style={[
+                        styles.bookingDate,
+                        { color: theme.textSecondary },
+                      ]}
+                    >
+                      {formatDate(booking.date)}
+                    </ThemedText>
+                  </View>
+                  <View
                     style={[
-                      styles.statusText,
-                      { color: getStatusColor(booking.status) },
+                      styles.statusBadge,
+                      {
+                        backgroundColor:
+                          getStatusColor(booking.status || "") + "20",
+                      },
                     ]}
                   >
-                    {booking.status.charAt(0).toUpperCase() +
-                      booking.status.slice(1)}
-                  </ThemedText>
+                    <View
+                      style={[
+                        styles.statusDot,
+                        {
+                          backgroundColor: getStatusColor(booking.status || ""),
+                        },
+                      ]}
+                    />
+                    <ThemedText
+                      style={[
+                        styles.statusText,
+                        { color: getStatusColor(booking.status || "") },
+                      ]}
+                    >
+                      {(booking.status || "").charAt(0).toUpperCase() +
+                        (booking.status || "").slice(1)}
+                    </ThemedText>
+                  </View>
                 </View>
-              </View>
 
-              <View style={styles.bookingDetails}>
-                <View style={styles.detailRow}>
-                  <Feather name='clock' size={16} color={theme.textSecondary} />
-                  <ThemedText
-                    style={[styles.detailText, { color: theme.textSecondary }]}
-                  >
-                    {booking.time}
-                  </ThemedText>
+                <View style={styles.bookingDetails}>
+                  <View style={styles.detailRow}>
+                    <Feather
+                      name='clock'
+                      size={16}
+                      color={theme.textSecondary}
+                    />
+                    <ThemedText
+                      style={[
+                        styles.detailText,
+                        { color: theme.textSecondary },
+                      ]}
+                    >
+                      {booking.time}
+                    </ThemedText>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Feather
+                      name={
+                        booking.type === "video_call"
+                          ? "video"
+                          : booking.type === "in_person"
+                            ? "user"
+                            : "phone"
+                      }
+                      size={16}
+                      color={theme.textSecondary}
+                    />
+                    <ThemedText
+                      style={[
+                        styles.detailText,
+                        { color: theme.textSecondary },
+                      ]}
+                    >
+                      {getTypeText(booking.type || "")}
+                    </ThemedText>
+                  </View>
                 </View>
-                <View style={styles.detailRow}>
-                  <Feather
-                    name={
-                      booking.type === "video_call"
-                        ? "video"
-                        : booking.type === "in_person"
-                          ? "user"
-                          : "phone"
-                    }
-                    size={16}
-                    color={theme.textSecondary}
-                  />
-                  <ThemedText
-                    style={[styles.detailText, { color: theme.textSecondary }]}
-                  >
-                    {getTypeText(booking.type)}
-                  </ThemedText>
-                </View>
-              </View>
 
-              <View style={styles.actionButtons}>
-                <Pressable
-                  style={[
-                    styles.actionButton,
-                    { backgroundColor: theme.backgroundSecondary },
-                  ]}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    // TODO: Handle reschedule
-                  }}
-                >
-                  <ThemedText style={styles.actionButtonText}>
-                    Reschedule
-                  </ThemedText>
-                </Pressable>
-                <Pressable
-                  style={[
-                    styles.actionButton,
-                    { backgroundColor: theme.primary },
-                  ]}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    handleBookingPress(booking.id);
-                  }}
-                >
-                  <ThemedText
+                <View style={styles.actionButtons}>
+                  <Pressable
                     style={[
-                      styles.actionButtonText,
-                      { color: theme.buttonText },
+                      styles.actionButton,
+                      { backgroundColor: theme.backgroundSecondary },
                     ]}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      // TODO: Handle reschedule
+                    }}
                   >
-                    View Details
-                  </ThemedText>
-                </Pressable>
-              </View>
-            </Pressable>
-          ))
+                    <ThemedText style={styles.actionButtonText}>
+                      Reschedule
+                    </ThemedText>
+                  </Pressable>
+                  <Pressable
+                    style={[
+                      styles.actionButton,
+                      { backgroundColor: theme.primary },
+                    ]}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      handleBookingPress(booking);
+                    }}
+                  >
+                    <ThemedText
+                      style={[
+                        styles.actionButtonText,
+                        { color: theme.buttonText || "#FFFFFF" },
+                      ]}
+                    >
+                      View Details
+                    </ThemedText>
+                  </Pressable>
+                </View>
+              </Pressable>
+            );
+          })
         )}
       </View>
     </ScreenScrollView>
@@ -294,9 +532,17 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.sm,
   },
   statusBadge: {
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.xs,
     borderRadius: BorderRadius.full,
+    gap: Spacing.xs,
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
   statusText: {
     fontSize: Typography.sizes.xs,

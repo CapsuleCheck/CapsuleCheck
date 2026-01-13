@@ -93,9 +93,7 @@ export default function PatientHomeScreen() {
         </View>
         <PrimaryButton
           title='Book Appointment'
-          onPress={() =>
-            navigation.navigate("BookAppointment", { prescriberId: "1" })
-          }
+          onPress={() => navigation.navigate("PrescribersList")}
           variant='secondary'
           style={styles.cardButton}
         />

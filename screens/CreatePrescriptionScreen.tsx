@@ -24,6 +24,7 @@ import { BookingsStackParamList } from "@/navigation/BookingsStackNavigator";
 import { Medication, PrescriptionStatus } from "@/types/data";
 import axios from "axios";
 import { API_BASE_URL } from "@/constants/api";
+import Toast from "react-native-toast-message";
 
 type CreatePrescriptionRouteProp = RouteProp<
   BookingsStackParamList,
@@ -204,6 +205,15 @@ export default function CreatePrescriptionScreen() {
             headers: {
               "Content-Type": "application/json",
             },
+          });
+
+          // Show success message
+          Toast.show({
+            type: "success",
+            text1: "Prescription Created!",
+            text2: "Your patient will be notified of this prescription.",
+            position: "top",
+            visibilityTime: 3000,
           });
         } catch (apiError) {
           console.error(

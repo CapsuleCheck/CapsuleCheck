@@ -16,9 +16,11 @@ import { ThemedText } from "@/components/ThemedText";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { useTheme } from "@/hooks/useTheme";
 import { useUser } from "@/context/UserContext";
+import { useAppData } from "@/context/AppDataContext";
 import { BorderRadius, Spacing, Typography } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootNavigator";
 import { API_BASE_URL } from "@/constants/api";
+import { PrescriberProfile } from "@/types/data";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -28,6 +30,7 @@ export default function LoginScreen() {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
+  const { setPrescriberProfile } = useAppData();
   const { completeOnboarding } = useUser();
 
   const [selectedRole, setSelectedRole] = useState<LoginRole>("patient");
@@ -129,6 +132,29 @@ export default function LoginScreen() {
         text2: "Welcome back!",
         position: "top",
       });
+
+      // Save prescriber profile if logging in as prescriber
+      if (selectedRole === "prescriber" && response.data.data) {
+        const prescriberData = response.data.data;
+        const prescriberProfile: PrescriberProfile = {
+          _id: prescriberData._id || prescriberData.id || "",
+          name: prescriberData.name || "",
+          email: prescriberData.email || "",
+          phoneNumber: prescriberData.phoneNumber || prescriberData.phone || "",
+          createdAt: prescriberData.createdAt || new Date().toISOString(),
+          title: prescriberData.title || "",
+          ratings: prescriberData.ratings || prescriberData.rating || 0,
+          ratingsCount: prescriberData.ratingsCount || prescriberData.reviewCount || 0,
+          verificationStatus: prescriberData.verificationStatus || false,
+          availability: prescriberData.availability || [],
+          bio: prescriberData.bio || "",
+          yearsExperience: prescriberData.yearsExperience || 0,
+          specialty: prescriberData.specialty || [],
+          licenseFile: prescriberData.licenseFile || "",
+          consultationFee: prescriberData.consultationFee || 0,
+        };
+        setPrescriberProfile(prescriberProfile);
+      }
 
       // Complete onboarding and navigate to main app
       completeOnboarding({ ...response.data.data, selectedRole });
