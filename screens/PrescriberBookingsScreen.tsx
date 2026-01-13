@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Pressable, ActivityIndicator } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Pressable,
+  ActivityIndicator,
+  ScrollView,
+} from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -207,7 +213,11 @@ export default function PrescriberBookingsScreen() {
         </ThemedText>
       </View>
 
-      <View style={styles.filterRow}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.filterRow}
+      >
         <Pressable
           onPress={() => setSelectedFilter("all")}
           style={[
@@ -312,7 +322,59 @@ export default function PrescriberBookingsScreen() {
             Pending
           </ThemedText>
         </Pressable>
-      </View>
+        <Pressable
+          onPress={() => setSelectedFilter("completed")}
+          style={[
+            styles.filterChip,
+            {
+              backgroundColor:
+                selectedFilter === "completed"
+                  ? theme.primary
+                  : theme.backgroundSecondary,
+            },
+          ]}
+        >
+          <ThemedText
+            style={[
+              styles.filterChipText,
+              {
+                color:
+                  selectedFilter === "completed"
+                    ? theme.buttonText || "#FFFFFF"
+                    : theme.text,
+              },
+            ]}
+          >
+            Completed
+          </ThemedText>
+        </Pressable>
+        <Pressable
+          onPress={() => setSelectedFilter("cancelled")}
+          style={[
+            styles.filterChip,
+            {
+              backgroundColor:
+                selectedFilter === "cancelled"
+                  ? theme.primary
+                  : theme.backgroundSecondary,
+            },
+          ]}
+        >
+          <ThemedText
+            style={[
+              styles.filterChipText,
+              {
+                color:
+                  selectedFilter === "cancelled"
+                    ? theme.buttonText || "#FFFFFF"
+                    : theme.text,
+              },
+            ]}
+          >
+            Cancelled
+          </ThemedText>
+        </Pressable>
+      </ScrollView>
 
       <View style={styles.bookingsList}>
         {isLoading ? (
@@ -495,6 +557,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xl,
     gap: Spacing.sm,
     marginBottom: Spacing.xl,
+    paddingRight: Spacing.xl,
   },
   filterChip: {
     paddingHorizontal: Spacing.md,
