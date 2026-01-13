@@ -29,7 +29,6 @@ export default function OnboardingScreen() {
     const userData = localStorage.getItem("userData")
       ? JSON.parse(localStorage.getItem("userData"))
       : null;
-    console.log({ userData });
     if (userData && userData?.token)
       return navigation.navigate("PatientHomeScreen");
   };

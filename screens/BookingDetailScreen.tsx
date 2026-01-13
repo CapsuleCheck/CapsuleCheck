@@ -69,11 +69,8 @@ export default function BookingDetailScreen() {
         },
       });
 
-      console.log("sds", response.data.bookings);
-
       // Handle different response formats
       let bookingData: BookingDetail | null = response.data.bookings[0];
-      console.log({ bookingData });
 
       if (bookingData) {
         // Extract patient name if patientId is an object

@@ -47,10 +47,8 @@ export default function PrescribersListScreen() {
           },
         }
       );
-      console.log("sds", response.data);
       // Handle both array response and object with data property
       const prescribersData = response.data?.data ?? [];
-      console.log({ prescribersData });
       setPrescribers([...prescribersData]);
     } catch (err) {
       console.error("Error fetching prescribers:", err);

@@ -87,18 +87,13 @@ export default function PrescriberHomeScreen() {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    console.log({ today });
-
     return bookings
       .filter((booking) => {
         const bookingDate = new Date(booking.date);
-        console.log({ bookingDate });
         const bookingDateTime = new Date(bookingDate);
-        console.log({ bookingDateTime });
 
         // Parse time (assuming format like "10:00 AM" or "02:00 PM")
         const timeMatch = booking.time.match(/(\d+):(\d+)\s*(AM|PM)/i);
-        console.log({ timeMatch });
         if (timeMatch) {
           let hours = parseInt(timeMatch[1], 10);
           const minutes = parseInt(timeMatch[2], 10);
@@ -109,7 +104,6 @@ export default function PrescriberHomeScreen() {
 
           bookingDateTime.setHours(hours, minutes, 0, 0);
         }
-        console.log({ now });
         // Check if booking is in the future
         return bookingDateTime >= now && booking.status !== "cancelled";
       })
@@ -123,8 +117,6 @@ export default function PrescriberHomeScreen() {
   };
 
   const upcomingBookings = getUpcomingBookings();
-
-  console.log({ upcomingBookings });
 
   // Get today's bookings count
   const getTodaysBookingsCount = () => {
@@ -173,7 +165,7 @@ export default function PrescriberHomeScreen() {
           />
           <ThemedText style={styles.greeting}>
             {prescriberProfile
-              ? `Good Morning, ${prescriberProfile.title} ${prescriberProfile.name.split(" ")[0]}`
+              ? `Good Morning, Prescriber ${prescriberProfile.name.split(" ")[0]}`
               : "Good Morning"}
           </ThemedText>
         </View>

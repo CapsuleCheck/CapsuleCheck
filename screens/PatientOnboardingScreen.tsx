@@ -429,7 +429,6 @@ export default function PatientOnboardingScreen() {
             <>
               <Pressable
                 onPress={() => {
-                  console.log("show date picker");
                   setShowDatePicker(true);
                   setShowGenderPicker(false);
                   setShowAllergyPicker(false);
