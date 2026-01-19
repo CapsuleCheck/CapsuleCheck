@@ -80,11 +80,11 @@ export default function PriceListScreen() {
             },
           ]}
         >
-          <Feather name="search" size={20} color={theme.textSecondary} />
+          <Feather name='search' size={20} color={theme.textSecondary} />
           <TextInput
             value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholder="Search medication..."
+            placeholder='Search medication...'
             placeholderTextColor={theme.textSecondary}
             style={[styles.searchInput, { color: theme.text }]}
           />
@@ -109,7 +109,7 @@ export default function PriceListScreen() {
             ]}
           >
             <Feather
-              name="filter"
+              name='filter'
               size={16}
               color={selectedFilter === "price" ? theme.primary : theme.text}
             />
@@ -136,7 +136,7 @@ export default function PriceListScreen() {
               },
             ]}
           >
-            <Feather name="arrow-down" size={16} color={theme.text} />
+            <Feather name='arrow-down' size={16} color={theme.text} />
             <ThemedText style={styles.filterText}>
               Price: Low to High
             </ThemedText>

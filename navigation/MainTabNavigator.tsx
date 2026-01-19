@@ -32,7 +32,7 @@ export default function MainTabNavigator() {
 
   return (
     <Tab.Navigator
-      initialRouteName="HomeTab"
+      initialRouteName='HomeTab'
       screenOptions={{
         tabBarActiveTintColor: theme.tabIconSelected,
         tabBarInactiveTintColor: theme.tabIconDefault,
@@ -59,42 +59,42 @@ export default function MainTabNavigator() {
       {isPrescriber ? (
         <>
           <Tab.Screen
-            name="HomeTab"
+            name='HomeTab'
             component={HomeStackNavigator}
             options={{
               title: "Dashboard",
               tabBarIcon: ({ color, size }) => (
-                <Feather name="grid" size={size} color={color} />
+                <Feather name='grid' size={size} color={color} />
               ),
             }}
           />
           <Tab.Screen
-            name="BookingsTab"
+            name='BookingsTab'
             component={BookingsStackNavigator}
             options={{
               title: "Bookings",
               tabBarIcon: ({ color, size }) => (
-                <Feather name="calendar" size={size} color={color} />
+                <Feather name='calendar' size={size} color={color} />
               ),
             }}
           />
           <Tab.Screen
-            name="PricingTab"
+            name='PricingTab'
             component={PricingStackNavigator}
             options={{
-              title: "Pricing",
+              title: "Database",
               tabBarIcon: ({ color, size }) => (
-                <Feather name="dollar-sign" size={size} color={color} />
+                <Feather name='dollar-sign' size={size} color={color} />
               ),
             }}
           />
           <Tab.Screen
-            name="ProfileTab"
+            name='ProfileTab'
             component={ProfileStackNavigator}
             options={{
               title: "Profile",
               tabBarIcon: ({ color, size }) => (
-                <Feather name="user" size={size} color={color} />
+                <Feather name='user' size={size} color={color} />
               ),
             }}
           />
@@ -102,17 +102,17 @@ export default function MainTabNavigator() {
       ) : (
         <>
           <Tab.Screen
-            name="HomeTab"
+            name='HomeTab'
             component={HomeStackNavigator}
             options={{
               title: "Home",
               tabBarIcon: ({ color, size }) => (
-                <Feather name="home" size={size} color={color} />
+                <Feather name='home' size={size} color={color} />
               ),
             }}
           />
           <Tab.Screen
-            name="MyRxTab"
+            name='MyRxTab'
             component={MyRxStackNavigator}
             options={{
               title: "My Rx",
@@ -122,22 +122,22 @@ export default function MainTabNavigator() {
             }}
           />
           <Tab.Screen
-            name="PharmaciesTab"
+            name='PharmaciesTab'
             component={PharmaciesStackNavigator}
             options={{
               title: "Prescribers",
               tabBarIcon: ({ color, size }) => (
-                <Feather name="map-pin" size={size} color={color} />
+                <Feather name='map-pin' size={size} color={color} />
               ),
             }}
           />
           <Tab.Screen
-            name="ProfileTab"
+            name='ProfileTab'
             component={ProfileStackNavigator}
             options={{
               title: "Profile",
               tabBarIcon: ({ color, size }) => (
-                <Feather name="user" size={size} color={color} />
+                <Feather name='user' size={size} color={color} />
               ),
             }}
           />

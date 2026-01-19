@@ -229,56 +229,56 @@ export default function PrescriberRegistrationScreen() {
       return;
     }
 
-    if (!title.trim()) {
-      Toast.show({
-        type: "error",
-        text1: "Title Required",
-        text2: "Please enter your professional title",
-        position: "top",
-      });
-      return;
-    }
+    // if (!title.trim()) {
+    //   Toast.show({
+    //     type: "error",
+    //     text1: "Title Required",
+    //     text2: "Please enter your professional title",
+    //     position: "top",
+    //   });
+    //   return;
+    // }
 
-    if (!bio.trim()) {
-      Toast.show({
-        type: "error",
-        text1: "Bio Required",
-        text2: "Please enter your professional bio",
-        position: "top",
-      });
-      return;
-    }
+    // if (!bio.trim()) {
+    //   Toast.show({
+    //     type: "error",
+    //     text1: "Bio Required",
+    //     text2: "Please enter your professional bio",
+    //     position: "top",
+    //   });
+    //   return;
+    // }
 
-    if (!yearsExperience.trim()) {
-      Toast.show({
-        type: "error",
-        text1: "Years of Experience Required",
-        text2: "Please enter your years of experience",
-        position: "top",
-      });
-      return;
-    }
+    // if (!yearsExperience.trim()) {
+    //   Toast.show({
+    //     type: "error",
+    //     text1: "Years of Experience Required",
+    //     text2: "Please enter your years of experience",
+    //     position: "top",
+    //   });
+    //   return;
+    // }
 
-    const yearsExpNum = parseInt(yearsExperience.trim(), 10);
-    if (isNaN(yearsExpNum) || yearsExpNum < 0) {
-      Toast.show({
-        type: "error",
-        text1: "Invalid Years of Experience",
-        text2: "Please enter a valid number",
-        position: "top",
-      });
-      return;
-    }
+    // const yearsExpNum = parseInt(yearsExperience.trim(), 10);
+    // if (isNaN(yearsExpNum) || yearsExpNum < 0) {
+    //   Toast.show({
+    //     type: "error",
+    //     text1: "Invalid Years of Experience",
+    //     text2: "Please enter a valid number",
+    //     position: "top",
+    //   });
+    //   return;
+    // }
 
-    if (specialties.length === 0) {
-      Toast.show({
-        type: "error",
-        text1: "Specialty Required",
-        text2: "Please add at least one specialty",
-        position: "top",
-      });
-      return;
-    }
+    // if (specialties.length === 0) {
+    //   Toast.show({
+    //     type: "error",
+    //     text1: "Specialty Required",
+    //     text2: "Please add at least one specialty",
+    //     position: "top",
+    //   });
+    //   return;
+    // }
 
     if (availability.length === 0) {
       Toast.show({
@@ -304,16 +304,16 @@ export default function PrescriberRegistrationScreen() {
       name: name.trim(),
       email: email.trim(),
       phoneNumber: phoneNumber.trim(),
-      title: title.trim(),
-      bio: bio.trim(),
-      yearsExperience: yearsExpNum,
-      specialty: specialties,
+      // title: title.trim(),
+      // bio: bio.trim(),
+      // yearsExperience: yearsExpNum,
+      // specialty: specialties,
       availability: availability,
       licenseFile: fileUri,
       licenseFileName: selectedFile,
-      consultationFee: consultationFee.trim()
-        ? parseFloat(consultationFee.trim())
-        : undefined,
+      // consultationFee: consultationFee.trim()
+      //   ? parseFloat(consultationFee.trim())
+      //   : undefined,
     };
 
     navigation.navigate("PrescriberPassword", { formData });
@@ -433,7 +433,7 @@ export default function PrescriberRegistrationScreen() {
         </View>
 
         {/* Title */}
-        <View style={styles.inputGroup}>
+        {/* <View style={styles.inputGroup}>
           <ThemedText style={styles.inputLabel}>Professional Title</ThemedText>
           <TextInput
             style={[
@@ -450,10 +450,10 @@ export default function PrescriberRegistrationScreen() {
             onChangeText={setTitle}
             autoCapitalize='words'
           />
-        </View>
+        </View> */}
 
         {/* Bio */}
-        <View style={styles.inputGroup}>
+        {/* <View style={styles.inputGroup}>
           <ThemedText style={styles.inputLabel}>Bio</ThemedText>
           <TextInput
             style={[
@@ -472,10 +472,10 @@ export default function PrescriberRegistrationScreen() {
             numberOfLines={4}
             textAlignVertical='top'
           />
-        </View>
+        </View> */}
 
         {/* Years of Experience */}
-        <View style={styles.inputGroup}>
+        {/* <View style={styles.inputGroup}>
           <ThemedText style={styles.inputLabel}>Years of Experience</ThemedText>
           <TextInput
             style={[
@@ -492,10 +492,10 @@ export default function PrescriberRegistrationScreen() {
             onChangeText={setYearsExperience}
             keyboardType='numeric'
           />
-        </View>
+        </View> */}
 
         {/* Specialty */}
-        <View style={styles.inputGroup}>
+        {/* <View style={styles.inputGroup}>
           <ThemedText style={styles.inputLabel}>Specialty</ThemedText>
           <ThemedText style={[styles.hintText, { color: theme.textSecondary }]}>
             Add your areas of specialization
@@ -531,7 +531,7 @@ export default function PrescriberRegistrationScreen() {
             </Pressable>
           </View>
 
-          {/* Display Added Specialties */}
+       
           {specialties.length > 0 && (
             <View style={styles.specialtiesList}>
               {specialties.map((spec, index) => (
@@ -558,10 +558,10 @@ export default function PrescriberRegistrationScreen() {
               ))}
             </View>
           )}
-        </View>
+        </View> */}
 
         {/* Consultation Fee */}
-        <View style={styles.inputGroup}>
+        {/* <View style={styles.inputGroup}>
           <ThemedText style={styles.inputLabel}>Consultation Fee</ThemedText>
           <TextInput
             style={[
@@ -578,7 +578,7 @@ export default function PrescriberRegistrationScreen() {
             onChangeText={setConsultationFee}
             keyboardType='numeric'
           />
-        </View>
+        </View> */}
 
         {/* Availability */}
         <View style={styles.inputGroup}>
