@@ -81,11 +81,11 @@ export default function PatientOnboardingScreen() {
     isEmailValid &&
     phoneNumber.trim() &&
     dob !== null &&
-    address.trim() &&
-    city.trim() &&
-    state.trim() &&
+    // address.trim() &&
+    // city.trim() &&
+    // state.trim() &&
     country.trim() &&
-    zip.trim() &&
+    // zip.trim() &&
     gender;
 
   const formatDate = (date: Date | null): string => {
@@ -173,35 +173,35 @@ export default function PatientOnboardingScreen() {
       return;
     }
 
-    if (!address.trim()) {
-      Toast.show({
-        type: "error",
-        text1: "Address Required",
-        text2: "Please enter your street address",
-        position: "top",
-      });
-      return;
-    }
+    // if (!address.trim()) {
+    //   Toast.show({
+    //     type: "error",
+    //     text1: "Address Required",
+    //     text2: "Please enter your street address",
+    //     position: "top",
+    //   });
+    //   return;
+    // }
 
-    if (!city.trim()) {
-      Toast.show({
-        type: "error",
-        text1: "City Required",
-        text2: "Please enter your city",
-        position: "top",
-      });
-      return;
-    }
+    // if (!city.trim()) {
+    //   Toast.show({
+    //     type: "error",
+    //     text1: "City Required",
+    //     text2: "Please enter your city",
+    //     position: "top",
+    //   });
+    //   return;
+    // }
 
-    if (!state.trim()) {
-      Toast.show({
-        type: "error",
-        text1: "State Required",
-        text2: "Please enter your state",
-        position: "top",
-      });
-      return;
-    }
+    // if (!state.trim()) {
+    //   Toast.show({
+    //     type: "error",
+    //     text1: "State Required",
+    //     text2: "Please enter your state",
+    //     position: "top",
+    //   });
+    //   return;
+    // }
 
     if (!country.trim()) {
       Toast.show({
@@ -213,15 +213,15 @@ export default function PatientOnboardingScreen() {
       return;
     }
 
-    if (!zip.trim()) {
-      Toast.show({
-        type: "error",
-        text1: "ZIP Code Required",
-        text2: "Please enter your ZIP code",
-        position: "top",
-      });
-      return;
-    }
+    // if (!zip.trim()) {
+    //   Toast.show({
+    //     type: "error",
+    //     text1: "ZIP Code Required",
+    //     text2: "Please enter your ZIP code",
+    //     position: "top",
+    //   });
+    //   return;
+    // }
 
     if (!gender) {
       Toast.show({
@@ -529,8 +529,8 @@ export default function PatientOnboardingScreen() {
           )}
         </View>
 
-        {/* Address */}
-        <View style={styles.inputGroup}>
+        {/* Address - commented out */}
+        {/* <View style={styles.inputGroup}>
           <ThemedText style={styles.inputLabel}>Address</ThemedText>
           <TextInput
             style={[
@@ -547,10 +547,10 @@ export default function PatientOnboardingScreen() {
             onChangeText={setAddress}
             autoCapitalize='words'
           />
-        </View>
+        </View> */}
 
-        {/* City */}
-        <View style={styles.inputGroup}>
+        {/* City - commented out */}
+        {/* <View style={styles.inputGroup}>
           <ThemedText style={styles.inputLabel}>City</ThemedText>
           <TextInput
             style={[
@@ -567,10 +567,10 @@ export default function PatientOnboardingScreen() {
             onChangeText={setCity}
             autoCapitalize='words'
           />
-        </View>
+        </View> */}
 
-        {/* State */}
-        <View style={styles.inputGroup}>
+        {/* State - commented out */}
+        {/* <View style={styles.inputGroup}>
           <ThemedText style={styles.inputLabel}>State</ThemedText>
           <TextInput
             style={[
@@ -587,7 +587,7 @@ export default function PatientOnboardingScreen() {
             onChangeText={setState}
             autoCapitalize='words'
           />
-        </View>
+        </View> */}
 
         {/* Country */}
         <View style={styles.inputGroup}>
@@ -609,8 +609,8 @@ export default function PatientOnboardingScreen() {
           />
         </View>
 
-        {/* ZIP Code */}
-        <View style={styles.inputGroup}>
+        {/* ZIP Code - commented out */}
+        {/* <View style={styles.inputGroup}>
           <ThemedText style={styles.inputLabel}>ZIP Code</ThemedText>
           <TextInput
             style={[
@@ -627,7 +627,7 @@ export default function PatientOnboardingScreen() {
             onChangeText={setZip}
             keyboardType='numeric'
           />
-        </View>
+        </View> */}
 
         {/* Gender */}
         <View style={styles.inputGroup}>
@@ -699,8 +699,8 @@ export default function PatientOnboardingScreen() {
           ) : null}
         </View>
 
-        {/* Allergies (Optional) */}
-        <View style={styles.inputGroup}>
+        {/* Allergies (Optional) - commented out */}
+        {/* <View style={styles.inputGroup}>
           <ThemedText style={styles.inputLabel}>
             Allergies{" "}
             <ThemedText
@@ -798,7 +798,6 @@ export default function PatientOnboardingScreen() {
             </View>
           ) : null}
 
-          {/* Display selected allergies as chips */}
           {allergies.length > 0 && allergies[0] !== "None" && (
             <View style={styles.selectedAllergiesContainer}>
               {allergies.map((allergy) => (
@@ -829,7 +828,7 @@ export default function PatientOnboardingScreen() {
               ))}
             </View>
           )}
-        </View>
+        </View> */}
 
         <PrimaryButton
           title='Continue'
