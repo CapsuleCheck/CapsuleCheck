@@ -116,14 +116,14 @@ export default function LoginScreen() {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
-
-      // Store auth token if provided
-      if (response.data.token) {
-        // You can store this in AsyncStorage or a secure store
-        // await AsyncStorage.setItem('authToken', response.data.token);
-      }
+      // Complete onboarding and navigate to main app (token stored in UserContext if present)
+      completeOnboarding({
+        ...response.data.data,
+        selectedRole,
+        token: response.data.token,
+      });
 
       // Show success message
       Toast.show({
@@ -144,7 +144,8 @@ export default function LoginScreen() {
           createdAt: prescriberData.createdAt || new Date().toISOString(),
           title: prescriberData.title || "",
           ratings: prescriberData.ratings || prescriberData.rating || 0,
-          ratingsCount: prescriberData.ratingsCount || prescriberData.reviewCount || 0,
+          ratingsCount:
+            prescriberData.ratingsCount || prescriberData.reviewCount || 0,
           verificationStatus: prescriberData.verificationStatus || false,
           availability: prescriberData.availability || [],
           bio: prescriberData.bio || "",
@@ -155,9 +156,6 @@ export default function LoginScreen() {
         };
         setPrescriberProfile(prescriberProfile);
       }
-
-      // Complete onboarding and navigate to main app
-      completeOnboarding({ ...response.data.data, selectedRole });
     } catch (err) {
       console.error("Error logging in:", err);
 

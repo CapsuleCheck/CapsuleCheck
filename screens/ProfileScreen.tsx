@@ -7,7 +7,6 @@ import { ScreenScrollView } from "@/components/ScreenScrollView";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { useTheme } from "@/hooks/useTheme";
 import { useUser } from "@/context/UserContext";
-import { useAppData } from "@/context/AppDataContext";
 import { usePrescriberProfile } from "@/hooks/useAppDataHooks";
 import { ProfileStackParamList } from "@/navigation/ProfileStackNavigator";
 import { BorderRadius, Spacing } from "@/constants/theme";
@@ -26,9 +25,7 @@ type MenuItem = {
 export default function ProfileScreen() {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
   const { theme } = useTheme();
-  const { setUserRole, userRole } = useUser();
-  const { state } = useAppData();
-  const userProfile = state.userProfile;
+  const { setUserRole, userRole, userData } = useUser();
   const prescriberProfile = usePrescriberProfile();
 
   const menuItems: MenuItem[] = [
@@ -53,21 +50,23 @@ export default function ProfileScreen() {
       navigation.navigate(screen);
     }
   };
-  // Get display data based on user role
+  // Get display data based on user role (userData structure)
   const displayName =
     userRole === "prescriber"
       ? prescriberProfile?.name || "Prescriber"
-      : userProfile?.name || "Patient";
+      : userData?.name ||
+        [userData?.firstName, userData?.lastName].filter(Boolean).join(" ").trim() ||
+        "Patient";
 
   const displayEmail =
     userRole === "prescriber"
       ? prescriberProfile?.email || ""
-      : userProfile?.email || "";
+      : userData?.email || "";
 
   const displayPhone =
     userRole === "prescriber"
       ? prescriberProfile?.phoneNumber || ""
-      : userProfile?.phone || "";
+      : (userData?.phone ?? userData?.phoneNumber ?? "");
 
   return (
     <ScreenScrollView>
@@ -92,22 +91,22 @@ export default function ProfileScreen() {
 
       {/* User Details Section */}
       <View style={styles.detailsSection}>
-        {displayEmail && (
+        {/* {displayEmail && (
           <View style={styles.detailRow}>
             <Feather name='mail' size={18} color={theme.textSecondary} />
             <ThemedText style={[styles.detailText, { color: theme.text }]}>
               {displayEmail}
             </ThemedText>
           </View>
-        )}
-        {displayPhone && (
+        )} */}
+        {/* {displayPhone && (
           <View style={styles.detailRow}>
             <Feather name='phone' size={18} color={theme.textSecondary} />
             <ThemedText style={[styles.detailText, { color: theme.text }]}>
               {displayPhone}
             </ThemedText>
           </View>
-        )}
+        )} */}
 
         {/* Prescriber-specific details */}
         {userRole === "prescriber" && prescriberProfile && (
@@ -186,23 +185,29 @@ export default function ProfileScreen() {
           </>
         )}
 
-        {/* Patient-specific details */}
-        {userRole === "patient" && userProfile && (
+        {/* Patient-specific details (userData structure) */}
+        {userRole === "patient" && userData?.address && (
           <>
-            {userProfile.address && (
+            {(userData.address.street || userData.address.city) && (
               <View style={styles.detailRow}>
                 <Feather name='map-pin' size={18} color={theme.textSecondary} />
                 <ThemedText style={[styles.detailText, { color: theme.text }]}>
-                  {userProfile.address.street}, {userProfile.address.city},{" "}
-                  {userProfile.address.state} {userProfile.address.zip}
+                  {[
+                    userData.address.street,
+                    userData.address.city,
+                    userData.address.state,
+                    userData.address.zip,
+                  ]
+                    .filter(Boolean)
+                    .join(", ")}
                 </ThemedText>
               </View>
             )}
-            {userProfile.insuranceProvider && (
+            {userData.insuranceProvider && (
               <View style={styles.detailRow}>
                 <Feather name='shield' size={18} color={theme.textSecondary} />
                 <ThemedText style={[styles.detailText, { color: theme.text }]}>
-                  {userProfile.insuranceProvider}
+                  {userData.insuranceProvider}
                 </ThemedText>
               </View>
             )}

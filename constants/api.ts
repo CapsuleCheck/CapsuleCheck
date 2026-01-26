@@ -5,6 +5,7 @@ export const API_BASE_URL =
 
 export const API_ENDPOINTS = {
   patients: "/patients",
+  patientUpdate: "/patients/update",
   prescribers: "/prescribers",
   // Add other endpoints here as needed
 };

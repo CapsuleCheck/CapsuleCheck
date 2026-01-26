@@ -167,8 +167,8 @@ export function useAIAnalyses() {
 }
 
 export function useUserProfile() {
-  const { state } = useAppData();
-  return state.userProfile;
+  const { userData } = useUser();
+  return userData;
 }
 
 export function usePrescriberProfile() {

@@ -8,7 +8,6 @@ import {
   Appointment,
   Notification,
   AIAnalysisResult,
-  UserProfile,
   PaymentMethod,
   NotificationPreferences,
   RefillRequest,
@@ -22,7 +21,6 @@ import {
   SEED_REVIEWS,
   SEED_APPOINTMENTS,
   SEED_NOTIFICATIONS,
-  SEED_USER_PROFILE,
   SEED_PAYMENT_METHODS,
   SEED_AI_ANALYSES,
 } from "@/data/seedData";
@@ -37,7 +35,6 @@ interface AppDataState {
   appointments: Appointment[];
   notifications: Notification[];
   aiAnalyses: AIAnalysisResult[];
-  userProfile: UserProfile | null;
   prescriberProfile: PrescriberProfile | null;
   paymentMethods: PaymentMethod[];
   notificationPreferences: NotificationPreferences;
@@ -62,7 +59,6 @@ type AppDataAction =
   | { type: "MARK_ALL_NOTIFICATIONS_READ" }
   | { type: "DELETE_NOTIFICATION"; payload: string }
   | { type: "CREATE_AI_ANALYSIS"; payload: AIAnalysisResult }
-  | { type: "UPDATE_USER_PROFILE"; payload: Partial<UserProfile> }
   | { type: "SET_PRESCRIBER_PROFILE"; payload: PrescriberProfile }
   | { type: "UPDATE_PRESCRIBER_PROFILE"; payload: Partial<PrescriberProfile> }
   | { type: "ADD_PAYMENT_METHOD"; payload: PaymentMethod }
@@ -97,7 +93,6 @@ interface AppDataContextType {
   markAllNotificationsRead: () => void;
   deleteNotification: (id: string) => void;
   createAIAnalysis: (analysis: AIAnalysisResult) => void;
-  updateUserProfile: (updates: Partial<UserProfile>) => void;
   setPrescriberProfile: (profile: PrescriberProfile) => void;
   updatePrescriberProfile: (updates: Partial<PrescriberProfile>) => void;
   addPaymentMethod: (method: PaymentMethod) => void;
@@ -124,7 +119,6 @@ const initialState: AppDataState = {
   appointments: [],
   notifications: [],
   aiAnalyses: [],
-  userProfile: null,
   prescriberProfile: null,
   paymentMethods: [],
   notificationPreferences: {
@@ -221,14 +215,6 @@ function appDataReducer(
         aiAnalyses: [...state.aiAnalyses, action.payload],
       };
 
-    case "UPDATE_USER_PROFILE":
-      return {
-        ...state,
-        userProfile: state.userProfile
-          ? { ...state.userProfile, ...action.payload }
-          : null,
-      };
-
     case "SET_PRESCRIBER_PROFILE":
       return {
         ...state,
@@ -317,7 +303,6 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     appointments: SEED_APPOINTMENTS,
     notifications: SEED_NOTIFICATIONS,
     aiAnalyses: SEED_AI_ANALYSES,
-    userProfile: SEED_USER_PROFILE,
     paymentMethods: SEED_PAYMENT_METHODS,
     refillRequests: [],
   });
@@ -347,8 +332,6 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       dispatch({ type: "DELETE_NOTIFICATION", payload: id }),
     createAIAnalysis: (analysis) =>
       dispatch({ type: "CREATE_AI_ANALYSIS", payload: analysis }),
-    updateUserProfile: (updates) =>
-      dispatch({ type: "UPDATE_USER_PROFILE", payload: updates }),
     setPrescriberProfile: (profile) =>
       dispatch({ type: "SET_PRESCRIBER_PROFILE", payload: profile }),
     updatePrescriberProfile: (updates) =>

@@ -5,11 +5,13 @@ import { ScreenScrollView } from "@/components/ScreenScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { useTheme } from "@/hooks/useTheme";
+import { useUser } from "@/context/UserContext";
 import { useAppData } from "@/context/AppDataContext";
 import { BorderRadius, Spacing, Typography } from "@/constants/theme";
 
 export default function PaymentMethodsScreen() {
   const { theme } = useTheme();
+  const { userData } = useUser();
   const { state, updatePaymentMethod, deletePaymentMethod, addPaymentMethod } =
     useAppData();
   const paymentMethods = state.paymentMethods;
@@ -41,7 +43,7 @@ export default function PaymentMethodsScreen() {
       type: "credit_card",
       lastFour: randomLast4,
       expiryDate: `${(Math.floor(Math.random() * 12) + 1).toString().padStart(2, "0")}/${(new Date().getFullYear() % 100) + Math.floor(Math.random() * 5) + 1}`,
-      cardholderName: state.userProfile?.name || "Cardholder",
+      cardholderName: userData?.name || "Cardholder",
       isDefault: paymentMethods.length === 0,
     });
   };

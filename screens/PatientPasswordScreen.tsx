@@ -19,7 +19,7 @@ import Toast from "react-native-toast-message";
 import { ThemedText } from "@/components/ThemedText";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { useTheme } from "@/hooks/useTheme";
-import { useAppData } from "@/context/AppDataContext";
+import { useUser } from "@/context/UserContext";
 import { BorderRadius, Spacing, Typography } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootNavigator";
 import { API_BASE_URL, API_ENDPOINTS } from "@/constants/api";
@@ -49,7 +49,7 @@ export default function PatientPasswordScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<RouteProp>();
-  const { dispatch } = useAppData();
+  const { setToken } = useUser();
 
   const formData = route.params?.formData as PatientFormData | undefined;
 
@@ -123,7 +123,7 @@ export default function PatientPasswordScreen() {
 
     try {
       // Make API call to create patient
-      await axios.post(
+      const response = await axios.post(
         `${API_BASE_URL}${API_ENDPOINTS.patients}`,
         patientData,
         {
@@ -133,24 +133,10 @@ export default function PatientPasswordScreen() {
         }
       );
 
-      // Update local state with the created patient data
-      dispatch({
-        type: "UPDATE_USER_PROFILE",
-        payload: {
-          name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
-          email: formData.email.trim(),
-          phone: formData.phoneNumber.trim(),
-          dateOfBirth: formData.dateOfBirth.trim(),
-          address: {
-            street: formData.address.street.trim(),
-            city: formData.address.city.trim(),
-            state: formData.address.state.trim(),
-            country: formData.address.country.trim(),
-            zip: formData.address.zip.trim(),
-          },
-          allergies: formData.allergies,
-        },
-      });
+      // Store JWT from sign-up response if provided
+      if (response.data?.token) {
+        setToken(response.data.token);
+      }
 
       // Show success message
       Toast.show({
