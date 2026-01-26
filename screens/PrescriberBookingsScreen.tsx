@@ -18,6 +18,7 @@ import { BorderRadius, Spacing, Typography } from "@/constants/theme";
 import { BookingsStackParamList } from "@/navigation/BookingsStackNavigator";
 import { API_BASE_URL } from "@/constants/api";
 import { usePrescriberProfile } from "@/hooks/useAppDataHooks";
+import { useUser } from "@/context/UserContext";
 
 type NavigationProp = NativeStackNavigationProp<BookingsStackParamList>;
 
@@ -51,6 +52,7 @@ export default function PrescriberBookingsScreen() {
   const screenInsets = useScreenInsets();
   const navigation = useNavigation<NavigationProp>();
   const prescriberProfile = usePrescriberProfile();
+  const { token } = useUser();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState<FilterType>("all");
@@ -70,6 +72,9 @@ export default function PrescriberBookingsScreen() {
       const response = await axios.get(`${API_BASE_URL}/bookings`, {
         headers: {
           "Content-Type": "application/json",
+          ...(token && {
+            Authorization: token.startsWith("Bearer ") ? token : `Bearer ${token}`,
+          }),
         },
         params: {
           prescriberId: prescriberProfile._id,

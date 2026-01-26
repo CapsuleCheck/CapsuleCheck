@@ -12,7 +12,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import * as DocumentPicker from "expo-document-picker";
 import Toast from "react-native-toast-message";
 import { ThemedText } from "@/components/ThemedText";
@@ -22,22 +21,6 @@ import { BorderRadius, Spacing, Typography } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootNavigator";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
-
-const DAYS_OF_WEEK = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
-
-interface AvailabilitySlot {
-  day: string;
-  startTime: string;
-  endTime: string;
-}
 
 export default function PrescriberRegistrationScreen() {
   const { theme } = useTheme();
@@ -56,17 +39,6 @@ export default function PrescriberRegistrationScreen() {
   const [emailError, setEmailError] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [fileUri, setFileUri] = useState<string | null>(null);
-  const [availability, setAvailability] = useState<AvailabilitySlot[]>([]);
-  const [showDayPicker, setShowDayPicker] = useState(false);
-  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
-  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
-  const [selectedDay, setSelectedDay] = useState<string>("");
-  const [selectedStartTime, setSelectedStartTime] = useState<Date>(
-    new Date(2024, 0, 1, 9, 0)
-  );
-  const [selectedEndTime, setSelectedEndTime] = useState<Date>(
-    new Date(2024, 0, 1, 17, 0)
-  );
 
   const validateEmail = (emailValue: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -98,66 +70,6 @@ export default function PrescriberRegistrationScreen() {
     } catch (error) {
       Alert.alert("Error", "Failed to select file. Please try again.");
     }
-  };
-
-  const formatTime = (date: Date): string => {
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const ampm = hours >= 12 ? "PM" : "AM";
-    const displayHours = hours % 12 || 12;
-    const displayMinutes = minutes.toString().padStart(2, "0");
-    return `${displayHours}:${displayMinutes} ${ampm}`;
-  };
-
-  const addAvailabilitySlot = () => {
-    if (!selectedDay) {
-      Toast.show({
-        type: "error",
-        text1: "Day Required",
-        text2: "Please select a day",
-        position: "top",
-      });
-      return;
-    }
-
-    const startTimeStr = formatTime(selectedStartTime);
-    const endTimeStr = formatTime(selectedEndTime);
-
-    if (selectedStartTime >= selectedEndTime) {
-      Toast.show({
-        type: "error",
-        text1: "Invalid Time Range",
-        text2: "End time must be after start time",
-        position: "top",
-      });
-      return;
-    }
-
-    const existingSlot = availability.find((slot) => slot.day === selectedDay);
-    if (existingSlot) {
-      Toast.show({
-        type: "error",
-        text1: "Day Already Added",
-        text2: "This day already has availability set",
-        position: "top",
-      });
-      return;
-    }
-
-    setAvailability([
-      ...availability,
-      {
-        day: selectedDay,
-        startTime: startTimeStr,
-        endTime: endTimeStr,
-      },
-    ]);
-    setSelectedDay("");
-    setShowDayPicker(false);
-  };
-
-  const removeAvailabilitySlot = (day: string) => {
-    setAvailability(availability.filter((slot) => slot.day !== day));
   };
 
   const addSpecialty = () => {
@@ -280,16 +192,6 @@ export default function PrescriberRegistrationScreen() {
     //   return;
     // }
 
-    if (availability.length === 0) {
-      Toast.show({
-        type: "error",
-        text1: "Availability Required",
-        text2: "Please add at least one availability slot",
-        position: "top",
-      });
-      return;
-    }
-
     if (!selectedFile) {
       Toast.show({
         type: "error",
@@ -308,7 +210,7 @@ export default function PrescriberRegistrationScreen() {
       // bio: bio.trim(),
       // yearsExperience: yearsExpNum,
       // specialty: specialties,
-      availability: availability,
+      availability: [],
       licenseFile: fileUri,
       licenseFileName: selectedFile,
       // consultationFee: consultationFee.trim()
@@ -580,230 +482,6 @@ export default function PrescriberRegistrationScreen() {
           />
         </View> */}
 
-        {/* Availability */}
-        <View style={styles.inputGroup}>
-          <ThemedText style={styles.inputLabel}>Availability</ThemedText>
-          <ThemedText style={[styles.hintText, { color: theme.textSecondary }]}>
-            Select your available days and times
-          </ThemedText>
-
-          {/* Day Picker */}
-          <Pressable
-            onPress={() => setShowDayPicker(!showDayPicker)}
-            style={[
-              styles.pickerButton,
-              {
-                backgroundColor: theme.backgroundSecondary,
-                borderColor: theme.border,
-              },
-            ]}
-          >
-            <ThemedText
-              style={[
-                styles.pickerButtonText,
-                { color: selectedDay ? theme.text : theme.textSecondary },
-              ]}
-            >
-              {selectedDay || "Select Day"}
-            </ThemedText>
-            <Feather
-              name={showDayPicker ? "chevron-up" : "chevron-down"}
-              size={20}
-              color={theme.textSecondary}
-            />
-          </Pressable>
-
-          {showDayPicker && (
-            <View
-              style={[
-                styles.pickerOptions,
-                {
-                  backgroundColor: theme.card,
-                  borderColor: theme.border,
-                },
-              ]}
-            >
-              {DAYS_OF_WEEK.map((day) => {
-                const isSelected = selectedDay === day;
-                const isAlreadyAdded = availability.some(
-                  (slot) => slot.day === day
-                );
-                return (
-                  <Pressable
-                    key={day}
-                    onPress={() => {
-                      if (!isAlreadyAdded) {
-                        setSelectedDay(day);
-                        setShowDayPicker(false);
-                      }
-                    }}
-                    disabled={isAlreadyAdded}
-                    style={[
-                      styles.pickerOption,
-                      isSelected && {
-                        backgroundColor: theme.primary + "20",
-                      },
-                      isAlreadyAdded && { opacity: 0.5 },
-                    ]}
-                  >
-                    <ThemedText
-                      style={[
-                        styles.pickerOptionText,
-                        isSelected && { color: theme.primary },
-                        isAlreadyAdded && { color: theme.textSecondary },
-                      ]}
-                    >
-                      {day}
-                      {isAlreadyAdded && " (Already added)"}
-                    </ThemedText>
-                  </Pressable>
-                );
-              })}
-            </View>
-          )}
-
-          {selectedDay && (
-            <>
-              {/* Start Time */}
-              <View style={styles.timePickerRow}>
-                <View style={styles.timePickerContainer}>
-                  <ThemedText style={styles.timeLabel}>Start Time</ThemedText>
-                  <Pressable
-                    onPress={() => setShowStartTimePicker(true)}
-                    style={[
-                      styles.timeButton,
-                      {
-                        backgroundColor: theme.backgroundSecondary,
-                        borderColor: theme.border,
-                      },
-                    ]}
-                  >
-                    <ThemedText style={styles.timeButtonText}>
-                      {formatTime(selectedStartTime)}
-                    </ThemedText>
-                    <Feather
-                      name='clock'
-                      size={18}
-                      color={theme.textSecondary}
-                    />
-                  </Pressable>
-                </View>
-
-                {/* End Time */}
-                <View style={styles.timePickerContainer}>
-                  <ThemedText style={styles.timeLabel}>End Time</ThemedText>
-                  <Pressable
-                    onPress={() => setShowEndTimePicker(true)}
-                    style={[
-                      styles.timeButton,
-                      {
-                        backgroundColor: theme.backgroundSecondary,
-                        borderColor: theme.border,
-                      },
-                    ]}
-                  >
-                    <ThemedText style={styles.timeButtonText}>
-                      {formatTime(selectedEndTime)}
-                    </ThemedText>
-                    <Feather
-                      name='clock'
-                      size={18}
-                      color={theme.textSecondary}
-                    />
-                  </Pressable>
-                </View>
-              </View>
-
-              {showStartTimePicker && (
-                <DateTimePicker
-                  value={selectedStartTime}
-                  mode='time'
-                  is24Hour={false}
-                  onChange={(event, date) => {
-                    if (Platform.OS === "android") {
-                      setShowStartTimePicker(false);
-                    }
-                    if (date) {
-                      setSelectedStartTime(date);
-                      if (Platform.OS === "ios") {
-                        setShowStartTimePicker(false);
-                      }
-                    } else if (Platform.OS === "android") {
-                      setShowStartTimePicker(false);
-                    }
-                  }}
-                />
-              )}
-
-              {showEndTimePicker && (
-                <DateTimePicker
-                  value={selectedEndTime}
-                  mode='time'
-                  is24Hour={false}
-                  onChange={(event, date) => {
-                    if (Platform.OS === "android") {
-                      setShowEndTimePicker(false);
-                    }
-                    if (date) {
-                      setSelectedEndTime(date);
-                      if (Platform.OS === "ios") {
-                        setShowEndTimePicker(false);
-                      }
-                    } else if (Platform.OS === "android") {
-                      setShowEndTimePicker(false);
-                    }
-                  }}
-                />
-              )}
-
-              <PrimaryButton
-                title='Add Availability'
-                onPress={addAvailabilitySlot}
-                variant='outline'
-                style={styles.addButton}
-              />
-            </>
-          )}
-
-          {/* Display Added Availability */}
-          {availability.length > 0 && (
-            <View style={styles.availabilityList}>
-              {availability.map((slot, index) => (
-                <View
-                  key={index}
-                  style={[
-                    styles.availabilityItem,
-                    {
-                      backgroundColor: theme.card,
-                      borderColor: theme.border,
-                    },
-                  ]}
-                >
-                  <View style={styles.availabilityItemContent}>
-                    <ThemedText style={styles.availabilityDay}>
-                      {slot.day}
-                    </ThemedText>
-                    <ThemedText
-                      style={[
-                        styles.availabilityTime,
-                        { color: theme.textSecondary },
-                      ]}
-                    >
-                      {slot.startTime} - {slot.endTime}
-                    </ThemedText>
-                  </View>
-                  <Pressable
-                    onPress={() => removeAvailabilitySlot(slot.day)}
-                    style={styles.removeButton}
-                  >
-                    <Feather name='x' size={20} color={theme.error} />
-                  </Pressable>
-                </View>
-              ))}
-            </View>
-          )}
-        </View>
-
         {/* License Upload */}
         <View style={styles.inputGroup}>
           <ThemedText style={styles.inputLabel}>License Details</ThemedText>
@@ -999,60 +677,6 @@ const styles = StyleSheet.create({
   },
   pickerOptionText: {
     fontSize: Typography.sizes.md,
-  },
-  timePickerRow: {
-    flexDirection: "row",
-    gap: Spacing.md,
-    marginTop: Spacing.md,
-  },
-  timePickerContainer: {
-    flex: 1,
-  },
-  timeLabel: {
-    fontSize: Typography.sizes.xs,
-    fontWeight: "600",
-    marginBottom: Spacing.xs,
-  },
-  timeButton: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-    borderRadius: BorderRadius.lg,
-    borderWidth: 1,
-  },
-  timeButtonText: {
-    fontSize: Typography.sizes.md,
-  },
-  addButton: {
-    marginTop: Spacing.md,
-  },
-  availabilityList: {
-    marginTop: Spacing.md,
-    gap: Spacing.sm,
-  },
-  availabilityItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: Spacing.md,
-    borderRadius: BorderRadius.md,
-    borderWidth: 1,
-  },
-  availabilityItemContent: {
-    flex: 1,
-  },
-  availabilityDay: {
-    fontSize: Typography.sizes.md,
-    fontWeight: "600",
-    marginBottom: Spacing.xs,
-  },
-  availabilityTime: {
-    fontSize: Typography.sizes.sm,
-  },
-  removeButton: {
-    padding: Spacing.xs,
   },
   uploadArea: {
     padding: Spacing["2xl"],

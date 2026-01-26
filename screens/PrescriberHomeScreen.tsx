@@ -17,6 +17,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { useScreenInsets } from "@/hooks/useScreenInsets";
 import { BorderRadius, Spacing, Typography } from "@/constants/theme";
 import { usePrescriberProfile } from "@/hooks/useAppDataHooks";
+import { useUser } from "@/context/UserContext";
 import { API_BASE_URL } from "@/constants/api";
 import { MainTabParamList } from "@/navigation/MainTabNavigator";
 
@@ -43,6 +44,7 @@ export default function PrescriberHomeScreen() {
   const navigation = useNavigation<NavigationProp>();
   const [isOnline, setIsOnline] = useState(true);
   const prescriberProfile = usePrescriberProfile();
+  const { token } = useUser();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoadingBookings, setIsLoadingBookings] = useState(true);
 
@@ -61,6 +63,9 @@ export default function PrescriberHomeScreen() {
       const response = await axios.get(`${API_BASE_URL}/bookings`, {
         headers: {
           "Content-Type": "application/json",
+          ...(token && {
+            Authorization: token.startsWith("Bearer ") ? token : `Bearer ${token}`,
+          }),
         },
         params: {
           prescriberId: prescriberProfile._id,

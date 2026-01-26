@@ -19,6 +19,7 @@ import { useScreenInsets } from "@/hooks/useScreenInsets";
 import { BorderRadius, Spacing, Typography } from "@/constants/theme";
 import { BookingsStackParamList } from "@/navigation/BookingsStackNavigator";
 import { API_BASE_URL } from "@/constants/api";
+import { useUser } from "@/context/UserContext";
 
 interface BookingDetail {
   _id?: string;
@@ -47,6 +48,7 @@ export default function BookingDetailScreen() {
   const screenInsets = useScreenInsets();
   const route = useRoute<BookingDetailRouteProp>();
   const navigation = useNavigation<NavigationProp>();
+  const { token } = useUser();
   const { bookingId } = route.params;
   const [booking, setBooking] = useState<BookingDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -63,6 +65,9 @@ export default function BookingDetailScreen() {
       const response = await axios.get(`${API_BASE_URL}/bookings`, {
         headers: {
           "Content-Type": "application/json",
+          ...(token && {
+            Authorization: token.startsWith("Bearer ") ? token : `Bearer ${token}`,
+          }),
         },
         params: {
           _id: bookingId,
