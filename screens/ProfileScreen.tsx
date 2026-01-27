@@ -25,7 +25,7 @@ type MenuItem = {
 export default function ProfileScreen() {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
   const { theme } = useTheme();
-  const { setUserRole, userRole, userData } = useUser();
+  const { logout, userRole, userData } = useUser();
   const prescriberProfile = usePrescriberProfile();
 
   const menuItems: MenuItem[] = [
@@ -42,7 +42,7 @@ export default function ProfileScreen() {
   ];
 
   const handleLogout = () => {
-    setUserRole(null);
+    logout();
   };
 
   const handleMenuPress = (screen: keyof ProfileStackParamList) => {

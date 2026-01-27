@@ -7,6 +7,7 @@ import React, {
 } from "react";
 
 const AUTH_TOKEN_KEY = "authToken";
+const USER_DATA_KEY = "userData";
 
 function getStoredToken(): string | null {
   if (typeof localStorage === "undefined") return null;
@@ -29,6 +30,16 @@ function setStoredToken(token: string | null) {
   }
 }
 
+export function clearStorage() {
+  try {
+    if (typeof localStorage === "undefined") return;
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(USER_DATA_KEY);
+  } catch {
+    // ignore
+  }
+}
+
 type UserRole = "patient" | "prescriber" | null;
 
 interface UserContextType {
@@ -36,6 +47,7 @@ interface UserContextType {
   setUserRole: (role: UserRole) => void;
   hasCompletedOnboarding: boolean;
   completeOnboarding: (data: any) => void;
+  logout: () => void;
   userData: any;
   updateUserData: (updates: any) => void;
   token: string | null;
@@ -65,7 +77,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       setHasCompletedOnboarding(true);
       const dataToStore = { selectedRole: data };
       if (typeof localStorage !== "undefined") {
-        localStorage.setItem("userData", JSON.stringify(dataToStore));
+        localStorage.setItem(USER_DATA_KEY, JSON.stringify(dataToStore));
       }
       setUserData(dataToStore);
       return;
@@ -83,16 +95,24 @@ export function UserProvider({ children }: { children: ReactNode }) {
       selectedRole: data?.selectedRole,
     };
     if (typeof localStorage !== "undefined") {
-      localStorage.setItem("userData", JSON.stringify(dataToStore));
+      localStorage.setItem(USER_DATA_KEY, JSON.stringify(dataToStore));
     }
     setUserData(dataToStore);
+  };
+
+  const logout = () => {
+    clearStorage();
+    setToken(null);
+    setUserRole(null);
+    setUserData(null);
+    setHasCompletedOnboarding(false);
   };
 
   const updateUserData = (updates: any) => {
     setUserData((prev: any) => {
       const next = { ...prev, ...updates };
       if (typeof localStorage !== "undefined") {
-        localStorage.setItem("userData", JSON.stringify(next));
+        localStorage.setItem(USER_DATA_KEY, JSON.stringify(next));
       }
       return next;
     });
@@ -105,6 +125,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         setUserRole,
         hasCompletedOnboarding,
         completeOnboarding,
+        logout,
         userData,
         updateUserData,
         token,

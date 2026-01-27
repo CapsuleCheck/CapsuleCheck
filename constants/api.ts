@@ -7,5 +7,7 @@ export const API_ENDPOINTS = {
   patients: "/patients",
   patientUpdate: "/patients/update",
   prescribers: "/prescribers",
+  prescriberUpdate: "/prescribers/update",
+  prescriberUploadLicense: "/prescribers/upload-license",
   // Add other endpoints here as needed
 };

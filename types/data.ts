@@ -212,6 +212,7 @@ export interface PrescriberProfile {
   yearsExperience: number;
   specialty: string[];
   licenseFile: string;
+  licenseFileUrl?: string;
   consultationFee: number;
 }
 

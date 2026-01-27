@@ -152,6 +152,7 @@ export default function LoginScreen() {
           yearsExperience: prescriberData.yearsExperience || 0,
           specialty: prescriberData.specialty || [],
           licenseFile: prescriberData.licenseFile || "",
+          licenseFileUrl: prescriberData.licenseFileUrl || "",
           consultationFee: prescriberData.consultationFee || 0,
         };
         setPrescriberProfile(prescriberProfile);

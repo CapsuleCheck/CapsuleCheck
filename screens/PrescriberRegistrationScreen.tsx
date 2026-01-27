@@ -6,13 +6,11 @@ import {
   Pressable,
   ScrollView,
   Platform,
-  Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import * as DocumentPicker from "expo-document-picker";
 import Toast from "react-native-toast-message";
 import { ThemedText } from "@/components/ThemedText";
 import { PrimaryButton } from "@/components/PrimaryButton";
@@ -37,8 +35,6 @@ export default function PrescriberRegistrationScreen() {
   const [specialties, setSpecialties] = useState<string[]>([]);
   const [consultationFee, setConsultationFee] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<string | null>(null);
-  const [fileUri, setFileUri] = useState<string | null>(null);
 
   const validateEmail = (emailValue: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -55,22 +51,6 @@ export default function PrescriberRegistrationScreen() {
   };
 
   const isEmailValid = !email.trim() || validateEmail(email.trim());
-
-  const handleSelectFile = async () => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: ["image/*", "application/pdf"],
-        copyToCacheDirectory: true,
-      });
-
-      if (!result.canceled && result.assets[0]) {
-        setSelectedFile(result.assets[0].name);
-        setFileUri(result.assets[0].uri);
-      }
-    } catch (error) {
-      Alert.alert("Error", "Failed to select file. Please try again.");
-    }
-  };
 
   const addSpecialty = () => {
     const trimmedSpecialty = specialty.trim();
@@ -192,30 +172,11 @@ export default function PrescriberRegistrationScreen() {
     //   return;
     // }
 
-    if (!selectedFile) {
-      Toast.show({
-        type: "error",
-        text1: "License Required",
-        text2: "Please upload your license details",
-        position: "top",
-      });
-      return;
-    }
-
     const formData = {
       name: name.trim(),
       email: email.trim(),
       phoneNumber: phoneNumber.trim(),
-      // title: title.trim(),
-      // bio: bio.trim(),
-      // yearsExperience: yearsExpNum,
-      // specialty: specialties,
       availability: [],
-      licenseFile: fileUri,
-      licenseFileName: selectedFile,
-      // consultationFee: consultationFee.trim()
-      //   ? parseFloat(consultationFee.trim())
-      //   : undefined,
     };
 
     navigation.navigate("PrescriberPassword", { formData });
@@ -482,44 +443,6 @@ export default function PrescriberRegistrationScreen() {
           />
         </View> */}
 
-        {/* License Upload */}
-        <View style={styles.inputGroup}>
-          <ThemedText style={styles.inputLabel}>License Details</ThemedText>
-          <ThemedText style={[styles.hintText, { color: theme.textSecondary }]}>
-            Upload your practicing license (PDF, JPG, or PNG)
-          </ThemedText>
-          <Pressable
-            onPress={handleSelectFile}
-            style={({ pressed }) => [
-              styles.uploadArea,
-              {
-                backgroundColor: theme.backgroundSecondary,
-                borderColor: selectedFile ? theme.primary : theme.border,
-                opacity: pressed ? 0.7 : 1,
-              },
-            ]}
-          >
-            <Feather
-              name={selectedFile ? "check-circle" : "upload"}
-              size={32}
-              color={selectedFile ? theme.primary : theme.textSecondary}
-            />
-            <ThemedText
-              style={[
-                styles.uploadTitle,
-                selectedFile && { color: theme.primary },
-              ]}
-            >
-              {selectedFile ? selectedFile : "Upload your license"}
-            </ThemedText>
-            <ThemedText
-              style={[styles.uploadSubtitle, { color: theme.textSecondary }]}
-            >
-              {selectedFile ? "Tap to change file" : "Tap to select a file"}
-            </ThemedText>
-          </Pressable>
-        </View>
-
         <PrimaryButton
           title='Continue'
           onPress={handleSubmit}
@@ -677,23 +600,6 @@ const styles = StyleSheet.create({
   },
   pickerOptionText: {
     fontSize: Typography.sizes.md,
-  },
-  uploadArea: {
-    padding: Spacing["2xl"],
-    borderRadius: BorderRadius.lg,
-    borderWidth: 2,
-    borderStyle: "dashed",
-    alignItems: "center",
-    marginTop: Spacing.sm,
-  },
-  uploadTitle: {
-    fontSize: Typography.sizes.md,
-    fontWeight: "600",
-    marginTop: Spacing.md,
-    marginBottom: Spacing.xs,
-  },
-  uploadSubtitle: {
-    fontSize: Typography.sizes.sm,
   },
   continueButton: {
     marginTop: Spacing.xl,

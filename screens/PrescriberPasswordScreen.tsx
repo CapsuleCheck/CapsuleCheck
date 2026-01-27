@@ -36,14 +36,12 @@ interface PrescriberFormData {
   name: string;
   email: string;
   phoneNumber: string;
-  title: string;
+  title?: string;
   bio?: string;
   yearsExperience?: number;
   specialty?: string[];
   consultationFee?: number;
   availability: AvailabilitySlot[];
-  licenseFile: string | null;
-  licenseFileName: string | null;
 }
 
 export default function PrescriberPasswordScreen() {
@@ -118,15 +116,8 @@ export default function PrescriberPasswordScreen() {
       name: formData.name.trim(),
       email: formData.email.trim(),
       phoneNumber: formData.phoneNumber.trim(),
-      // title: formData.title.trim(),
-      // bio: formData.bio?.trim() || "",
-      // yearsExperience: formData.yearsExperience || 0,
-      // specialty: formData.specialty || [],
-      // consultationFee: formData.consultationFee,
       password: password.trim(),
       availability: formData.availability,
-      licenseFile: formData.licenseFile,
-      licenseFileName: formData.licenseFileName,
       createdAt: new Date(),
     };
 
