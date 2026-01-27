@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { View, StyleSheet, Pressable, ActivityIndicator } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useRoute, useNavigation } from "@react-navigation/native";
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 import Toast from "react-native-toast-message";
 import { ScreenScrollView } from "@/components/ScreenScrollView";
 import { ThemedText } from "@/components/ThemedText";
@@ -10,23 +10,149 @@ import { PrimaryButton } from "@/components/PrimaryButton";
 import { useTheme } from "@/hooks/useTheme";
 import { useScreenInsets } from "@/hooks/useScreenInsets";
 import { BorderRadius, Spacing } from "@/constants/theme";
-import { usePrescribers } from "@/hooks/useAppDataHooks";
 import { HomeStackParamList } from "@/navigation/HomeStackNavigator";
 import { API_BASE_URL, API_ENDPOINTS } from "@/constants/api";
 import { useUser } from "@/context/UserContext";
 
-const DAYS_OF_WEEK = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
-const TIME_SLOTS = [
-  "09:00 AM",
-  "09:30 AM",
-  "10:00 AM",
-  "10:30 AM",
-  "11:00 AM",
-  "11:30 AM",
-  "02:00 PM",
-  "02:30 PM",
-  "03:00 PM",
-];
+type AvailabilitySlot = {
+  day: string;
+  startTime: string;
+  endTime: string;
+};
+
+const DAY_NAME_TO_WEEKDAY: Record<string, number> = {
+  Sunday: 0,
+  Monday: 1,
+  Tuesday: 2,
+  Wednesday: 3,
+  Thursday: 4,
+  Friday: 5,
+  Saturday: 6,
+};
+
+const WEEKDAY_TO_DAY_NAME: Record<number, string> = {
+  0: "Sunday",
+  1: "Monday",
+  2: "Tuesday",
+  3: "Wednesday",
+  4: "Thursday",
+  5: "Friday",
+  6: "Saturday",
+};
+
+function normalizeAvailability(prescriber: {
+  availability?: AvailabilitySlot[];
+  availableDays?: string[];
+}): AvailabilitySlot[] {
+  const av = prescriber?.availability;
+  if (av && Array.isArray(av) && av.length > 0) {
+    return av.map((s) => ({
+      day: s.day || "",
+      startTime: s.startTime || "09:00",
+      endTime: s.endTime || "17:00",
+    }));
+  }
+  const days = prescriber?.availableDays;
+  if (days && Array.isArray(days) && days.length > 0) {
+    return days.map((d) => ({
+      day: typeof d === "string" ? d : "",
+      startTime: "09:00",
+      endTime: "17:00",
+    }));
+  }
+  return [];
+}
+
+function getAvailableWeekdays(slots: AvailabilitySlot[]): number[] {
+  const set = new Set<number>();
+  for (const s of slots) {
+    const w = DAY_NAME_TO_WEEKDAY[s.day];
+    if (typeof w === "number") set.add(w);
+  }
+  return Array.from(set);
+}
+
+function getUpcomingAvailableDates(
+  weekdays: number[],
+  numWeeks: number = 6,
+): { date: Date; yyyyMmDd: string; dayOfMonth: number; monthYear: string }[] {
+  if (weekdays.length === 0) return [];
+  const out: {
+    date: Date;
+    yyyyMmDd: string;
+    dayOfMonth: number;
+    monthYear: string;
+  }[] = [];
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(start);
+  end.setDate(end.getDate() + numWeeks * 7);
+  const d = new Date(start);
+  while (d <= end) {
+    if (weekdays.includes(d.getDay())) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      out.push({
+        date: new Date(d),
+        yyyyMmDd: `${y}-${m}-${day}`,
+        dayOfMonth: d.getDate(),
+        monthYear: d.toLocaleString("default", {
+          month: "short",
+          year: "numeric",
+        }),
+      });
+    }
+    d.setDate(d.getDate() + 1);
+  }
+  return out;
+}
+
+function parseTime24(s: string): { h: number; m: number } {
+  const [h, m] = (s || "09:00").split(":").map(Number);
+  return { h: isNaN(h) ? 9 : h, m: isNaN(m) ? 0 : m };
+}
+
+function timeToMinutes(h: number, m: number): number {
+  return h * 60 + m;
+}
+
+function formatTime12h(h: number, m: number): string {
+  const pm = h >= 12;
+  const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+  const mm = String(m).padStart(2, "0");
+  return `${h12}:${mm} ${pm ? "PM" : "AM"}`;
+}
+
+function getTimeSlotsForDay(
+  slots: AvailabilitySlot[],
+  dayName: string,
+  intervalMinutes: number = 30,
+): string[] {
+  const daySlots = slots.filter(
+    (s) => s.day.toLowerCase() === dayName.toLowerCase(),
+  );
+  if (daySlots.length === 0) return [];
+  const seen = new Set<string>();
+  const order: string[] = [];
+  for (const s of daySlots) {
+    const start = parseTime24(s.startTime);
+    const end = parseTime24(s.endTime);
+    let mins = timeToMinutes(start.h, start.m);
+    const endMins = timeToMinutes(end.h, end.m);
+    while (mins < endMins) {
+      const h = Math.floor(mins / 60) % 24;
+      const m = mins % 60;
+      const str = formatTime12h(h, m);
+      if (!seen.has(str)) {
+        seen.add(str);
+        order.push(str);
+      }
+      mins += intervalMinutes;
+    }
+  }
+  return order;
+}
 
 export default function BookAppointmentScreen() {
   const { theme } = useTheme();
@@ -37,38 +163,39 @@ export default function BookAppointmentScreen() {
   const { prescriberId, prescriber } =
     (route.params as HomeStackParamList["BookAppointment"]) || {};
 
-  const [selectedDate, setSelectedDate] = useState(10);
-  const [selectedTime, setSelectedTime] = useState("10:00 AM");
+  const [selectedDateYyyyMmDd, setSelectedDateYyyyMmDd] = useState<
+    string | null
+  >(null);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Get current month/year for display
-  const currentDate = useMemo(() => {
-    const date = new Date();
-    return {
-      month: date.toLocaleString("default", { month: "long" }),
-      year: date.getFullYear(),
-      currentMonth: date.getMonth(),
-      currentYear: date.getFullYear(),
-    };
-  }, []);
+  const availability = useMemo(
+    () => (prescriber ? normalizeAvailability(prescriber) : []),
+    [prescriber],
+  );
+  const hasAvailability = availability.length > 0;
 
-  // Format selected date to YYYY-MM-DD format
-  const formatSelectedDate = () => {
-    const selectedDateObj = new Date(
-      currentDate.currentYear,
-      currentDate.currentMonth,
-      selectedDate,
-    );
-    const year = selectedDateObj.getFullYear();
-    const month = String(selectedDateObj.getMonth() + 1).padStart(2, "0");
-    const day = String(selectedDateObj.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
+  const availableWeekdays = useMemo(
+    () => getAvailableWeekdays(availability),
+    [availability],
+  );
+  const upcomingDates = useMemo(
+    () => getUpcomingAvailableDates(availableWeekdays, 6),
+    [availableWeekdays],
+  );
 
-  // Generate meeting link (you can customize this logic)
+  const selectedDayName = useMemo(() => {
+    if (!selectedDateYyyyMmDd) return null;
+    const d = new Date(selectedDateYyyyMmDd + "T12:00:00");
+    return WEEKDAY_TO_DAY_NAME[d.getDay()];
+  }, [selectedDateYyyyMmDd]);
+
+  const timeSlotsForSelectedDay = useMemo(() => {
+    if (!selectedDayName) return [];
+    return getTimeSlotsForDay(availability, selectedDayName, 30);
+  }, [availability, selectedDayName]);
+
   const generateMeetingLink = () => {
-    // For now, generate a simple meeting link
-    // In production, you might want to integrate with Zoom, Google Meet, etc.
     const meetingId = `meeting-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     return `https://meet.capsulecheck.com/${meetingId}`;
   };
@@ -79,6 +206,16 @@ export default function BookAppointmentScreen() {
         type: "error",
         text1: "Error",
         text2: "Prescriber information is missing",
+        position: "top",
+      });
+      return;
+    }
+
+    if (!hasAvailability || !selectedDateYyyyMmDd || !selectedTime) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Please select a date and time.",
         position: "top",
       });
       return;
@@ -98,18 +235,17 @@ export default function BookAppointmentScreen() {
     setIsLoading(true);
 
     try {
-      const bookingDate = formatSelectedDate();
       const meetingLink = generateMeetingLink();
 
       const bookingData = {
         prescriberId: prescriberId,
         patientId: patientId,
-        date: bookingDate,
+        date: selectedDateYyyyMmDd,
         time: selectedTime,
         meetingLink: meetingLink,
       };
 
-      const response = await axios.post(
+      await axios.post(
         `${API_BASE_URL}${API_ENDPOINTS.bookings}`,
         bookingData,
         {
@@ -139,7 +275,7 @@ export default function BookAppointmentScreen() {
       console.error("Error creating booking:", err);
       let errorMessage = "Failed to book appointment. Please try again.";
 
-      if (axios.isAxiosError(err)) {
+      if (isAxiosError(err)) {
         if (err.response) {
           errorMessage =
             err.response.data?.message ||
@@ -182,7 +318,7 @@ export default function BookAppointmentScreen() {
           <View
             style={[styles.avatar, { backgroundColor: theme.primary + "20" }]}
           >
-            <Feather name='user' size={32} color={theme.primary} />
+            <Feather name="user" size={32} color={theme.primary} />
           </View>
           <View style={styles.pharmacistDetails}>
             <ThemedText style={styles.pharmacistName}>
@@ -194,14 +330,14 @@ export default function BookAppointmentScreen() {
               {/* {prescriber.specialty.join(", ")} */}
             </ThemedText>
             <View style={styles.ratingRow}>
-              <Feather name='star' size={14} color='#F59E0B' />
+              <Feather name="star" size={14} color="#F59E0B" />
               <ThemedText style={styles.rating}>
-                {prescriber.ratings.toFixed(1)}
+                {(prescriber.ratings ?? 0).toFixed(1)}
               </ThemedText>
               <ThemedText
                 style={[styles.reviews, { color: theme.textSecondary }]}
               >
-                ({prescriber.ratingsCount} reviews)
+                ({prescriber.ratingsCount ?? 0} reviews)
               </ThemedText>
             </View>
             {prescriber.bio && (
@@ -214,7 +350,7 @@ export default function BookAppointmentScreen() {
                 Consultation Fee: ${prescriber.consultationFee}
               </ThemedText>
             )}
-            {prescriber.yearsExperience > 0 && (
+            {(prescriber.yearsExperience ?? 0) > 0 && (
               <ThemedText
                 style={[styles.experience, { color: theme.textSecondary }]}
               >
@@ -224,103 +360,149 @@ export default function BookAppointmentScreen() {
           </View>
         </View>
 
-        <ThemedText style={styles.sectionTitle}>Select a Date</ThemedText>
-        <View style={styles.calendarHeader}>
-          <Pressable>
-            <Feather name='chevron-left' size={24} color={theme.text} />
-          </Pressable>
-          <ThemedText style={styles.monthYear}>
-            {currentDate.month} {currentDate.year}
-          </ThemedText>
-          <Pressable>
-            <Feather name='chevron-right' size={24} color={theme.text} />
-          </Pressable>
-        </View>
-
-        <View style={styles.weekDays}>
-          {DAYS_OF_WEEK.map((day) => (
+        {!hasAvailability ? (
+          <View
+            style={[
+              styles.noAvailabilityCard,
+              {
+                backgroundColor: theme.backgroundSecondary,
+                borderColor: theme.border,
+              },
+            ]}
+          >
+            <Feather name="calendar" size={40} color={theme.textSecondary} />
             <ThemedText
-              key={day}
-              style={[styles.weekDay, { color: theme.textSecondary }]}
+              style={[styles.noAvailabilityTitle, { color: theme.text }]}
             >
-              {day}
+              No availability set
             </ThemedText>
-          ))}
-        </View>
-
-        <View style={styles.datesGrid}>
-          {[...Array(14)].map((_, i) => {
-            const date = i + 6;
-            const isSelected = date === selectedDate;
-            return (
-              <Pressable
-                key={i}
-                onPress={() => setSelectedDate(date)}
-                style={({ pressed }) => [
-                  styles.dateCell,
-                  {
-                    backgroundColor: isSelected ? theme.primary : "transparent",
-                    opacity: pressed ? 0.7 : 1,
-                  },
-                ]}
-              >
-                <ThemedText
-                  style={[
-                    styles.dateText,
-                    { color: isSelected ? "#FFFFFF" : theme.text },
-                  ]}
-                >
-                  {date}
-                </ThemedText>
-              </Pressable>
-            );
-          })}
-        </View>
-
-        <ThemedText style={styles.sectionTitle}>
-          Available Time Slots
-        </ThemedText>
-        <View style={styles.timeSlotsGrid}>
-          {TIME_SLOTS.map((time) => {
-            const isSelected = time === selectedTime;
-            return (
-              <Pressable
-                key={time}
-                onPress={() => setSelectedTime(time)}
-                style={({ pressed }) => [
-                  styles.timeSlot,
-                  {
-                    backgroundColor: isSelected
-                      ? theme.primary + "20"
-                      : theme.backgroundSecondary,
-                    borderColor: isSelected ? theme.primary : theme.border,
-                    opacity: pressed ? 0.7 : 1,
-                  },
-                ]}
-              >
-                <ThemedText
-                  style={[
-                    styles.timeText,
-                    { color: isSelected ? theme.primary : theme.text },
-                  ]}
-                >
-                  {time}
-                </ThemedText>
-              </Pressable>
-            );
-          })}
-        </View>
-
-        <PrimaryButton
-          title={isLoading ? "Booking..." : "Confirm Appointment"}
-          onPress={handleConfirmAppointment}
-          style={styles.confirmButton}
-          disabled={isLoading}
-        />
-        {isLoading && (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size='small' color={theme.primary} />
+            <ThemedText
+              style={[
+                styles.noAvailabilityText,
+                { color: theme.textSecondary },
+              ]}
+            >
+              This prescriber has not set their availability yet. Please check
+              back later.
+            </ThemedText>
           </View>
+        ) : (
+          <>
+            <ThemedText style={styles.sectionTitle}>Select a date</ThemedText>
+            <ThemedText
+              style={[styles.sectionSubtitle, { color: theme.textSecondary }]}
+            >
+              Dates shown are when this prescriber is available.
+            </ThemedText>
+            <View style={styles.datesGrid}>
+              {upcomingDates.map((item) => {
+                const isSelected = item.yyyyMmDd === selectedDateYyyyMmDd;
+                return (
+                  <Pressable
+                    key={item.yyyyMmDd}
+                    onPress={() => {
+                      setSelectedDateYyyyMmDd(item.yyyyMmDd);
+                      setSelectedTime(null);
+                    }}
+                    style={({ pressed }) => [
+                      styles.dateCell,
+                      {
+                        backgroundColor: isSelected
+                          ? theme.primary
+                          : theme.backgroundSecondary,
+                        borderColor: isSelected ? theme.primary : theme.border,
+                        borderWidth: 1,
+                        opacity: pressed ? 0.7 : 1,
+                      },
+                    ]}
+                  >
+                    <ThemedText
+                      style={[
+                        styles.dateText,
+                        { color: isSelected ? "#FFFFFF" : theme.text },
+                      ]}
+                    >
+                      {item.dayOfMonth}
+                    </ThemedText>
+                    <ThemedText
+                      style={[
+                        styles.dateSubtext,
+                        {
+                          color: isSelected
+                            ? "rgba(255,255,255,0.9)"
+                            : theme.textSecondary,
+                        },
+                      ]}
+                    >
+                      {item.monthYear}
+                    </ThemedText>
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            <ThemedText style={styles.sectionTitle}>
+              Available time slots
+            </ThemedText>
+            {!selectedDateYyyyMmDd ? (
+              <ThemedText
+                style={[styles.hintText, { color: theme.textSecondary }]}
+              >
+                Select a date first to see available times.
+              </ThemedText>
+            ) : timeSlotsForSelectedDay.length === 0 ? (
+              <ThemedText
+                style={[styles.hintText, { color: theme.textSecondary }]}
+              >
+                No time slots for this day.
+              </ThemedText>
+            ) : (
+              <View style={styles.timeSlotsGrid}>
+                {timeSlotsForSelectedDay.map((time) => {
+                  const isSelected = time === selectedTime;
+                  return (
+                    <Pressable
+                      key={time}
+                      onPress={() => setSelectedTime(time)}
+                      style={({ pressed }) => [
+                        styles.timeSlot,
+                        {
+                          backgroundColor: isSelected
+                            ? theme.primary + "20"
+                            : theme.backgroundSecondary,
+                          borderColor: isSelected
+                            ? theme.primary
+                            : theme.border,
+                          opacity: pressed ? 0.7 : 1,
+                        },
+                      ]}
+                    >
+                      <ThemedText
+                        style={[
+                          styles.timeText,
+                          { color: isSelected ? theme.primary : theme.text },
+                        ]}
+                      >
+                        {time}
+                      </ThemedText>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            )}
+
+            <PrimaryButton
+              title={isLoading ? "Booking..." : "Confirm Appointment"}
+              onPress={handleConfirmAppointment}
+              style={styles.confirmButton}
+              disabled={isLoading || !selectedDateYyyyMmDd || !selectedTime}
+            />
+            {isLoading && (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color={theme.primary} />
+              </View>
+            )}
+          </>
         )}
       </View>
     </ScreenScrollView>
@@ -386,31 +568,36 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: Spacing["3xl"],
   },
+  noAvailabilityCard: {
+    padding: Spacing["2xl"],
+    borderRadius: BorderRadius.xl,
+    borderWidth: 1,
+    alignItems: "center",
+    marginBottom: Spacing["3xl"],
+  },
+  noAvailabilityTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.sm,
+  },
+  noAvailabilityText: {
+    fontSize: 14,
+    textAlign: "center",
+    lineHeight: 20,
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "600",
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.sm,
   },
-  calendarHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: Spacing.lg,
-  },
-  monthYear: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  weekDays: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: Spacing.md,
-  },
-  weekDay: {
-    width: 40,
-    textAlign: "center",
+  sectionSubtitle: {
     fontSize: 14,
-    fontWeight: "500",
+    marginBottom: Spacing.lg,
+  },
+  hintText: {
+    fontSize: 14,
+    marginBottom: Spacing.xl,
   },
   datesGrid: {
     flexDirection: "row",
@@ -419,15 +606,20 @@ const styles = StyleSheet.create({
     marginBottom: Spacing["3xl"],
   },
   dateCell: {
-    width: 40,
-    height: 40,
-    borderRadius: BorderRadius.full,
+    minWidth: 56,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.sm,
+    borderRadius: BorderRadius.lg,
     justifyContent: "center",
     alignItems: "center",
   },
   dateText: {
-    fontSize: 16,
-    fontWeight: "500",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  dateSubtext: {
+    fontSize: 11,
+    marginTop: 2,
   },
   timeSlotsGrid: {
     flexDirection: "row",
