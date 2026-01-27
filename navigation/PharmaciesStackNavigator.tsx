@@ -4,10 +4,11 @@ import PharmaciesScreen from "@/screens/PharmaciesScreen";
 import BookAppointmentScreen from "@/screens/BookAppointmentScreen";
 import { useTheme } from "@/hooks/useTheme";
 import { getCommonScreenOptions } from "@/navigation/screenOptions";
+import { Prescriber } from "@/types/data";
 
 export type PharmaciesStackParamList = {
   Pharmacies: undefined;
-  BookAppointment: { prescriberId: string };
+  BookAppointment: { prescriberId: string; prescriber: Prescriber };
 };
 
 const Stack = createNativeStackNavigator<PharmaciesStackParamList>();

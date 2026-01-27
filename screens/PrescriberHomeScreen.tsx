@@ -148,8 +148,10 @@ export default function PrescriberHomeScreen() {
   };
 
   const handleManageAvailability = () => {
-    // TODO: Navigate to availability management screen
-    console.log("Manage availability");
+    const tabNav = (navigation as any).getParent?.();
+    if (tabNav) {
+      tabNav.navigate("ProfileTab", { screen: "Availability" });
+    }
   };
 
   const handleUpdatePricing = () => {

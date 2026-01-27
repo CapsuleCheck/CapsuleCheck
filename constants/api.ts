@@ -5,6 +5,7 @@ export const API_BASE_URL =
 
 export const API_ENDPOINTS = {
   patients: "/patients",
+  bookings: "/bookings",
   patientUpdate: "/patients/update",
   prescribers: "/prescribers",
   prescriberUpdate: "/prescribers/update",

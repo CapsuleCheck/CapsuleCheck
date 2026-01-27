@@ -12,7 +12,7 @@ import { useScreenInsets } from "@/hooks/useScreenInsets";
 import { BorderRadius, Spacing } from "@/constants/theme";
 import { usePrescribers } from "@/hooks/useAppDataHooks";
 import { HomeStackParamList } from "@/navigation/HomeStackNavigator";
-import { API_BASE_URL } from "@/constants/api";
+import { API_BASE_URL, API_ENDPOINTS } from "@/constants/api";
 import { useUser } from "@/context/UserContext";
 
 const DAYS_OF_WEEK = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
@@ -33,7 +33,7 @@ export default function BookAppointmentScreen() {
   const screenInsets = useScreenInsets();
   const route = useRoute();
   const navigation = useNavigation();
-  const { userData } = useUser();
+  const { userData, token } = useUser();
   const { prescriberId, prescriber } =
     (route.params as HomeStackParamList["BookAppointment"]) || {};
 
@@ -57,7 +57,7 @@ export default function BookAppointmentScreen() {
     const selectedDateObj = new Date(
       currentDate.currentYear,
       currentDate.currentMonth,
-      selectedDate
+      selectedDate,
     );
     const year = selectedDateObj.getFullYear();
     const month = String(selectedDateObj.getMonth() + 1).padStart(2, "0");
@@ -110,13 +110,18 @@ export default function BookAppointmentScreen() {
       };
 
       const response = await axios.post(
-        `${API_BASE_URL}/bookings`,
+        `${API_BASE_URL}${API_ENDPOINTS.bookings}`,
         bookingData,
         {
           headers: {
             "Content-Type": "application/json",
+            ...(token && {
+              Authorization: token.startsWith("Bearer ")
+                ? token
+                : `Bearer ${token}`,
+            }),
           },
-        }
+        },
       );
 
       Toast.show({
@@ -314,7 +319,7 @@ export default function BookAppointmentScreen() {
         />
         {isLoading && (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="small" color={theme.primary} />
+            <ActivityIndicator size='small' color={theme.primary} />
           </View>
         )}
       </View>

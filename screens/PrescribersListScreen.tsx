@@ -16,6 +16,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useScreenInsets } from "@/hooks/useScreenInsets";
 import { BorderRadius, Spacing } from "@/constants/theme";
+import { useUser } from "@/context/UserContext";
 import { HomeStackParamList } from "@/navigation/HomeStackNavigator";
 import { API_BASE_URL, API_ENDPOINTS } from "@/constants/api";
 import { Prescriber } from "@/types/data";
@@ -26,6 +27,7 @@ export default function PrescribersListScreen() {
   const { theme } = useTheme();
   const navigation = useNavigation<NavigationProp>();
   const screenInsets = useScreenInsets();
+  const { token } = useUser();
   const [prescribers, setPrescribers] = useState<Prescriber[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -44,8 +46,13 @@ export default function PrescribersListScreen() {
         {
           headers: {
             "Content-Type": "application/json",
+            ...(token && {
+              Authorization: token.startsWith("Bearer ")
+                ? token
+                : `Bearer ${token}`,
+            }),
           },
-        }
+        },
       );
       // Handle both array response and object with data property
       const prescribersData = response.data?.data ?? [];
@@ -83,8 +90,8 @@ export default function PrescribersListScreen() {
         (p) =>
           p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           p.specialty.some((s) =>
-            s.toLowerCase().includes(searchQuery.toLowerCase())
-          )
+            s.toLowerCase().includes(searchQuery.toLowerCase()),
+          ),
       )
     : prescribers;
   //     : prescribers.filter((p) => p.acceptingNewPatients);
@@ -215,11 +222,11 @@ export default function PrescribersListScreen() {
                       ({prescriber.ratingsCount} reviews)
                     </ThemedText>
                   </View>
-                  {prescriber.consultationFee && (
+                  {prescriber.consultationFee ? (
                     <ThemedText style={[styles.fee, { color: theme.primary }]}>
                       ${prescriber?.consultationFee ?? 0} consultation fee
                     </ThemedText>
-                  )}
+                  ) : null}
                 </View>
                 <Feather
                   name='chevron-right'

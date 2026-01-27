@@ -8,12 +8,14 @@ import PrivacySecurityScreen from "@/screens/PrivacySecurityScreen";
 import PaymentMethodsScreen from "@/screens/PaymentMethodsScreen";
 import HelpSupportScreen from "@/screens/HelpSupportScreen";
 import AboutScreen from "@/screens/AboutScreen";
+import AvailabilitySettingsScreen from "@/screens/AvailabilitySettingsScreen";
 import { useTheme } from "@/hooks/useTheme";
 import { getCommonScreenOptions } from "@/navigation/screenOptions";
 
 export type ProfileStackParamList = {
   Profile: undefined;
   PersonalInformation: undefined;
+  Availability: undefined;
   Notifications: undefined;
   PrivacySecurity: undefined;
   PaymentMethods: undefined;
@@ -40,6 +42,13 @@ export default function ProfileStackNavigator() {
         component={PersonalInformationScreen}
         options={{
           title: "Personal Information",
+        }}
+      />
+      <Stack.Screen
+        name="Availability"
+        component={AvailabilitySettingsScreen}
+        options={{
+          title: "Availability",
         }}
       />
       <Stack.Screen

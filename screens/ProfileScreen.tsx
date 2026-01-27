@@ -34,6 +34,15 @@ export default function ProfileScreen() {
       label: "Personal Information",
       screen: "PersonalInformation",
     },
+    ...(userRole === "prescriber"
+      ? [
+          {
+            icon: "calendar" as keyof typeof Feather.glyphMap,
+            label: "Availability",
+            screen: "Availability" as keyof ProfileStackParamList,
+          },
+        ]
+      : []),
     { icon: "bell", label: "Notifications", screen: "Notifications" },
     { icon: "lock", label: "Privacy & Security", screen: "PrivacySecurity" },
     { icon: "credit-card", label: "Payment Methods", screen: "PaymentMethods" },
@@ -55,7 +64,10 @@ export default function ProfileScreen() {
     userRole === "prescriber"
       ? prescriberProfile?.name || "Prescriber"
       : userData?.name ||
-        [userData?.firstName, userData?.lastName].filter(Boolean).join(" ").trim() ||
+        [userData?.firstName, userData?.lastName]
+          .filter(Boolean)
+          .join(" ")
+          .trim() ||
         "Patient";
 
   const displayEmail =
@@ -109,7 +121,7 @@ export default function ProfileScreen() {
         )} */}
 
         {/* Prescriber-specific details */}
-        {userRole === "prescriber" && prescriberProfile && (
+        {/* {userRole === "prescriber" && prescriberProfile && (
           <>
             {prescriberProfile.specialty &&
               prescriberProfile.specialty.length > 0 && (
@@ -183,10 +195,10 @@ export default function ProfileScreen() {
               </View>
             )}
           </>
-        )}
+        )} */}
 
         {/* Patient-specific details (userData structure) */}
-        {userRole === "patient" && userData?.address && (
+        {/* {userRole === "patient" && userData?.address && (
           <>
             {(userData.address.street || userData.address.city) && (
               <View style={styles.detailRow}>
@@ -212,7 +224,7 @@ export default function ProfileScreen() {
               </View>
             )}
           </>
-        )}
+        )} */}
       </View>
 
       <View style={styles.menuSection}>
