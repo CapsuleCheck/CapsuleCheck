@@ -36,6 +36,59 @@ const ALLERGY_OPTIONS = [
   "Other",
 ];
 
+const US_STATES = [
+  "Alabama",
+  "Alaska",
+  "Arizona",
+  "Arkansas",
+  "California",
+  "Colorado",
+  "Connecticut",
+  "Delaware",
+  "Florida",
+  "Georgia",
+  "Hawaii",
+  "Idaho",
+  "Illinois",
+  "Indiana",
+  "Iowa",
+  "Kansas",
+  "Kentucky",
+  "Louisiana",
+  "Maine",
+  "Maryland",
+  "Massachusetts",
+  "Michigan",
+  "Minnesota",
+  "Mississippi",
+  "Missouri",
+  "Montana",
+  "Nebraska",
+  "Nevada",
+  "New Hampshire",
+  "New Jersey",
+  "New Mexico",
+  "New York",
+  "North Carolina",
+  "North Dakota",
+  "Ohio",
+  "Oklahoma",
+  "Oregon",
+  "Pennsylvania",
+  "Rhode Island",
+  "South Carolina",
+  "South Dakota",
+  "Tennessee",
+  "Texas",
+  "Utah",
+  "Vermont",
+  "Virginia",
+  "Washington",
+  "West Virginia",
+  "Wisconsin",
+  "Wyoming",
+];
+
 export default function PatientOnboardingScreen() {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
@@ -50,12 +103,12 @@ export default function PatientOnboardingScreen() {
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
-  const [country, setCountry] = useState("");
   const [zip, setZip] = useState("");
   const [gender, setGender] = useState("");
   const [allergies, setAllergies] = useState<string[]>([]);
   const [showGenderPicker, setShowGenderPicker] = useState(false);
   const [showAllergyPicker, setShowAllergyPicker] = useState(false);
+  const [showStatePicker, setShowStatePicker] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
 
   const validateEmail = (emailValue: string): boolean => {
@@ -83,8 +136,7 @@ export default function PatientOnboardingScreen() {
     dob !== null &&
     // address.trim() &&
     // city.trim() &&
-    // state.trim() &&
-    country.trim() &&
+    state.trim() &&
     // zip.trim() &&
     gender;
 
@@ -203,11 +255,11 @@ export default function PatientOnboardingScreen() {
     //   return;
     // }
 
-    if (!country.trim()) {
+    if (!state.trim()) {
       Toast.show({
         type: "error",
-        text1: "Country Required",
-        text2: "Please enter your country",
+        text1: "State Required",
+        text2: "Please select your state",
         position: "top",
       });
       return;
@@ -234,7 +286,9 @@ export default function PatientOnboardingScreen() {
     }
 
     // Filter out "None" from allergies array if present
-    const allergiesArray = allergies.filter((allergy) => allergy !== "None");
+    const allergiesArray = (allergies ?? []).filter(
+      (allergy) => allergy !== "None",
+    );
 
     const formData = {
       firstName: firstName.trim(),
@@ -246,7 +300,7 @@ export default function PatientOnboardingScreen() {
         street: address.trim(),
         city: city.trim(),
         state: state.trim(),
-        country: country.trim(),
+        country: "USA",
         zip: zip.trim(),
       },
       gender: gender,
@@ -432,6 +486,7 @@ export default function PatientOnboardingScreen() {
                   setShowDatePicker(true);
                   setShowGenderPicker(false);
                   setShowAllergyPicker(false);
+                  setShowStatePicker(false);
                 }}
                 style={[
                   styles.selectInput,
@@ -589,24 +644,75 @@ export default function PatientOnboardingScreen() {
           />
         </View> */}
 
-        {/* Country */}
+        {/* State (USA) */}
         <View style={styles.inputGroup}>
-          <ThemedText style={styles.inputLabel}>Country</ThemedText>
-          <TextInput
+          <ThemedText style={styles.inputLabel}>State</ThemedText>
+          <Pressable
             style={[
-              styles.textInput,
+              styles.selectInput,
               {
                 backgroundColor: theme.backgroundSecondary,
-                color: theme.text,
                 borderColor: theme.border,
               },
             ]}
-            placeholder='Enter your country'
-            placeholderTextColor={theme.textSecondary}
-            value={country}
-            onChangeText={setCountry}
-            autoCapitalize='words'
-          />
+            onPress={() => {
+              setShowStatePicker(!showStatePicker);
+              setShowGenderPicker(false);
+              setShowAllergyPicker(false);
+            }}
+          >
+            <ThemedText
+              style={
+                state
+                  ? styles.selectText
+                  : [styles.selectPlaceholder, { color: theme.textSecondary }]
+              }
+            >
+              {state || "Select your state"}
+            </ThemedText>
+            <Feather
+              name={showStatePicker ? "chevron-up" : "chevron-down"}
+              size={20}
+              color={theme.textSecondary}
+            />
+          </Pressable>
+
+          {showStatePicker ? (
+            <View
+              style={[
+                styles.optionsList,
+                { backgroundColor: theme.card, borderColor: theme.border },
+              ]}
+            >
+              {US_STATES.map((option) => (
+                <Pressable
+                  key={option}
+                  style={[
+                    styles.optionItem,
+                    state === option && {
+                      backgroundColor: theme.primary + "20",
+                    },
+                  ]}
+                  onPress={() => {
+                    setState(option);
+                    setShowStatePicker(false);
+                  }}
+                >
+                  <ThemedText
+                    style={[
+                      styles.optionText,
+                      state === option && { color: theme.primary },
+                    ]}
+                  >
+                    {option}
+                  </ThemedText>
+                  {state === option ? (
+                    <Feather name='check' size={18} color={theme.primary} />
+                  ) : null}
+                </Pressable>
+              ))}
+            </View>
+          ) : null}
         </View>
 
         {/* ZIP Code - commented out */}
@@ -643,6 +749,7 @@ export default function PatientOnboardingScreen() {
             onPress={() => {
               setShowGenderPicker(!showGenderPicker);
               setShowAllergyPicker(false);
+              setShowStatePicker(false);
             }}
           >
             <ThemedText
@@ -720,6 +827,7 @@ export default function PatientOnboardingScreen() {
             onPress={() => {
               setShowAllergyPicker(!showAllergyPicker);
               setShowGenderPicker(false);
+              setShowStatePicker(false);
             }}
           >
             <ThemedText
